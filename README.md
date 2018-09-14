@@ -1,4 +1,4 @@
-# teamredminer v0.3.0 (formerly known as tdxminer)
+# teamredminer v0.3.1 (formerly known as tdxminer)
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -27,10 +27,14 @@ Rough performance numbers with this version:
 
 | GPU           | SCLK (MHz) | MCLK (MHz) | Lyra2z (Mh/s) | Phi2 (Mh/s) |
 |---------------|-----------:|-----------:|--------------:|------------:|
-| RX 580        | 1366       | 2000       | 3.74          | 6.34        |
-| RX Vega 64 LC | 1560       | 945        | 7.57          | 12.49       |
+| RX 580        | 1366       | 2000       | 3.74          | 5.92        |
+| RX Vega 64 LC | 1560       | 945        | 7.57          | 11.56       |
 
 
 For reporting bugs and/or for features requests, please open an issue on this project's github [issue tracker](https://github.com/todxx/teamredminer/issues).
 
 Happy hashing ;)
+
+-----------
+Changes in v0.3.1
+- Fixed phi2 issues causing rejected shares and low pool-side hashrate.
