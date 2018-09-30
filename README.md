@@ -5,11 +5,11 @@ This software is in a beta stage and may be unstable on some hardware.
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
 GPUs supported and tested:
-- RX 580/570/480/470 with amdgpu-pro drivers
-- RX Vega 64/56, Vega FE with amdgpu-pro/PAL drivers
+- RX 580/570/480/470 on windows and linux with amdgpu-pro drivers
+- RX Vega 64/56, Vega FE on windows and linux with amdgpu-pro/PAL drivers
 
 GPUs supported but untested:
-- RX 560/550 with amdgpu-pro drivers
+- RX 560/550 on windows and linux with amdgpu-pro drivers
 
 Software Requirements:
 - A supported driver version (see GPUs Supported above)
