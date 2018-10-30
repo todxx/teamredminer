@@ -1,4 +1,4 @@
-# teamredminer v0.3.3 (formerly known as tdxminer)
+# teamredminer v0.3.4
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -13,30 +13,33 @@ GPUs supported but untested:
 
 Software Requirements:
 - A supported driver version (see GPUs Supported above)
+- For cryptonight v8 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
-This miner currently supports the lyra2z and phi2 algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
+This miner currently supports the lyra2z, phi2, and cryptonightv8/cnv2 algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
 
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
 
 NOTE: This miner does NOT monitor GPU temperatures.  It is up to the user to ensure that GPU(s) are functioning within safe power and temperature limits.  Support for monitoring fans and temperatures will be added in a later version.
 
-This miner includes a 3% dev fee.
+This miner includes the following dev fees:
+- Cryptonight v8: 2.5%
+- Lyra2z:         3%
+- Phi2:           3%
 
-The miner reports user hash rates every 30 seconds.  These are the hash rates after dev fee deduction. I.E. the hash rates reported should be the average hash rate that your pool reports.)
-
-Rough performance numbers with this version:
-
-| GPU           | SCLK (MHz) | MCLK (MHz) | Lyra2z (Mh/s) | Phi2 (Mh/s) |
-|---------------|-----------:|-----------:|--------------:|------------:|
-| RX 580        | 1366       | 2000       | 3.74          | 5.92        |
-| RX Vega 64 LC | 1560       | 945        | 7.57          | 11.56       |
-
+The miner reports GPU hash rates every 30 seconds.  These are the full GPU hash rates before dev fee deduction (your pool hashrate will be slightly lower).
 
 For reporting bugs and/or for features requests, please open an issue on this project's github [issue tracker](https://github.com/todxx/teamredminer/issues).
 
 Happy hashing ;)
 
 -----------
+Changes in v0.3.4
+- Added CryptoNight v8 (CNv2) support
+- Changed stats display to include pool hashrate and better formatting
+- Added parallel GPU initialization
+- Added output of submitted/accepted/rejected shares.
+- Changed hashrate reported to be full GPU hashrate (previously hashrate reported was after dev fee deduction)
+
 Changes in v0.3.3
 - ROCm support reintroduced
 - API support based on the sgminer API
