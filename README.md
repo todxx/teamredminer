@@ -1,4 +1,4 @@
-# teamredminer v0.3.4
+# teamredminer v0.3.5
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -33,6 +33,11 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.3.5
+- Changed GPU initialization to be sequential by default and added --init_style option for faster init styles.
+- Fixed network buffer size issue preventing the use of very long usernames/passwords/rig_ids.
+- Added opencl platform auto-detection for AMD platforms when --platform is not specified.
+
 Changes in v0.3.4
 - Added CryptoNight v8 (CNv2) support
 - Changed stats display to include pool hashrate and better formatting
