@@ -1,4 +1,4 @@
-# teamredminer v0.3.5
+# teamredminer v0.3.6
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -33,6 +33,11 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.3.6
+- Added support for Rx550 cards (gfx804).
+- Improved stability on larger rigs, especially with weaker cpus.
+- Improved error reporting on failed initialization.
+
 Changes in v0.3.5
 - Changed GPU initialization to be sequential by default and added --init_style option for faster init styles.
 - Fixed network buffer size issue preventing the use of very long usernames/passwords/rig_ids.
