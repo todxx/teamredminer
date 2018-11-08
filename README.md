@@ -1,4 +1,4 @@
-# teamredminer v0.3.6
+# teamredminer v0.3.7
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -33,6 +33,18 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.3.7
+- Redesigned GPU initialization, should now be less error prone.
+- Added clean shutdown to reduce driver/GPU crashes.
+- Added staggered GPU start-up to reduce GPU crashes.
+- Added CPU verification for CNv8 and associated --no_cpu_check option.
+- Fixed crash on pool authentication error.
+- Added --pool_broken_rpc work-around option for pools that violate json rpc spec.
+- Added option to reorder by PCIe bus numbers.
+- Added --list_devices option to show available devices.
+- Added changed stats formatting to indicate which numbers are accepted/rejected/hw-error shares.
+- Added uptime to stats.
+
 Changes in v0.3.6
 - Added support for Rx550 cards (gfx804).
 - Improved stability on larger rigs, especially with weaker cpus.
