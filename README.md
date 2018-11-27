@@ -1,4 +1,4 @@
-# teamredminer v0.3.7
+# teamredminer v0.3.8
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -7,8 +7,6 @@ Download is available in the [releases section](https://github.com/todxx/teamred
 GPUs supported and tested:
 - RX 580/570/480/470 on windows and linux with rocm or amdgpu-pro drivers
 - RX Vega 64/56, Vega FE on windows and linux with rocm or amdgpu-pro/PAL drivers
-
-GPUs supported but untested:
 - RX 560/550 on windows and linux with rocm or amdgpu-pro drivers
 
 Software Requirements:
@@ -18,8 +16,6 @@ Software Requirements:
 This miner currently supports the lyra2z, phi2, and cryptonightv8/cnv2 algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
 
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
-
-NOTE: This miner does NOT monitor GPU temperatures.  It is up to the user to ensure that GPU(s) are functioning within safe power and temperature limits.  Support for monitoring fans and temperatures will be added in a later version.
 
 This miner includes the following dev fees:
 - Cryptonight v8: 2.5%
@@ -33,6 +29,18 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.3.8
+- Added support for fan speed and temperatures.
+- Added watchdog function for gpu init stuck, dead gpu, over-temp gpu, and non-responding pool.
+- Added new optional 'L' config prefix for low-end cards like lexa/baffin for a 10+% speed-up on some cards
+- Added an option for writing out a log file.
+- Added cycling through multi-entry dns records when connecting to pools.
+- Added a pool-connect timeout.
+- Added measurement and displaying of pool response times.
+- Added support for 80-byte headers for Phi2 algo (for non-LUX coins).
+- Slightly tuned the '+' mode for polaris, some GPUs will show slight performance increase.
+- Fixed bug with API interface occasionally getting stuck.
+
 Changes in v0.3.7
 - Redesigned GPU initialization, should now be less error prone.
 - Added clean shutdown to reduce driver/GPU crashes.
