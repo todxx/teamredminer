@@ -1,4 +1,4 @@
-# teamredminer v0.3.8
+# teamredminer v0.3.9
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -11,7 +11,7 @@ GPUs supported and tested:
 
 Software Requirements:
 - A supported driver version (see GPUs Supported above)
-- For cryptonight v8 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
+- For cryptonight v8 and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
 This miner currently supports the lyra2z, phi2, and cryptonightv8/cnv2 algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
 
@@ -19,6 +19,7 @@ The miner includes a read-only api based on the sgminer-5.5 API.  Both the json 
 
 This miner includes the following dev fees:
 - Cryptonight v8: 2.5%
+- Lyra2rev3:      2.5%
 - Lyra2z:         3%
 - Phi2:           3%
 
@@ -29,6 +30,10 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.3.9
+- Added support for lyra2rev3 on amdgpu-pro and windows.  ROCm support coming in later version.
+- Fixed API bug with not reporting dead GPUs
+
 Changes in v0.3.8
 - Added support for fan speed and temperatures.
 - Added watchdog function for gpu init stuck, dead gpu, over-temp gpu, and non-responding pool.
