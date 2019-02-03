@@ -1,4 +1,4 @@
-# teamredminer v0.3.9
+# teamredminer v0.3.10
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -30,6 +30,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.3.10
+- Slight performace improvement for Vegas on lyra2rev3
+- Pool stratum protocol work-arounds for some pools, fixing duplicate share error.
+- Changed handling of unrecognized pool rpcs to be ignored instead of causing a reconnect.
+- Fix for duplicate shares on 480/580/Vega56 cards with lyra2rev3.
+
 Changes in v0.3.9
 - Added support for lyra2rev3 on amdgpu-pro and windows.  ROCm support coming in later version.
 - Fixed API bug with not reporting dead GPUs
