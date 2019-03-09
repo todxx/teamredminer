@@ -1,4 +1,4 @@
-# teamredminer v0.3.10
+# teamredminer v0.4.0
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -9,15 +9,19 @@ GPUs supported and tested:
 - RX Vega 64/56, Vega FE on windows and linux with rocm or amdgpu-pro/PAL drivers
 - RX 560/550 on windows and linux with rocm or amdgpu-pro drivers
 
+GPUs supported and untested:
+- Radeon VII on windows and linux with rocm or amdgpu-pro/PAL drivers (currently limited CN performance)
+
 Software Requirements:
 - A supported driver version (see GPUs Supported above)
-- For cryptonight v8 and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
+- For cryptonight R/v8 and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
-This miner currently supports the lyra2z, phi2, and cryptonightv8/cnv2 algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
+This miner currently supports the lyra2z, phi2, cryptonightv8/cnv2, and cryptonight R algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
 
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
 
 This miner includes the following dev fees:
+- Cryptonight R:  2.5%
 - Cryptonight v8: 2.5%
 - Lyra2rev3:      2.5%
 - Lyra2z:         3%
@@ -30,6 +34,16 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.4.0
+- Added cryptonight R support.  (--algo cnr)
+- Added support for ssl/tls pool connections using the stratum+ssl:// prefix.
+- Added colors (and an option to disable them).
+- Slight performance increase for lyra2rev3 (~0.5%).
+- Fix for occasional crashes when pool disconnects.
+- Added more messages regarding not being connected to dev pool.
+- Changed printing to not block mining progress if stdout writes block.
+
+
 Changes in v0.3.10
 - Slight performace improvement for Vegas on lyra2rev3
 - Pool stratum protocol work-arounds for some pools, fixing duplicate share error.
