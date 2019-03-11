@@ -1,4 +1,4 @@
-# teamredminer v0.4.0
+# teamredminer v0.4.1
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -34,6 +34,16 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.4.1
+- Removed server name verification for SSL connections. (Pools like supportxmr now work with SSL)
+- Fixed bug causing GPUs to fail to initialize on some systems.
+- Fixed bug causing GPUs to only run one thread (but display 2x hashrate)
+- Fixed bug where having GPU_MAX_WORKGROUP_SIZE set too high would cause GPUs to crash.
+- Fixed bug where older windows versions would get no console output.
+- Added work-around for driver bug in linux amdgpu-pro drivers resulting in low pool-side hash for polaris cards in rare cases.
+- Added some cpu verification optimizations.  CN/R cpu usage should decrease about 15%.
+
+
 Changes in v0.4.0
 - Added cryptonight R support.  (--algo cnr)
 - Added support for ssl/tls pool connections using the stratum+ssl:// prefix.
