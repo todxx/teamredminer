@@ -1,4 +1,4 @@
-# teamredminer v0.4.1
+# teamredminer v0.4.2
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -14,18 +14,22 @@ GPUs supported and untested:
 
 Software Requirements:
 - A supported driver version (see GPUs Supported above)
-- For cryptonight R/v8 and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
+- For cryptonight algos and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
-This miner currently supports the lyra2z, phi2, cryptonightv8/cnv2, and cryptonight R algorithms.  Its only configuration is via command line to set the basic parameters for connecting to a stratum pool and selecting which platforms/devices to use.  Invoking the miner with the --help option will print a short help message for how to use the options.
+This miner currently supports the lyra2z, phi2, cryptonight R, cryptonight v8, cryptonight v8 half, cryptonight v8 double, and cryptonight v8 reverse waltz algorithms.
+Its configuration is via command line, please run with the --help option will print a short help message for how to use the command line options.
 
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
 
 This miner includes the following dev fees:
-- Cryptonight R:  2.5%
-- Cryptonight v8: 2.5%
-- Lyra2rev3:      2.5%
-- Lyra2z:         3%
-- Phi2:           3%
+- Cryptonight R:            2.5%
+- Cryptonight v8 half:      2.5%
+- Cryptonight v8 double:    2.5%
+- Cyrptonight v8 rwz:       2.5%
+- Cryptonight v8:           2.5%
+- Lyra2rev3:                2.5%
+- Lyra2z:                   3%
+- Phi2:                     3%
 
 The miner reports GPU hash rates every 30 seconds.  These are the full GPU hash rates before dev fee deduction (your pool hashrate will be slightly lower).
 
@@ -34,6 +38,14 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.4.2
+- Added cryptonight v8 half (--algo cnv8_half) algo for coins such as stellite and masari.
+- Added cryptonight v8 double (--algo cnv8_dbl) algo for coins such as x-cash.
+- Added cryptonight v8 reverse waltz (--algo cnv8_rwz) algo for coins such as graft.
+- Added support for running devices on multiple OpenCL platforms.
+- Fixed more issues with console colors on older windows versions.
+- Added more cpu verification optimization for CN/R. CN/R cpu usage should decrease ~70%.
+
 Changes in v0.4.1
 - Removed server name verification for SSL connections. (Pools like supportxmr now work with SSL)
 - Fixed bug causing GPUs to fail to initialize on some systems.
