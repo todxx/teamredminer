@@ -1,4 +1,4 @@
-# teamredminer v0.4.2
+# teamredminer v0.4.3
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -16,13 +16,13 @@ Software Requirements:
 - A supported driver version (see GPUs Supported above)
 - For cryptonight algos and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
-This miner currently supports the lyra2z, phi2, cryptonight R, cryptonight v8, cryptonight v8 half, cryptonight v8 double, and cryptonight v8 reverse waltz algorithms.
-Its configuration is via command line, please run with the --help option will print a short help message for how to use the command line options.
+This miner currently supports the lyra2z, phi2, cryptonight R, cryptonight v8, cryptonight v8 turtle, cryptonight v8 half, cryptonight v8 double, and cryptonight v8 reverse waltz algorithms. Its configuration is via command line, please run with the --help option will print a short help message for how to use the command line options.
 
-The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
+The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.  
 
 This miner includes the following dev fees:
 - Cryptonight R:            2.5%
+- Cryptonight v8 turtle:    2.5%
 - Cryptonight v8 half:      2.5%
 - Cryptonight v8 double:    2.5%
 - Cyrptonight v8 rwz:       2.5%
@@ -31,13 +31,18 @@ This miner includes the following dev fees:
 - Lyra2z:                   3%
 - Phi2:                     3%
 
-The miner reports GPU hash rates every 30 seconds.  These are the full GPU hash rates before dev fee deduction (your pool hashrate will be slightly lower).
+The miner reports GPU hash rates every 30 seconds.  These are the full GPU hash rates before dev fee deduction (your pool hashrate will be slightly lower). 
 
 For reporting bugs and/or for features requests, please open an issue on this project's github [issue tracker](https://github.com/todxx/teamredminer/issues).
 
 Happy hashing ;)
 
 -----------
+Changes in v0.4.3
+- Added cryptonight v8 turtle (--algo cnv8_trtl) algo for coins such as turtle coin and loki.
+- Added support for running CN mining single-threaded using Y+0 configurations.
+- Changed the auto config mode for Radeon VII to L30+0 as a temporary setting.
+
 Changes in v0.4.2
 - Added cryptonight v8 half (--algo cnv8_half) algo for coins such as stellite and masari.
 - Added cryptonight v8 double (--algo cnv8_dbl) algo for coins such as x-cash.
@@ -55,7 +60,6 @@ Changes in v0.4.1
 - Added work-around for driver bug in linux amdgpu-pro drivers resulting in low pool-side hash for polaris cards in rare cases.
 - Added some cpu verification optimizations.  CN/R cpu usage should decrease about 15%.
 
-
 Changes in v0.4.0
 - Added cryptonight R support.  (--algo cnr)
 - Added support for ssl/tls pool connections using the stratum+ssl:// prefix.
@@ -65,7 +69,6 @@ Changes in v0.4.0
 - Added more messages regarding not being connected to dev pool.
 - Changed printing to not block mining progress if stdout writes block.
 
-
 Changes in v0.3.10
 - Slight performace improvement for Vegas on lyra2rev3
 - Pool stratum protocol work-arounds for some pools, fixing duplicate share error.
@@ -73,7 +76,7 @@ Changes in v0.3.10
 - Fix for duplicate shares on 480/580/Vega56 cards with lyra2rev3.
 
 Changes in v0.3.9
-- Added support for lyra2rev3 on amdgpu-pro and windows.  ROCm support coming in later version.
+- Added support for lyra2rev3 amdgpu-pro and windows.  ROCm support coming in later version.
 - Fixed API bug with not reporting dead GPUs
 
 Changes in v0.3.8
@@ -96,7 +99,7 @@ Changes in v0.3.7
 - Fixed crash on pool authentication error.
 - Added --pool_broken_rpc work-around option for pools that violate json rpc spec.
 - Added option to reorder by PCIe bus numbers.
-- Added --list_devices option to show available devices.
+- Added --list_devices option to show available devices. 
 - Added changed stats formatting to indicate which numbers are accepted/rejected/hw-error shares.
 - Added uptime to stats.
 
