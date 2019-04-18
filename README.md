@@ -1,4 +1,4 @@
-# teamredminer v0.4.3
+# teamredminer v0.4.4
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -25,7 +25,7 @@ This miner includes the following dev fees:
 - Cryptonight v8 turtle:    2.5%
 - Cryptonight v8 half:      2.5%
 - Cryptonight v8 double:    2.5%
-- Cyrptonight v8 rwz:       2.5%
+- Cryptonight v8 rwz:       2.5%
 - Cryptonight v8:           2.5%
 - Lyra2rev3:                2.5%
 - Lyra2z:                   3%
@@ -38,6 +38,13 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.4.4
+- Added * mode specifically for modded timings on Vega GPUs.  Use with e.g. --cn_config=15*15.  This mode is now the default for Vegas.
+- Introduced slow start/ramp-up.  Threads increase their workload slowly at start or restart after e.g. a network outage.
+- Added interleave adjustment logic.  Readjusts the two threads per gpu over time to make sure they don't gravitate and get stuck.
+- Added support for forcing colors (--force_color) for windows redirected consoles (git bash, cygwin, node.js).
+- Added hotkey menu system (show stats, enable/disable gpu). 
+
 Changes in v0.4.3
 - Added cryptonight v8 turtle (--algo cnv8_trtl) algo for coins such as turtle coin and loki.
 - Added support for running CN mining single-threaded using Y+0 configurations.
