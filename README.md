@@ -1,4 +1,4 @@
-# teamredminer v0.4.4
+# teamredminer v0.4.5
 
 This software is in a beta stage and may be unstable on some hardware.
 
@@ -22,6 +22,7 @@ The miner includes a read-only api based on the sgminer-5.5 API.  Both the json 
 
 This miner includes the following dev fees:
 - Cryptonight R:            2.5%
+- Cryptonight v8 upx2:      2.5%
 - Cryptonight v8 turtle:    2.5%
 - Cryptonight v8 half:      2.5%
 - Cryptonight v8 double:    2.5%
@@ -38,6 +39,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.4.5
+- Added cryptonight v8 upx2 for the uPlexa coin fork.
+- Reworked init procedure, added retry logic on comm errors.
+- Added section on temps to the CN_MAX_YOUR_VEGA guide.
+- Added a new howto MAP_YOUR_GPUS describing how to map gpus between miner/tools/registry.
+
 Changes in v0.4.4
 - Added * mode specifically for modded timings on Vega GPUs.  Use with e.g. --cn_config=15*15.  This mode is now the default for Vegas.
 - Introduced slow start/ramp-up.  Threads increase their workload slowly at start or restart after e.g. a network outage.
