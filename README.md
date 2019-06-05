@@ -1,6 +1,4 @@
-# teamredminer v0.4.5
-
-This software is in a beta stage and may be unstable on some hardware.
+# teamredminer v0.5.0
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -8,19 +6,17 @@ GPUs supported and tested:
 - RX 580/570/480/470 on windows and linux with rocm or amdgpu-pro drivers
 - RX Vega 64/56, Vega FE on windows and linux with rocm or amdgpu-pro/PAL drivers
 - RX 560/550 on windows and linux with rocm or amdgpu-pro drivers
-
-GPUs supported and untested:
-- Radeon VII on windows and linux with rocm or amdgpu-pro/PAL drivers (currently limited CN performance)
+- Radeon VII on windows and linux with rocm or amdgpu-pro/PAL drivers
 
 Software Requirements:
 - A supported driver version (see GPUs Supported above)
 - For cryptonight algos and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
-This miner currently supports the lyra2z, phi2, cryptonight R, cryptonight v8, cryptonight v8 turtle, cryptonight v8 half, cryptonight v8 double, and cryptonight v8 reverse waltz algorithms. Its configuration is via command line, please run with the --help option will print a short help message for how to use the command line options.
+This miner supports a range of algorithms.  Please see the list below for details.  The miner is configured via command line only, please run with the --help option to print a short help message for how to use the command line options.
 
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.  
 
-This miner includes the following dev fees:
+This miner includes the following algorithms and respective dev fees:
 - Cryptonight R:            2.5%
 - Cryptonight v8 upx2:      2.5%
 - Cryptonight v8 turtle:    2.5%
@@ -28,6 +24,12 @@ This miner includes the following dev fees:
 - Cryptonight v8 double:    2.5%
 - Cryptonight v8 rwz:       2.5%
 - Cryptonight v8:           2.5%
+- Cryptonight heavy:        2.5%
+- Cryptonight haven:        2.5%
+- Cryptonight saber:        2.5%
+- x16r:                     2.5%
+- x16s:                     2.5%
+- x16rt:                    2.5%
 - Lyra2rev3:                2.5%
 - Lyra2z:                   3%
 - Phi2:                     3%
@@ -39,6 +41,15 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.0
+- Added cryptonight 4MB variants: heavy, haven and saber.
+- Added x16 algo suite: x16r, x16s, x16rt (both gin and veil).
+- Auto-tuning mode for all CN variants, see bundled guide.
+- Manual key-driven CN tuning mode available inside the miner.
+- Additional data in miner stats console output.
+- Watchdog now detecting single stuck thread when mining CN.
+- Fix: in rare cases, poolside hash for compute algos (lyra2z, phi2, lyra2rev3) only reached ~95% of expected value. 
+
 Changes in v0.4.5
 - Added cryptonight v8 upx2 for the uPlexa coin fork.
 - Reworked init procedure, added retry logic on comm errors.
