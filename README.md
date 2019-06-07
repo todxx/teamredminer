@@ -1,4 +1,4 @@
-# teamredminer v0.5.0
+# teamredminer v0.5.1
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -41,6 +41,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.1
+- Added better support for CN intensities 16*15, use --allow_large_alloc under Linux.
+- Added --no_ntime_roll for mining x16rt on e.g. bsod.pw.
+- Added Tonga device recognition.
+- Better error reporting for pool communication issues.
+
 Changes in v0.5.0
 - Added cryptonight 4MB variants: heavy, haven and saber.
 - Added x16 algo suite: x16r, x16s, x16rt (both gin and veil).
