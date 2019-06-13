@@ -1,4 +1,4 @@
-# teamredminer v0.5.1
+# teamredminer v0.5.2
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -41,6 +41,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.2
+- Bugfix release only, no new added algos or features.
+- Fix for 1-2% degraded hashrate on Radeon VIIs in some scenarios.
+- Fix for Radeon VII allocation bug, causing hw errs.
+- Fix for allocation bug causing crashes for some drivers and gpus.
+
 Changes in v0.5.1
 - Added better support for CN intensities 16*15, use --allow_large_alloc under Linux.
 - Added --no_ntime_roll for mining x16rt on e.g. bsod.pw.
