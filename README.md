@@ -1,4 +1,4 @@
-# teamredminer v0.5.2
+# teamredminer v0.5.3
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -30,6 +30,7 @@ This miner includes the following algorithms and respective dev fees:
 - x16r:                     2.5%
 - x16s:                     2.5%
 - x16rt:                    2.5%
+- MTP:                      2.5%
 - Lyra2rev3:                2.5%
 - Lyra2z:                   3%
 - Phi2:                     3%
@@ -41,6 +42,10 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.3
+- Added MTP algo for Zcoin/XZC (please read MTP_MINING.txt before mining).
+- Further small stabilization fixes for CN variants, primarily 4MB algos.
+
 Changes in v0.5.2
 - Bugfix release only, no new added algos or features.
 - Fix for 1-2% degraded hashrate on Radeon VIIs in some scenarios.
