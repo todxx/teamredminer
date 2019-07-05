@@ -1,4 +1,4 @@
-# teamredminer v0.5.3
+# teamredminer v0.5.4
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -42,6 +42,10 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.4
+- Fixed API bug for MTP, crashing when using Awesome Miner.
+- Small MTP improvements, mostly for Polaris.
+
 Changes in v0.5.3
 - Added MTP algo for Zcoin/XZC (please read MTP_MINING.txt before mining).
 - Further small stabilization fixes for CN variants, primarily 4MB algos.
