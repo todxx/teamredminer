@@ -1,4 +1,4 @@
-# teamredminer v0.5.4
+# teamredminer v0.5.5
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -31,6 +31,7 @@ This miner includes the following algorithms and respective dev fees:
 - x16s:                     2.5%
 - x16rt:                    2.5%
 - MTP:                      2.5%
+- Cuckatoo31:               2.5%
 - Lyra2rev3:                2.5%
 - Lyra2z:                   3%
 - Phi2:                     3%
@@ -42,6 +43,9 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.5
+- Added cuckatoo31 algo for grin.
+
 Changes in v0.5.4
 - Fixed API bug for MTP, crashing when using Awesome Miner.
 - Small MTP improvements, mostly for Polaris.
