@@ -1,4 +1,4 @@
-# teamredminer v0.5.5
+# teamredminer v0.5.6
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -43,6 +43,9 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.6
+- MTP improvements for Vega and Polaris (+1-3% hashrate, improved efficiency, esp Polaris)
+
 Changes in v0.5.5
 - Added cuckatoo31 algo for grin.
 
