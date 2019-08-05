@@ -1,4 +1,4 @@
-# teamredminer v0.5.6
+# teamredminer v0.5.7
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -27,11 +27,13 @@ This miner includes the following algorithms and respective dev fees:
 - Cryptonight heavy:        2.5%
 - Cryptonight haven:        2.5%
 - Cryptonight saber:        2.5%
+- Cryptonight conceal:      2.5%
 - x16r:                     2.5%
 - x16s:                     2.5%
 - x16rt:                    2.5%
 - MTP:                      2.5%
 - Cuckatoo31:               2.5%
+- Cuckarood29:              2.5%
 - Lyra2rev3:                2.5%
 - Lyra2z:                   3%
 - Phi2:                     3%
@@ -43,6 +45,10 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.7
+- Added CN conceal algo for Conceal (CCX).
+- Added cuckarood29 algo for grin.
+
 Changes in v0.5.6
 - MTP improvements for Vega and Polaris (+1-3% hashrate, improved efficiency, esp Polaris)
 
