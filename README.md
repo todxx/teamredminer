@@ -1,4 +1,4 @@
-# teamredminer v0.5.7
+# teamredminer v0.5.8
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -28,6 +28,7 @@ This miner includes the following algorithms and respective dev fees:
 - Cryptonight haven:        2.5%
 - Cryptonight saber:        2.5%
 - Cryptonight conceal:      2.5%
+- Chukwa-512 (Turtlecoin):  2.5%
 - x16r:                     2.5%
 - x16s:                     2.5%
 - x16rt:                    2.5%
@@ -45,6 +46,11 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.8
+- Added Chukwa-512 algo For Turtlecoin (trtl_chukwa).
+- Issue fix: kernels not loaded properly for Conceal.
+- Issue fix: added logic for pool reconnect on N rejected shares in a row (see --pool_max_rejects=N).
+
 Changes in v0.5.7
 - Added CN conceal algo for Conceal (CCX).
 - Added cuckarood29 algo for grin.
