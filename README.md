@@ -1,4 +1,4 @@
-# teamredminer v0.5.8
+# teamredminer v0.5.9
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -30,6 +30,7 @@ This miner includes the following algorithms and respective dev fees:
 - Cryptonight conceal:      2.5%
 - Chukwa-512 (Turtlecoin):  2.5%
 - x16r:                     2.5%
+- x16rv2:                   2.5%
 - x16s:                     2.5%
 - x16rt:                    2.5%
 - MTP:                      2.5%
@@ -46,6 +47,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.5.9
+- Added x16rv2 for the upcoming Ravencoin fork.
+- Optimization work on x16r: +8-10% hashrate depending on clocks.
+- Optimization work on x16r: mem clock no longer as important.
+- Issue fix: kernels split into multiple binaries to fix linux amdgpu-pro driver issues.
+
 Changes in v0.5.8
 - Added Chukwa-512 algo For Turtlecoin (trtl_chukwa).
 - Issue fix: kernels not loaded properly for Conceal.
