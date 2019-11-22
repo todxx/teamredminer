@@ -1,6 +1,8 @@
-# teamredminer v0.5.9
+# teamredminer v0.6.0
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
+
+TRM discord server: https://discord.gg/RGykKqB
 
 GPUs supported and tested:
 - RX 580/570/480/470 on windows and linux with rocm or amdgpu-pro drivers
@@ -17,6 +19,8 @@ This miner supports a range of algorithms.  Please see the list below for detail
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.  
 
 This miner includes the following algorithms and respective dev fees:
+- Ethash on Polaris GPUs    0.75%
+- Ethash on all other GPUs  1.0%
 - Cryptonight R:            2.5%
 - Cryptonight v8 upx2:      2.5%
 - Cryptonight v8 turtle:    2.5%
@@ -47,6 +51,10 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.6.0
+- Added ethash support.
+- Relaxed ssl/tls cert chain verification.
+
 Changes in v0.5.9
 - Added x16rv2 for the upcoming Ravencoin fork.
 - Optimization work on x16r: +8-10% hashrate depending on clocks.
