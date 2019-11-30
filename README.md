@@ -1,4 +1,4 @@
-# teamredminer v0.6.0
+# teamredminer v0.6.1
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -51,6 +51,16 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.6.1
+- Added pool failover and load balancing.
+- Added better error messages when failing to allocate eth DAG buffers.
+- Added server name for TLS SNI.
+- Added automatic setting for environment variables for 4GB GPUs.
+- Extended maximum length of usernames and passwords (for some merged mining setups).
+- Added report of pool stats.
+- Changed initial pool auto detect mode to eth proxy.
+- Various fixes for submitting hashrate to pools.
+
 Changes in v0.6.0
 - Added ethash support.
 - Relaxed ssl/tls cert chain verification.
