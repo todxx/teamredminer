@@ -1,4 +1,4 @@
-# teamredminer v0.7.0
+# teamredminer v0.7.1
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -52,6 +52,9 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.1
+- Fixed issue with VII ethash/kawpow on windows.
+
 Changes in v0.7.0
 - Added kawpow algo for Ravencoin.
 - Added Navi support for kawpow and ethash.
