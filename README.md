@@ -1,17 +1,17 @@
-# teamredminer v0.6.1
+# teamredminer v0.7.0
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
 TRM discord server: https://discord.gg/RGykKqB
 
 GPUs supported and tested:
-- RX 580/570/480/470 on windows and linux with rocm or amdgpu-pro drivers
-- RX Vega 64/56, Vega FE on windows and linux with rocm or amdgpu-pro/PAL drivers
-- RX 560/550 on windows and linux with rocm or amdgpu-pro drivers
-- Radeon VII on windows and linux with rocm or amdgpu-pro/PAL drivers
+- RX 5700(XT) for kawpow and ethash only.
+- Radeon VII
+- RX Vega 64/56, Vega FE
+- RX 580/570/480/470
+- RX 560/550
 
 Software Requirements:
-- A supported driver version (see GPUs Supported above)
 - For cryptonight algos and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
 
 This miner supports a range of algorithms.  Please see the list below for details.  The miner is configured via command line only, please run with the --help option to print a short help message for how to use the command line options.
@@ -21,6 +21,7 @@ The miner includes a read-only api based on the sgminer-5.5 API.  Both the json 
 This miner includes the following algorithms and respective dev fees:
 - Ethash on Polaris GPUs    0.75%
 - Ethash on all other GPUs  1.0%
+- Kawpow                    2.0%
 - Cryptonight R:            2.5%
 - Cryptonight v8 upx2:      2.5%
 - Cryptonight v8 turtle:    2.5%
@@ -51,6 +52,17 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.0
+- Added kawpow algo for Ravencoin.
+- Added Navi support for kawpow and ethash.
+- Changed device ordering to be pcie bus based by default, added --opencl_order option.
+- Fixed issue with --list devices not working without other args.
+- Reformatted help message to hopefully make it easier to read.
+- Added multipool example scripts.
+- Removed ssl/tls server name verification (was re-added with TLS SNI fix)
+- Fixed an unhandled signal bug that would cause rare crashes.
+- Fixed multi-pool API bug.
+
 Changes in v0.6.1
 - Added pool failover and load balancing.
 - Added better error messages when failing to allocate eth DAG buffers.
