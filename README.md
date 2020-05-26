@@ -1,11 +1,11 @@
-# teamredminer v0.7.1
+# teamredminer v0.7.2
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
 TRM discord server: https://discord.gg/RGykKqB
 
 GPUs supported and tested:
-- RX 5700(XT) for kawpow and ethash only.
+- RX 5700(XT)/5600(XT) for kawpow and ethash only.
 - Radeon VII
 - RX Vega 64/56, Vega FE
 - RX 580/570/480/470
@@ -52,6 +52,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.2
+- Fixed kawpow dag build DEAD gpu issue on windows Adrenalin 2020 drivers.
+- Fixed Navi 5600(xt) support on windows.
+- Fixed mining on Vegas on older amdgpu-pro drivers.
+- Fixed ADL reporting of stats on windows for newer cards.
+
 Changes in v0.7.1
 - Fixed issue with VII ethash/kawpow on windows.
 
