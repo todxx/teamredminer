@@ -1,4 +1,4 @@
-# teamredminer v0.7.2
+# teamredminer v0.7.3
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -52,6 +52,10 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.3
+- Emergency patch for 4GB cards to handle a few more ETC epochs.
+  A more complete patch is coming out shortly.
+
 Changes in v0.7.2
 - Fixed kawpow dag build DEAD gpu issue on windows Adrenalin 2020 drivers.
 - Fixed Navi 5600(xt) support on windows.
