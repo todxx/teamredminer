@@ -1,4 +1,4 @@
-# teamredminer v0.7.3
+# teamredminer v0.7.4
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -52,6 +52,15 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.4
+- Increased ethash support on 4GB GPUs up to epoch 380-383
+- Implemented split ethash dag buffers for 8GB GPUs to support DAGs over 4GB
+- Kawpow optimizations (Navi +2.25%, Vega +1.25%, Polaris +0.25%)
+- Added gpu enable/disable API support.
+- Windows TDR detection/handling/warning.
+- Monitor detection on Windows/Linux with intensity adjustment.
+- Fix for ethash pool hashrate reporting stopping after network outage.
+
 Changes in v0.7.3
 - Emergency patch for 4GB cards to handle a few more ETC epochs.
   A more complete patch is coming out shortly.
