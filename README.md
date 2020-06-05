@@ -1,4 +1,4 @@
-# teamredminer v0.7.4
+# teamredminer v0.7.5
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -52,6 +52,9 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.5
+- Fixed broken optimizations for kawpow in 0.7.4.
+
 Changes in v0.7.4
 - Increased ethash support on 4GB GPUs up to epoch 380-383
 - Implemented split ethash dag buffers for 8GB GPUs to support DAGs over 4GB
