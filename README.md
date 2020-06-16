@@ -1,11 +1,11 @@
-# teamredminer v0.7.5
+# teamredminer v0.7.6
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
 TRM discord server: https://discord.gg/RGykKqB
 
 GPUs supported and tested:
-- RX 5700(XT)/5600(XT) for kawpow and ethash only.
+- RX 5700(XT)/5600(XT)/5500(XT) for kawpow and ethash only.
 - Radeon VII
 - RX Vega 64/56, Vega FE
 - RX 580/570/480/470
@@ -52,6 +52,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.6
+- Fixed broken keyboard input in tmux+screen sessions (e.g. Hive OS).
+- Added support for 5500(xt).
+- Fixed Linux watchdog support for hard driver crashes (script was not executed).
+- Fixed kawpow nicehash extranonce support.
+
 Changes in v0.7.5
 - Fixed broken optimizations for kawpow in 0.7.4.
 
