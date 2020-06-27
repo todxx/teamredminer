@@ -1,4 +1,4 @@
-# teamredminer v0.7.6
+# teamredminer v0.7.7
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
@@ -22,6 +22,7 @@ This miner includes the following algorithms and respective dev fees:
 - Ethash on Polaris GPUs    0.75%
 - Ethash on all other GPUs  1.0%
 - Kawpow                    2.0%
+- Nimiq                     2.5%
 - Cryptonight R:            2.5%
 - Cryptonight v8 upx2:      2.5%
 - Cryptonight v8 turtle:    2.5%
@@ -52,6 +53,15 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.7
+- Added support for Nimiq Polaris/Vega (dumb mode only).
+- Integrated a Nimiq node.js network proxy into the miner.
+- Fixed Nimiq bug that could lose shares, especially against lower vardiff pools.
+- Fixed Nimiq bug that could cause duplicate shares on startup for low-diff pools.
+- Fixed regression bug for ethash Nicehash, correct stratum mode now used again.
+- Added support for Nimiq Navi.
+- Added support for icemining Nimiq solo mining mode (set -x m=solo).
+
 Changes in v0.7.6
 - Fixed broken keyboard input in tmux+screen sessions (e.g. Hive OS).
 - Added support for 5500(xt).
