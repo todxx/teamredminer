@@ -60,7 +60,7 @@ Changes in v0.7.7
 - Fixed Nimiq bug that could cause duplicate shares on startup for low-diff pools.
 - Fixed regression bug for ethash Nicehash, correct stratum mode now used again.
 - Added support for Nimiq Navi.
-- Added support for icemining Nimiq solo mining mode (set -x m=solo).
+- Added support for icemining Nimiq solo mining mode (set -p m=solo).
 
 Changes in v0.7.6
 - Fixed broken keyboard input in tmux+screen sessions (e.g. Hive OS).
