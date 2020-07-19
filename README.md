@@ -1,11 +1,11 @@
-# teamredminer v0.7.7
+# teamredminer v0.7.8
 
 Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
 
 TRM discord server: https://discord.gg/RGykKqB
 
 GPUs supported and tested:
-- RX 5700(XT)/5600(XT)/5500(XT) for kawpow and ethash only.
+- RX 5700(XT)/5600(XT)/5500(XT) for kawpow/ethash/nimiq only.
 - Radeon VII
 - RX Vega 64/56, Vega FE
 - RX 580/570/480/470
@@ -53,6 +53,12 @@ For reporting bugs and/or for features requests, please open an issue on this pr
 Happy hashing ;)
 
 -----------
+Changes in v0.7.8
+- Upgrade for the upcoming Haven hard fork (July 20, 2020).
+- Tiny Nimiq optimizations (1-2% max, mostly Vega and Navi).
+- Fixed CPU usage issue when redirecting stdin to /dev/null.
+- Fixed pool name returned by API for Nimiq.
+
 Changes in v0.7.7
 - Added support for Nimiq Polaris/Vega (dumb mode only).
 - Integrated a Nimiq node.js network proxy into the miner.
