@@ -1,0 +1,48 @@
+Team Red Miner Nimiq Mining
+============================
+This document provides some quick pointers on how to best test and
+tune for the Nimiq argon2 variant.
+
+
+WALLETS IN MINING OS CONFIGS
+----------------------------
+IMPORTANT: in both Hive and SMOS, the Nimiq wallet needs to be passed
+without spaces, i.e.  "NQ69ABCD...." instead of the user-friendly form
+"NQ69 ABCD ....".
+
+
+Pools
+-----
+TRM only support Nimiq dumb mode mining, and not over secure
+websockets but plain tcp. This is not a mode supported by
+pools. Therefore, TRM runs a separate process as a network proxy
+converting the plain tcp traffic into secure websockets messages.
+
+The proxy is now integrated into the miner and executed automatically
+unless you disable it using --nimiq_no_proxy as a command line
+argument. There are also arguments for controlling the local port and
+the path to the proxy binary. See --help or USAGE.txt for more info.
+
+The bundled binaries are built from the source found here:
+
+https://github.com/Kerney666/trm_nimiq_proxy
+
+You can also run the proxy outside of the miner. Follow the
+instructions in the proxy github, pass --nimiq_no_proxy as argument to
+the miner and pass the IP+port where the proxy is listening for the
+stratum pool argument.
+
+Use the --nimiq_worker=myrig argument to set a device name for your
+workers that is passed to the pool(s).
+
+
+Tuning
+------
+Nimiq tuning is more or less identical to Turtlecoin Chukwa
+tuning. See our separate tuning guide TRTL_CHUKWA_TUNING.txt.
+
+
+Nimiq Tuning Parameters
+-----------------------
+There are no tuning parameters for Nimiq, it just runs. Play with your
+clocks to adjust behavior and power draw.

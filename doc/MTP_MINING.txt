@@ -1,0 +1,101 @@
+Team Red Miner MTP Mining
+=========================
+The MTP algo is primarily used by Zcoin (XZC). We're writing this
+document since the algo is a little different from the other
+algorithms available in TRM.
+
+4GB Cards
+=========
+4GB cards are NOT supported as the MTP scratchpad will not fit in the
+available vram. The miner will automatically exclude GPUs where the
+driver reports less than 4.4GB available vram. If you still want to
+force the miner to run you can add the --allow_all_devices argument.
+
+Characteristics
+===============
+MTP runs HOT on your gpus and is truly a power hog algo. On most gpus
+it will consume close to 100% of the compute resources available while
+also activating the mem controller to 75-85% of full load. Hence,
+MTP's profile is both that of a compute bound and a mem bound
+algo. For example, if you limit the compute resources too much with
+e.g. a lower core clk you can end up running the mem clk unnecessarily
+high and vice versa. In practice, this means you need to find the
+correct balance between core and mem clk for max efficiency.
+
+Due to the power hog profile where e.g. a Vega64 LC at 1407@900 core
+clk, 1107@900 mem clk easily can pull 250W, we cannot stress this
+enough: DO NOT START THE MINER OF A FULL RIG AT "NORMAL" CLOCKS unless
+you know your PSU can handle a very high load. Run it on 1-2 gpus
+first using -d 0,1 and observe, or lower your clocks and work your way
+upwards instead when tuning.
+
+Tuning
+======
+For Polaris (470-580s) cards, a typical configuration would be a core
+clk around 1200 MHz. Then, start with a mem clk around 1900-2000 MHz
+and lower it in steps of 50 MHz and measure the hashrate for each
+change. The first steps should have a very small impact on the
+hashrate, but at some point the mem clk will have a more significant
+impact. This point varies a lot between gpus, you have to find your
+own. After finding your hard limit for the mem clk, adjust it upwards
+a little bit to a hashrate of your liking given the power draw. Last,
+dial down both core and mem voltage as much as possible to save power.
+
+For Vegas, as stated above this algo runs HOT. To improve efficiency,
+the key is to lower your mem clk significantly, to 800 MHz or even 500
+MHz. You should also try to force the mem power state to P2 or P1
+since this will lower the soc clk, resulting in lower power draw as
+well.
+
+In a full throttle configuration on my Vega 64 LC using e.g. 1400 cclk
+at 860 mV, 800 memclk, I can push it to 3.5 MH/s. This will be a 250W+
+power draw. This can absolutely be a net win in the end, but you need
+to check your numbers and account for your power costs.
+
+For a full Vega rig, a more reasonable approach is to clock down mem
+to 500 MHz in mem p-state 1 and the core clk to anything between
+1180-1250 MHz. Start with the core clk in the low range and set
+voltages to 800 mV (for both core and mem), then increase core clk to
+see how far you can push it while remaining at 800mV. This will lead
+to 2.8-2.9 MH/s for a Vega 64 and 2.6-2.7 (maybe) MH/s for Vega 56s,
+still pulling around 200W per gpu.
+
+Nicehash Mining
+===============
+TRM supports Nicehash mining for MTP out of the box. However, there is
+a confirmed bug with Nicehash for ntime rolling which they are aware
+of. Meanwhile TRM will automatically apply the option
+"--no_ntime_roll" whenever Nicehash mining is detected.
+
+Dev Fee Switching
+=================
+In all other TRM algos, we run the dev fee hashes with a very fine
+granularity, many times truly concurrently with the user's work. This
+means that there are no interruptions for the user, a smooth poolside
+hashrate and zero downtime for pool switching (which can have a very
+negative impact with pools that penalize pool hoppers).
+
+For MTP, this approach is not possible. The user's and dev's work will
+never use the same 4GB scratchpad. Therefore, MTP must be implemented
+using a more traditional switching mechanism. We've worked actively to
+reduce the impact for the user with this less sophisticated approach:
+
+- Heavily optimized code for the pad rebuild, fully done on gpu
+  (1.6-1.9 secs on both Polaris and Vega GPUs).
+
+- We're flexible with when we switch, always trying to switch when a
+  new user job arrives which means that the pad would have to be
+  rebuilt anyway.
+
+- We remove -0.1% from the listed dev fee, i.e. devs take the hit for
+  the extra pad rebuild, not the user.
+
+Last, we don't log explicitly when we switch to dev hashing. That
+said, we do not switch often, and the user should indeed see a
+poolside hashrate of 97.5% of the average hashrate over time. Another
+difference compared to other miners is that different GPUs are not
+necessarily switched at the same time. However, please note that there
+will always be a single early dev fee switch on all GPUs to avoid easy
+circumvention of the dev fee by restarting the miner repeatedly. This
+means that the (very) early poolside hashrate for the user might be
+lower than expected.

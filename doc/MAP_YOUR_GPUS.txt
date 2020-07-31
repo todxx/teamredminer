@@ -1,0 +1,54 @@
+Team Red Miner GPU Mapping Tutorial
+===================================
+
+Introduction
+============
+In a multi-gpu rig, a recurring problem is to understand which gpu is which when moving between the Windows registry, miners, and tools like OverdriveNTool. 
+
+Basically, there are three enumerations of interest to the user:
+
+1) PCI bus id order. Each PCI device/slot is assigned a bus id. It stays the same across reboots.
+2) OpenCL order. This is the order chosen by the device driver.
+3) (Windows) Registry order. For e.g. assigning soft powerplay tables, you need the registry key: 0000, 0001, etc.
+4) (Linux) Kernel sysfs order. 
+
+The most common order chosen by mining software has been the OpenCL enumeration order, since that's the interface you use to communicate with the driver. That is also the default enumeration order in TeamRedMiner. That said, with things like multiple OpenCL platforms now being used by the Linux driver, this is getting annoyingly complex. The PCI bus id order makes more sense, and if we would have built TeamRedMiner from scratch today we probably would have opted to use that order instead.
+
+The OpenCL order is produced by the device driver. As long as you don't add/remove GPUs the order will stay constant. You can always enumerate this order yourself by running the command "clinfo", available on both Windows and Linux. It will dump a boatload of data in your face and isn't trivial to follow, but if you only look at device names you should find all your devices.
+
+
+Windows
+=======
+On Windows, the best way to map gpus is to use OverdriveNTool:
+
+1) Download and install OverdriveNTool.
+2) Open the tool, then right-click the top title bar and choose "Settings".
+3) In the menu, enable "Bus Number", "Registry Key", and "Friendly Name" in the upper-left section.
+
+Each gpu is now listed as e.g. "1: Radeon RX Vega (Bus: 6:0:0 | RegKey: 0001)". Note that OverdriveNTool itself uses the PCI bus id order. Next, in your .bat file that starts TeamRedMiner, add the command line arg "--bus_reorder". This instructs TRM to also use the PCI bus id order.
+
+With these changes, and assuming you mine on all AMD GPUs in TRM, you will:
+
+1) Have the same set of gpus in OverdriveNTool and TRM, listed in the same order.
+2) Be able to use OverdriveNTool to map a gpu to the registry.
+
+You can also sanity check the mappings by checking the PCI bus id printed by TRM at startup, then verify that the same nrs are indeed listed per gpu in the same order in OverdriveNTool.
+
+
+Linux
+=====
+Linux doesn't really have the same recurring mapping issues as Windows. Under Linux, the PCI bus id is available in a number of places, for example in /sys/class/drm/card*/device/uevent.
+
+The most common issue for Linux is rather if you have hacked your own clock/fan scripts using sysfs that have hardcoded cardX values. The order under /sys/class/drm/card* is chosen by the kernel and is not guaranteed to stay constant if you e.g. add/remove a gpu. For mixed rigs, it's VERY annoying if one gpus dies, you have some watchdog reboot mechanism, and then you apply clocks and voltages to the wrong cards because cardX is now cardY instead.
+
+Therefore, it's much better to scan all /sys/class/drm/card* entries for a specific PCI bus id, and not use hardcoded cardX values at all. Naturally, all of the custom Linux mining OSs will solve this for you. It's also a good way to make sure you apply clocks/PPTs to the correct card in the TRM device order that you use. For finding the sysfs path for a gpu with PCI bus id 0000:11:00.0 you can use this one-liner:
+
+%> egrep PCI_SLOT_NAME /sys/class/drm/card*/device/uevent | egrep "0000:11:" | cut -f 1-5 -d /
+
+
+API PCI bus id support
+======================
+This is a somewhat undocumented feature to our sgminer-compatible API that can be helpful for 3rd parties using the API:
+
+1) Execute the sgminer "DEVDETAILS" API call.
+2) Each gpu will have the PCI bus id in hex format in the "Device Path" field.

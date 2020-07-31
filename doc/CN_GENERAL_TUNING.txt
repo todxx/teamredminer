@@ -1,0 +1,68 @@
+Team Red Miner CryptoNight Tuning
+=================================
+
+IMPORTANT IMPORTANT IMPORTANT: this document preceeds the new tuning document included in the releae, CN_AUTOTUNING_WITH_TRM.txt. While the information below is still accurate, it is also somewhat outdated. It is very much recommended to read the auto-tuning guide and use the new auto-tuning support to trim your rigs.
+
+Note: the hashrates mentioned in this document are for the main Monero PoW variants, CNv8 and CN/r.
+
+Introduction
+------------
+This miner is more lean than other CN miners. This can translate into either increased hashrate, lower power draw, or both, or none of the above. Your mileage may vary and is highly dependent on mem straps, modded timings and clocks. For most CN variants, if this miner is running at the same hashrate as other CN miners, you can expect your power draw per GPU to decrease between -5-20W depending on gpu model and clocks. 
+
+There are fewer controls in this miner than the standard CN miner. You specify a config for one or two threads, and a mode. You provide one intensity value per thread in the range 0-16. Moreover, you can choose between three modes, +, - and *. The + and - modes will most often not have any effect on the end result, but it never hurts to try it. The effect of the + and - modes varies with your gpu model and clocks, making it difficult to make general recommendations on when to us one or the other.
+
+The * mode is different. It's designed specifically to take advantage of modded timings on Vega cards. Whenever you use modded timings with tightened latency, you should use the * mode. The AMD Memory Tweak tool released by ElioVP is truly an amazing addition to the Vega toolset. We recommend all Vega owners to read up on the tool and the current latest and greatest mem timings provided by the community. The tool is available at https://github.com/Eliovp/amdmemorytweak, and the Bitcointalk ANN thread can be found here: https://bitcointalk.org/index.php?topic=5123724.0
+
+Standard Tuning Guide
+---------------------
+
+[Windows drivers]
+For some Polaris cards, the good ol' blockchain driver works fine. However, the one driver that seems to be a good fit across the board is 18.6.1, and that's the driver we have used in all our Windows tests.
+
+[Windows swap space]
+You should to set up your swap space to be at least the sum of all GPU memory you intend to use when mining. Typically, for a 4GB card this is 3.5GB and for an 8GB it's 7.5GB. Playing it safe is recommended, i.e. rather add the full memory size of all your GPUs and set the swap to the total sum or more.
+
+[Linux drivers]
+For your Vegas to reach max possible hashrate under linux, you need amdgpu-pro drivers >= 18.30. Polaris/Baffins/Lexa Pros are not as sensitive to the driver version. Also, please note that this release does not include ROCm support for CN variants, it will be included in an upcoming release instead.
+
+[Polaris cards (470-580)]
+The standard configuration is 8+8 for all of these cards. 8+6 or 7+7 might give the same optimal hashrate, and 9+9 can, especially under linux, give a better result for 480/580. For some cards, 16+14 is the best choice but also increases the probability of stale shares. You must have good mem straps to reach a good hashrate. Normally e.g. the Pimp My Straps function in SRB Polaris Bios Editor is sufficient. For mem clk, boosting it as much as possible while avoiding mem errors is a good thing. The core clk should generally end up between 1230-1270. For 580s, a boosted core clk to 1300 can push the hashrate to 1100 h/s while still staying at a reasonable power draw. We have seen few Polaris cards not being able to reach 1020-1030 h/s with this miner when the proper mem straps are in place. With the introduction of CN/r, which is more power hungry than CNv8, the core clks mentioned above might be too high and skew your efficiency. Either lower them somewhat or make sure your temps and power draw at-the-wall is under control.
+
+[Baffin and Lexa Pro cards (550-560)]
+From v0.3.8, this miner has now been better optimized for these smaller cards. The major additions are that the '+' mode has been optimized and a 'L' prefix mode designed for the smallest Lexa Pro cards has been added. Some rules of thumb when you optimize your rigs:
+
+o We'd expect 4+4 and 4+3 to be the only interesting configs for 4GB cards.
+o For Lexa Pro cards with 8 CUs, prefix your config with 'L', i.e. L4+3.
+o The 'L' prefix is designed for Lexa Pro, but can also work well for Baffin with 10 CUs.
+o Many 2GB Lexa Pro can't do L4+3 under Win, only L3+3. For max performance you should try Linux and L4+3.
+o For an overkill full range test, you should try all of 4+4,4+3,3+3,3+2,2+2 in four modes: X+Y,LX+Y,X-Y,LX-Y
+
+[Vega cards]
+The Vegas can end up anywhere from 1900-2450 depending on if it's a 56 or 64, a reference card or not and your choice of clocks and modded mem timings. With the AMD Memory Tweak tool, we have an additional dimension to play with, and there this section has been expanded into a separate Vega tweaking document with full examples of how to bring different Vegas to their maximum potential with this miner. If you only want a quick overview of the interesting configurations for a Vega: try 14+14, 14-14, 14*14, 15+15, 15*15, 16+14, 16*14. You can also try 16+15, 16*15, 15+14, 15*14, etc. The mem clk is very important, and you should aim for as high as possible while keeping your rig stable. If you have a Vega 64 and don't mod your timings, a higher core clk will have a significant effect on the hashrate, but tweaking timings is much more efficient. The 16+14 configuration will often not show its true capability before hitting 1500 core clk. Your power draw should still stay reasonable (as in lower than other miners at more standard clocks). For a lower core clk around 1408, some cards do best with 16+14, others with 15+15, some with 14+14, YMMV. Again, with modded timings you can keep your core clk around 1408 and still hit a very high hashrate.
+
+[Older cards]
+We're sorry, we only support 470-580, 550/560 and Vega cards. There are reports of people successfully running the miner on Fiji and Tonga cards (R9 290X etc), but we do not test on said devices.
+
+Benchmark results (CNv8 results, somewhat outdated but still indicative)
+------------------------------------------------------------------------
+For most Polaris cards below, one-click Pimp My Straps in SRB Polaris Bios Editor has been used for mem straps.
+
+6 x Rx 470 8GB (Samsung mem) rig
+8+8, 1250/900 cclk, 2000/900 mclk, 6105 h/s, total rig 685W
+
+Rx 560 4GB (Samsung mem)
+4+4, 1230/900 cclk, 2050/900 mclk, 540 h/s, unknown power draw
+
+Rx 570 8GB (Samsung mem)
+8+8, 1270/900 cclk, 2100/900 mclk, 1030 h/s @ ~100W at wall
+
+Rx 580 8GB (Hynix mem)
+8+8, 1250/900 cclk, 2000/900 mclk, 1029 h/s @ ~105W at wall
+
+Vega 56 reference card (56 bios, ppt mod)
+16+14, 1413/880 cclk, 935/880 mclk, ~2000 h/s @ ~197W at wall
+
+Vega 64 liquid cooling
+15+15, 1408/880 cclk, 1100/880 mclk, ~2100 h/s @ ~190W(?) at wall
+16+14, 1560/925 cclk, 1100/880 mclk, ~2270 h/s @ ~210W(?) at wall
+

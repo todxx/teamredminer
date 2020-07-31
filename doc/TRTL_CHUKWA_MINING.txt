@@ -1,0 +1,71 @@
+Team Red Miner Turtlecoin Chukwa-512 Mining
+===========================================
+This document describes how to tune for the Argon2id-512 algo used by
+Turtlecoin.
+
+
+2GB/4GB Cards
+=============
+The algo allocates ~1.2GB of ram and should run on 550 2GB gpus and
+up. At the time of writing, we have not done any tests on <= 4GB gpus
+though.
+
+
+Characteristics
+===============
+Chukwa-512 runs quite lean. Mem clock and timings is _everything_. For
+max hashrate you actually _need_ to downclock the core clk to find
+your sweet spot.
+
+
+Polaris Tuning 
+==============
+For Polaris (470-580s) cards, crank up your mem clock as much as
+possible and use optimized straps. We have mostly tested using CN
+optimized straps which seem to work fine. 
+
+After maxing the mem clock, proceed by lowering your core clock. You
+should see your hashrate fluctuate slightly. My sweet spot during
+testing was around 1050 MHz, yours might be different.
+
+Next, proceed to undervolt as much as possible while keeping your rig
+stable.
+
+Last, using the rx boost (--ref) tweak with the AMD Mem Tweak Tool by
+eliovp can give you a boost as well.
+
+
+Vega Tuning (56/64/VII)
+=======================
+For Vega 56/64, we recommend flashing ref V56s with the corresponding
+V64 bioses. Mem latency is important for the Vegas for Chukwa. Modding
+mem timings using the AMD Mem Tweak Tool by eliovp will help a lot for
+Vegas.
+
+The typical configuration for a Vega 56/64 is simple: max your mem
+clock, pull down your core clock to e.g. 1137 MHz, undervolt as much
+as possible. Also try to find your sweet spot for the core clk, it
+could boost the hashrate somewhat.
+
+Next, if you want to maximize your hashrate, you need to apply mem
+timings. We recommend running with stock timings to make sure the rig
+is stable first though. Then, try either our recommended timings in
+CN_MAX_YOUR_VEGA.txt in order Lucky, Weaker, Conceal (for V64s). Or,
+use your own timings. Personally, I run with the leaner Conceal on my
+V64s.
+
+For Radeon VII, this is one of the few algos where a maxed out mem
+clock at 1200 MHz actually provides a better hashrate. Cooling is
+often the bottleneck for VIIs. Play with your clocks until you find a
+reasonable hashrate vs power draw vs cooling setup. Modding timings
+can also help for the VIIs, not very common.
+
+Vega clocks and hashrates examples
+
+Type          CoreClk     MemClk     mV      Stock Mem   Modded Mem
+----------    --------    --------   ------  ---------   ----------
+V56 Hynix     1137 MHz     945 MHz   875 mV  101 kh/s    110 kh/s (Lucky)
+V56@64 Ref    1137 MHz    1075 MHz   900 mV  110 kh/s    120 kh/s (Conceal)
+V64 LC        1137 MHz    1107 MHz   900 mV  114 kh/s    123 kh/s (Conceal)
+VII           1351 MHz    1150 MHz   831 mV  222 kh/s    225 kh/s (small patches)
+VII           1400 MHz    1200 MHz   831 mV  231 kh/s    234 kh/s (small patches)

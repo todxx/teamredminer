@@ -1,0 +1,129 @@
+Team Red Miner CryptoNight Auto-Tuning Support
+==============================================
+
+TL;DR
+-----
+TRM now has auto-tuning capabilities and the recommended way is to either always run the miner without specific configurations or use a script to deduce the best configurations. The former means deleting any --cn_config arguments from existing start scripts. For the latter, edit the included run_autotune_quick.bat/.sh with your algo, pool, wallet and password. Run the script and wait until it completes. Expected runtime is 5-15 mins. Open the logfile autotune_quick.txt and copy the command line arg at the end of the file with the CN configs to your start script, replacing any existing --cn_config argument. If you change the rig setup (e.g. add/remove gpus), do this process again.
+
+
+Introduction
+------------
+In TRM 0.5, we had to add an set of additional tuning parameters for CN variants. The CN config format now contains an optional fine-tuning suffix set of a colon and three letters. This meant that the scan range became much larger than before, turning tuning a rig into a tedious project. Moreover, it's not trivial to explain when to try different combinations of the fine-tuning parameters.
+
+We also noticed that many of the previous variants could benefit from small tweaks to the CN configs as well, but in highly random ways. There is no simple default formula that provides the optimal CN config for TRM for both Windows and Linux, across all driver versions and sets of chosen clocks and timings. 
+
+Given the above, we felt it was necessary to include auto-tuning support in the miner rather than ask the users to spend hours on end and still not be sure they are running TRM in the best possible configuration for their rig(s). In some ways, this can be described as a much better default mode where we don't have to guess but can take 5 mins on startup and benchmark our way to the best found config, without restarting the miner and still mining at close to maximum speed while benchmarking.
+
+We have also added a manual tuning mode using key menus in the miner. This means you can switch freely between CN configs without restarting the miner. The only limitation is that intensities can't be increased.
+
+
+The CN Configuration
+--------------------
+The full CN config now consists of the following parts. Please note that this is mostly for reference, the idea with the auto-tuning is rather that the user should have to care _less_ about the parameters involved.
+
+o Prefix: an optional L. This enables a more compressed deployment on the gpu
+          where each work unit handles more pads. Mostly used for small pad
+          algos (Turtle, UPX2) or on small gpus like 550s.
+          
+o Thread 1 intensity X: typically a number between 1-16 for 8GB gpus and
+          standard 2MB pad size, but it depends on the algo and pad size.
+          
+o Tweak setting: one of the following chars:
+    o -  No tweak enabled.
+    o +  First tweak option (only option for Lexa/Baffin/Polaris cards).
+    o *  Second tweak option (for Vegas, especiall with timing mods enabled).
+    o .  I don't care, let the miner choose.
+    
+o Thread 2 intensity Y: the second thread's intensity. Can be zero to disable
+          thread 2.
+           
+o Finetune: three chars that are loosely defined from the user's perspective
+          since we might change these at any time. The standard finetune set
+          is always AAA. Not all algos have all combinations available. 
+    o Finetune 1: one of ABCDE
+    o Finetune 2: one of AB
+    o Finetune 3: one of AB
+
+Please note that it's _always_ possible to specify the CN config without the added finetune part.
+
+Example configs:
+    
+    16*14:CAA    Common Vega config for 2MB pad algos.
+   L28+28:AAA    Common Vega config for small pad algos (Turtle, UPX2).
+      8+7:AAA    Common 470-580 config for 2MB pad algos.
+    16+14:CBB    Common 470-580 and Vega config for 4MB pad algos.
+
+
+Types of Auto-Tuning available
+------------------------------
+The miner supports the following types of auto-tuning:
+
+o AUTO:  A (default) quick scan on start-up for all GPUs, only checking a small
+         set of known good configs. If the user has specified specific config
+         units (intensities), only a single configuration per gpu is scanned,
+         otherwise a sensible default range is used.
+
+o QUICK: The same quick scan as AUTO, but with better reporting.
+
+o SCAN:  A thorough exhaustive search of all configurations. This can take a
+         long time to execute (> 1-2h) but guarantees that all configs have
+         been tested. It can also scan across multiple intensities.
+
+o NONE:  Disable all forms of auto-tuning, just run with the provided or
+         default configs. This is not recommended.
+
+
+The Auto-Tuning Process
+-----------------------
+Note 1: the quality of the auto-tuning output can vary, and in rare cases there might even be false best modes chosen. In general you will end up with a config that is either your best choice under the chosen clocks and timings, or it is at least very very close. That said, verify that you're getting the expected hashrates from the chosen configs, otherwise revert to the 2nd or 3rd best config in the final list printed in step (7) below.
+
+Note 2: during the auto-tuning, there is a small probability that false hw errors will occur when switching between configs. Therefore, please disregard any small amount of hw errors that occur during the auto-tuning process. Errors that occur when the process has completed for a gpu and it's listed as 100% done are real errors and indicate you're clocks and/or timings are too aggressive.
+
+1.  Set the clocks and timings you aim to run in production, but be a little
+    more generous. This primarily means lowering memclk and raising voltages
+    just a little. We want the clock regime to be compatible with the final
+    clocks from an optimization perspective, but we also want to minimize the
+    risk of crashing during the auto-tuning process.
+   
+2.  Edit the run_autotune_quick.bat/.sh:
+     o Set your pool, user and password.
+     o If you only want to work with a subset of your gpus, set the DEVS
+       variable to a -d x,y,z argument.
+       
+3.  Execute run_autotune_quick.bat/.sh. The miner will shut down when the
+    auto-tuning process has completed.
+   
+4.  Open the autotune_quick_log.txt file and scroll to the bottom. Copy the 
+    command line argument with the CN configs printed by the miner to
+    your start script for the miner, either adding it or replacing any
+    existing --cn_config argument.
+ 
+5.  Optional continuation: if you _really_ want to make sure you are running
+    the best possible configuration for your gpu(s), open the 
+    run_autotune_full.bat/.sh file and insert the same variables as for the
+    quick script.
+    
+6.  You can also enter CN configurations for all gpus in the full scan. The
+    only reason for doing so would be to force the start intensities to
+    specific values for a gpu. The scan will try all possible configurations
+    at each intensity level, decreasing the intensity one step at the time.
+    The miner will normally choose high start intensities when it knows it is
+    going to scan a full range, making this step unnecessary. If you still 
+    want to add it, set the CN_CFG variable to e.g. 
+    --cn_config=16+15,8+8 for a two-gpu system. Do NOT configure more than the
+    two intensities (i.e. 16+15 rather than 16+15:AAA) or you will disable the
+    auto-tuning.
+    
+7.  Start run_autotune_full.bat/.sh and go grab lunch, coffee or dinner. This
+    will take a while.
+   
+8.  Open the autotune_full_log.txt file and scroll to the bottom. Compare the
+    final output values to the values from the quick scan and use any mix of
+    the two.
+
+    
+Manual menu-based tuning
+------------------------
+For manual tuning, we've also added a key-driven menu subsystem in the miner that reuses the same mechanisms as the auto-tuning mode. You enter it by pressing 't' and then then one of 0-9 (or a-f for 10-15).
+
+The mode itself should hopefully be self-explanatory. You can cycle all available options per finetune parameter, tweak mode and L prefix enabled or not. You can also move freely between intensities <= the ones chosen at startup. This is a great power-user mode and for playing around with the configs found by the auto-tune process.

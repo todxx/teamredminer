@@ -1,0 +1,177 @@
+Team Red Miner CryptoNight Tuning For Vega GPUs
+===============================================
+
+Introduction
+============
+With the addition of ElioVP's awesome AMD Memory Tweak tool to the Vega toolset, the game has changed drastically. In addition to the old tools like soft powerplay mods, we can now tweak the memory timings on the Vega GPUs much in the same way we've been able to fine-tune Polaris GPUs with bios mods for a long time. We're now able to achieve higher hashrates than ever before while still keeping the core clk at standard or low CN levels. 
+
+At the time of writing, the community is producing new modded memory timings on a daily basis. This document only presents a few of the available timings that at this point seem stable over time. They might not work for all GPUs. Silicon lottery will definitely be a factor when trying to squeeze out as much performance as possible. I do hope automated tuning tools become available that e.g. can tune the memory timings automatically and run benchmarks jobs with known result sets to automatically check for memory/hw errors. 
+
+This guide only contains two recipes, one for Samsung and one for Hynix HBM memory. It's not intended to be a complete guide, rather focused on presenting one path to achieving a very competitive hashrate on each type of Vega GPU, then leaving it up to the community to do further tweaking and present their results. It will most definitely not be the most efficient setup, we will rather keep clocks and voltages at stable old-school CN levels.
+
+The hashrates we hope to achieve by following this guide are:
+
+Vega 64            (Samsung)   2440 h/s @ 185-195W
+Vega 56 flashed 64 (Samsung)   2250 h/s @ 180-190W 
+Vega 56            (Hynix)     2110 h/s @ 180-185W
+
+
+Step 1 - which HBM2 memory do I have?
+=====================================
+There are three manufacturers of HBM2 memory, the type of memory used in all Vega GPUs: Samsung, Hynix and Micron. Not surprising, Samsung is best-in-class and afaik used in all Vega 64s and reference Vega 56s. Hynix is typically found in newer (non-ref designs) Vega 56s, although there might be instances that uses Samsung memory as well. I believe Micron is only used in the Radeon VII which isn't covered in this guide. 
+
+The type of memory decides how aggressive we can be with out modded timings. If you're not sure about what memory your Vega has, you can run GPU-Z under Windows, it will in almost all cases list the manufacturer under "Memory Type". 
+
+
+Step 2 - flash reference Vega 56 with Vega 64 bios
+==================================================
+NOTE: this step might not be necessary, but at the time of writing, we've only tested the Samsung timing mods on V56@64. In practice, this step means that you grab the corresponding Vega 64 bios for your particular type of Vega 56 and flash that using ATIFlash. There are a number of videos available on youtube to help you out if necessary.
+
+
+Step 3 - which driver should I use?
+===================================
+For Windows, we've tested extensively on Adrenaline 18.6.1. Newer drivers do provide the nice feature of being able to edit all P-states without soft powerplay tables (see next step). However, we have gotten reports that the hashrates are not as competitive as with 18.6.1, and sometimes power draw seems to be higher. 
+
+For Linux, any amdpgpu-pro >= 18.30 should be fine.
+
+
+Step 4 - set up soft powerplay tables (or use 19.4)
+===================================================
+We will only briefly mention this step here - there are many links and tutorials out there to produce soft powerplay mods for both Windows and Linux. If you're not familiar with powerplay tables, please google or youtube your way to the necessary knowledge. After that you should be able to parse the information below.
+
+We are targeting an effective core clk of approx 1350 MHz on all GPUs. By "effective", we mean the value displayed by HWinfo64 (Windows) or /sys/kernel/debug/dri/*/amdgpu_pm_info (Linux).
+
+The results mentioned in the introduction section above were achieved under Windows using:
+
+Type                              CoreClk P7          MemClk P3
+Vega 64 or flashed 64 (Samsung)	  1407 MHz, 905mV     1075 MHz, 905 mV
+Vega 56 (Hynix)                   1407 MHz, 905mV      930 MHz, 905 mV
+
+If you don't want to deal with messy powerplay tables, you can install Adrenaline 19.4.1, the latest driver available when writing this. You should be able to edit the full P-state information directly using OverdriveNTool 0.2.8. This approach has not been tested when writing this guide. 
+
+
+Step 5 - make sure you manage your temps
+========================================
+The HBM2 memory performance will degrade with rising temperaturs. It is _imperative_ that you keep your gpu core temps under control. A rule of thumb is that the HBM2 temp will be around +10C from the gpu core temp, and we do _not_ want the HBM2 temp > 75C. Some people advocate keeping the HBM2 <= 60C at all times, meaning you should target 50C for your core temp. Personally, I target 55C for my core temps. 
+
+For Windows and drivers < 18.12.2, you can simply enter a target temp in Wattman, OverdriveNTool or your PPT, and the driver will adjust the fan speed over time to keep the temp stable around your entered target. For newer drivers >= 18.12.2, this mechanism has been replaced with a very annoying fan curve that doesn't use interpolation of fan speeds between defined states. Unless you want to use Wattman, make sure you use OverdriveNTool >= 0.2.8 for full support.
+
+For Linux, there are a few tools available to set the fan speed, and there is normally good support in custom mining OSs. 
+
+For monitoring, it's usually enough to just monitor the gpu core temp as displayed by the miner and assume +10C for the HBM2 temp. If you want to dig deeper, you can also run HWinfo64 or GPU-Z under Windows to see the true HBM2 temp at runtime instead of deriving it from the core temp. Under Linux, the HBM2 temp sensor isn't available in standard setups, although you might find it in custom mining OSs.
+
+
+Step 6 - download ElioVP's AMD Memory Tweak Tool and apply timings
+==================================================================
+The Bitcointalk ANN thread is here: https://bitcointalk.org/index.php?topic=5123724.0
+The tool is available here: https://github.com/Eliovp/amdmemorytweak/releases
+
+Unfortunately, there is no bundled single file per platform to download. For Linux, you only download the single binary file "amdmemtweak". For Windows, download all the other files one-by-one and place them in the same directory. Note: the latest version when writing this was 0.1.7. Later releases might have a proper bundling in e.g. a .zip or .tgz file.
+
+NOTE: the memory tweak tool must always be run with Administrator/root permissions. 
+
+The memory tweak tool lists GPUs in bus order. This is the same order that e.g. OverDriveNTool uses. TeamRedMiner does not use this order by default, but you can enable it by adding --bus_reorder as a command line argument for TRM. This is highly recommended. 
+
+If you execute "teamredminer.exe --bus_reorder --list_devices", you will list all your available GPUs in the same order as the memory tweak tool uses. The goal is now to apply the appropriate timings to all your Vega GPUs. The approach followed below is to apply the timings one GPU at the time in a .bat or shell script.
+
+These are the timings used in our results presented above. We do NOT assume responsibility for applying these. We have used them extensively on many different GPUs, and the Vegas in general are quite fine being manhandled with weird settings.
+
+Lucky Vega 64 or flashed 64 (Samsung):
+--CL 19 --RAS 28 --RCDRD 12 --RCDWR 5 --RC 44 --RP 12 --RRDS 3 --RRDL 3 --RTP 4 --FAW 18 --CWL 6 --WTRS 4 --WTRL 9 --WR 15 --WRRD 1 --RDWR 18 --REF 17000 --RFC 248
+
+Weaker Vega 64 or flashed 64 (Samsung) - use if lucky timings aren't stable:
+--CL 19 --RAS 30 --RCDRD 12 --RCDWR 6 --RC 44 --RP 13 --RRDS 5 --RRDL 5 --RTP 4 --FAW 18 --CWL 6 --WTRS 4 --WTRL 9 --WR 15 --WRRD 1 --RDWR 18 --REF 17000 --RFC 248
+
+Conceal Vega 64 or flashed 64 (Samsung) - use for CN Conceal or try for any algo if Weaker straps still didn't work:
+--CL 19 --RAS 32 --RCDRD 15 --RCDWR 8 --RC 46 --RP 13 --RRDS 4 --RRDL 5 --RTP 5 --FAW 16 --CWL 7 --WTRS 4 --WTRL 9 --WR 16 --WRRD 1 --RDWR 19 --REF 17000 --RFC 248
+
+Lucky Vega 56 (Hynix):
+--RAS 22 --RCDRD 17 --RCDWR 4 --RC 35 --RP 13 --RRDS 4 --RRDL 4 --RFC 148 --REF 15600
+
+Weaker Vega 56 (Hynix):
+--RAS 24 --RCDRD 19 --RCDWR 4 --RC 35 --RP 13 --RRDS 4 --RRDL 5 --RFC 148 --REF 15600
+
+Note: the Vega 56 timings are based on user anwil's post on bitcointalk.
+
+Example mixed rig with three Vegas, two flashed 64, one Hynix. The last GPU is the Hynix.
+
+# Fetch the TeamRedMiner GPU order (using --bus_reorder)
+%> ./teamredminer --bus_reorder --list_devices
+
+[2019-04-18 15:48:53] Auto-detected AMD OpenCL platform 0
+[2019-04-18 15:48:53] Auto-detected AMD OpenCL platform 1
+[2019-04-18 15:48:54] Detected 5 devices, listed in pcie bus id order:
+[2019-04-18 15:48:54] Miner Platform OpenCL BusId    Name          Model                     Nr CUs
+[2019-04-18 15:48:54] ----- -------- ------ -------- ------------- ------------------------- ------
+[2019-04-18 15:48:54]     0        0      2 03:00.0  gfx900        Radeon RX Vega                56
+[2019-04-18 15:48:54]     1        1      0 05:00.0  Ellesmere     Radeon RX 570 Series          32
+[2019-04-18 15:48:54]     2        1      1 09:00.0  Baffin        Radeon RX 560 Series          16
+[2019-04-18 15:48:54]     3        0      1 0e:00.0  gfx900        Radeon RX Vega                56
+[2019-04-18 15:48:54]     4        0      0 11:00.0  gfx900        Radeon RX Vega                56
+[2019-04-18 15:48:54] Successful clean shutdown.
+
+# Verify that the order matches the tool (note: output filtered)
+%> ./amdmemtweak --bus_reorder --list_devices
+
+GPU 0:  Vega [Radeon RX Vega]   pci:0000:03:00.0
+...
+GPU 1:  Ellesmere [Radeon RX 470/480]   pci:0000:05:00.0
+...
+GPU 3:  Vega [Radeon RX Vega]   pci:0000:0e:00.0
+...
+GPU 4:  Vega [Radeon RX Vega]   pci:0000:11:00.0
+...
+
+# This would be the content of a Windows .bat file with different straps selections:
+--------
+@echo off
+
+rem Vega gpu 0 - lucky Samsung straps
+WinAMDTweak.exe --gpu 0 --CL 19 --RAS 28 --RCDRD 12 --RCDWR 5 --RC 44 --RP 12 --RRDS 3 --RRDL 3 --RTP 4 --FAW 18 --CWL 6 --WTRS 4 --WTRL 9 --WR 15 --WRRD 1 --RDWR 18 --REF 17000 --RFC 248
+
+rem Vega gpu 3 - weaker Samsung straps
+WinAMDTweak.exe --gpu 3 --CL 19 --RAS 28 --RCDRD 12 --RCDWR 5 --RC 44 --RP 12 --RRDS 3 --RRDL 3 --RTP 4 --FAW 18 --CWL 6 --WTRS 4 --WTRL 9 --WR 15 --WRRD 1 --RDWR 18 --REF 17000 --RFC 248
+
+rem Vega gpu 4 - lucky Hynix straps
+WinAMDTweak.exe --gpu 4 --RAS 22 --RCDRD 17 --RCDWR 4 --RC 35 --RP 13 --RRDS 4 --RRDL 4 --RFC 148 --REF 15600
+--------
+
+As you can see, you simply execute the command with "<tool binary> --gpu <id>" and then append the full timings line copied from our list above.
+
+After applying the memory timings, you can run the tool with "WinAMDTweak.exe --current" and verify that the presented values for the GPUs now matches the straps you wanted to apply.
+
+Step 7 - configure and run miner
+================================
+After making sure both your powerplay table (clocks/voltages) and your memory timings are applied, it's time to start the miner. The most important part is to make sure the new *-mode is used for all Vegas. If this mode isn't used, you will not see any significant improvements with the memory timings. The mode will be used by default.
+
+In practice, this means that any old start script for the miner that configures each gpu by passing e.g. --cn_config=16+14,14+14 for a Vega 64+Vega 56 now should be modified to --cn_config=15*15,14*14, these are the expected best modes per Vega type. Flashing a Vega 56 to 64 does not increase the nr of compute units, so you should try 14*14 first. In some cases, 15*15 has been a little better. For true Vega 64s, we expect 15*15 to be optimal, but it can also be interesting to try 16*14.
+
+Other than the above, I will not repeat how you configure the miner in this document. For the simplest form of testing, run the start_cnr.bat or ./start_cnr.sh script included in the release. It will run the miner with decent configurations on all AMD GPUs found.
+
+
+Step 8 - monitor and evaluate results
+=====================================
+This step is much more important now that we've introduced an additional form of optimization with the modded memory timings. We need to make sure our clocks and timings do indeed produce correct results over time. The best way of assessing this is by running the miner for a longer period, then inspect the nr of hw errs and the poolside hashrate as reported by TRM. 
+
+If you see too many hw errors for your GPU(s), you simply need to dial down on the memory timings, lower your core and/or mem clk, and potentially also increase voltage. You need to tune your way to stability. If none of the timings above work, look for better memory timings suggested in the Bitcointalk thread for the tool. However, if you see a low amount of hw errors, maybe 0.10-0.20% and your poolside hashrate still matches the expected, you can definitely choose to keep the settings, but keep an eye out going forward.
+
+Now, I believe most miners don't know how to evaluate their poolside hashrate properly. It's never about how long you are running the miner in your test(s), it's _only_ about the nr of shares found. Moreover, we actually need a very(!) large amount of shares found before we can determine if a miner is doing its job or not. Running 10h against Nicehash is absolutely  useless(!) as an assessment test of a miner's poolside hashrate.
+
+Instead, to produce a large nr of found shares we can do two things: run for a very long time, or run with a low static difficulty, or both. However, it is NOT nice to pool ops to use a low static diff just to test your miner. Instead, download xmrig-proxy and configure it with your pool of choice. Then, also configure the "custom-diff" value and set it to a very low value and shares will be flying, which is what we want. Xmrig-proxy will forward only the shares that matches the true pool difficulty to the pool, and everyone is happy.
+
+This is the outline for a good test:
+
+1) We need to run until we have a count of 50,000 accepted shares.
+2) We want to run for max 5h. This means ~3 found shares/sec.
+3) If the hashrate of your rig is X h/s, you need to set a custom diff of X/3 in xmrig-proxy.
+4) Run for 5h.
+5) Check the poolside hashrate in TRM and verify against the avg hashrate * 0.975.
+
+Using this approach, being more than 2% from the expected value is highly unlikely. In a few cases, you will still be between 1-2% off the mark. If you're further off, continue to run until you can see which GPU(s) are too far off from their respective mark. Again, take the avg hashrate * 0.975, this time per GPU. Many times it's obvious which GPU is being problematic, especially if hw errors are present. Other times it can be more difficult when one or more cards simply don't deliver the expected nr shares over time.
+
+
+Last Step
+=========
+
+Happy Mining, and as per ElioVP's wishes: share any improved memory straps you may come up in the Bitcointalk ANN thread!
+

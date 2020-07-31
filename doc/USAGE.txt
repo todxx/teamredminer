@@ -1,0 +1,229 @@
+          Team Red Miner version 0.7.9
+Usage: teamredminer [OPTIONS]
+Options:
+  -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
+                              ethash            (eth, etc, etp, others)
+                              kawpow            (ravencoin)
+                              lyra2z      
+                              phi2              (lux, argoneum)
+                              lyra2rev3         (vtc)
+                              x16r              (rvn original)
+                              x16rv2            (rvn)
+                              x16s              (pgn, xsh)
+                              x16rt             (veil, gin)
+                              mtp               (zcoin)
+                              cuckatoo31_grin   (grin)
+                              cuckarood29_grin  (grin)
+                              cnv8        
+                              cnr               (monero)
+                              cnv8_half         (stellite, masari)
+                              cnv8_dbl          (x-cash)
+                              cnv8_rwz          (graft)
+                              cnv8_trtl         (old turtlecoin, loki)
+                              cnv8_upx2         (uplexa)
+                              cn_heavy          (classic CN heavy)
+                              cn_haven          (haven)
+                              cn_saber          (bittube)
+                              cn_conceal        (conceal)
+                              trtl_chukwa       (turtlecoin)
+                              nimiq             (nimiq)
+
+  -h, --help                Display this help message and exit.
+      --debug               Enables debug log output.
+      --disable_colors      Disables console output colors.
+      --force_colors        Forces console color output even if the terminal does not seem to support them.
+      --api_listen=IP:PORT  Enables the api. IP:PORT is optional. If present, the IP:PORT combo decides
+                              the interface(s) and port to listen to. Default is 127.0.0.1:4028. For
+                              external access, use e.g. 0.0.0.0:4028. It's also valid to only specify the
+                              port, e.g. 4029.
+      --log_file=FILENAME   Enables logging of miner output into the file specified by FILENAME.
+  -l, --log_interval=SEC    Set the time interval in seconds for averaging and printing GPU hashrates.
+                              SEC sets the interval in seconds, and must be > 0.
+
+Pool config options:
+  -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
+                              Each additional time this option is specified will start a new pool config.
+                              Per-pool options (such as -u, -p) will need to be explicitly specified
+                              again for each new pool.  (See the example start_multipool.sh/bat file)
+                              The multi-pool strategy for the miner is set with the --pool_strategy option.
+  -u, --user=USERNAME       Sets the username for pool authorization.
+  -p, --pass=PASSWORD       Sets the password for pool authorization.
+      --pool_force_ensub    Forces an extranonce subscribe request for supported pools unknown to the miner.
+      --pool_no_ensub       Prevent miner from sending extranonce subscribe request to the pool.
+      --pool_broken_rpc     Tells the miner to only allow a single outstanding rpc request on the pool
+                              connection.  This is a work-around for pools that violate the json rpc
+                              specification regarding rpc IDs.
+
+Global pool options:
+      --pool_connect_TO=SEC Set the time-out for attempting to connect to a pool. SEC is the time to wait in
+                              seconds. Default is 10.
+      --pool_rpc_TO=SEC     Set how long the miner will wait for an unanswered RPC to the pool.  After this
+                              time, the miner will reconnect to the pool.  SEC is the time to wait in seconds.
+                              Default is 60.
+      --pool_max_rejects=N  If a pool rejects N shares in a row, the pool connection is reset. This is to prevent
+                              against pools that invalidates mining sessions without disconnecting the user.
+                              Default value is 5.
+      --pool_strategy=STRAT Sets the strategy for selecting pools when running with multiple pools.  The available
+                              values are: priority, load_balance, and quota.  The default is priority. 
+                              priority: The miner will use pools in the order they are listed, only moving on 
+                                to the next pool if the previous cannot establish a connection. 
+                              load_balance: The miner will evenly balance the hashrate across all currently
+                                connected pools.
+                              quota: The miner will evenly balance the total hashes completed across 
+                                all pools.  If a pool disconnects and later reconnects, the miner will move 
+                                hashrate to the pool until the total hashes for each pool is balanced. 
+      --no_ntime_roll       Prevents the miner from rolling ntime in the block header, only using the value
+                              provided by the pool. This needs to be enabled for some pools when mining x16rt.
+
+GPU options:
+      --platform=INDEX      Sets the index of the OpenCL platform to use. If not specified, platform will
+                              be auto-detected. Linux with multiple platforms is only supported using no
+                              --platform arg but instead adding --bus_reorder.
+  -d, --devices=DEVLIST     Sets gpu devices to use from detected list. DEVLIST should be a comma-
+                              separated list of device indices, e.g. -d 0,1,2,4.  If not specified, all
+                              devices on the platform(s) will be used.  NOTE: by default the devices are ordered
+                              by pcie bus ordering. Use --list_devices to show indices.
+      --init_style=1/2/3    Specified the init style (1 is default):
+                              1: One gpu at the time, complete all before mining.
+                              2: Three gpus at the time, complete all before mining.
+                              3: All gpus in parallel, start mining immediately.
+      --pcie_fmt=FORMAT     Sets print format for pcie bus numbers.  The accepted values for FORMAT are
+                              either 'hex' or 'dec'.  The default is dec for windows and hex for linux.
+      --bus_reorder         Reorders the detected or specified devices after their pcie bus id.  If no
+                              platform is specified, devices will be collected from all detected AMD OpenCL
+                              platforms.  Note: As of version v0.7.0 this is the default behavior.
+      --opencl_order        Orders the detected or specified devices in the order OpenCL presents them.
+      --list_devices        Lists the available devices for the detected or specified platform and exits
+                              immediately.  Bus reordering will be implemented in the displayed order.
+
+Watchdog options:
+      --no_gpu_monitor      Disables the ADL (Windows) or sysfs (Linux) GPU monitor for temperature and
+                              fan speed.
+      --temp_limit=TEMP     Sets the temperature at which the miner will stop GPUs that are too hot.
+                              Default is 85C.
+      --temp_resume=TEMP    Sets the temperature below which the miner will resume GPUs that were previously
+                              stopped due to temperature exceeding limit.  Default is 60C.
+      --watchdog_script(=X) Configures the gpu watchdog to shut down the miner and run the specified platform
+                              and exits immediately. The default script is watchdog.bat/watchdog.sh in the
+                              current directory, but a different script can be provided as an optional argument,
+                              potentially with a absolute or relative path as well.
+      --watchdog_test       Tests the configured watchdog script by triggering the same action as a dead gpu
+                              after ~20 secs of mining.
+      --watchdog_disabled   Forces the watchdog to not execute. Can be used to disable the watchdog in mining os
+                              that always run with the watchdog enabled.
+
+Ethash options:
+      --eth_config=CONFIG   Manual ethash configuration for the miner.  CONFIG must be in the form [M][L].
+                              The [M] value selects the mode which can be either 'A' or 'B'.
+                              The 'B' mode uses additional memory and will only work on 8+GB cards.
+                              The [L] value selects the intensity and it's range will depend on the GPU architecture.
+                              Both values are optional, but if [L] is specified, [M] must also be specified.
+                              Example configs: --eth_config=A
+                                               --eth_config=B750
+                              CONFIG can also be a comma separated list of config values where each is
+                              applied to each GPU. For example: --eth_config=A,B750,,A288
+                              Any gpu that does not have a specific config in the list will use the first
+                              config in the list.
+      --eth_aggr_mode       Enables automatic use of the 'B' mode for all Polaris 8GB cards, unless they have a
+                              different config provided by the --eth_config argument.  This is the same thing as 
+                              manually setting all Polaris 8GB gpus in the rig to 'B' mode using --eth_config.
+                              For most gpus, this adds 0.1-0.2 MH/s of hashrate.  NOTE: 20-25% of rigs becomes less
+                              stable in this mode which is the reason it isn't the default mode.  If you experience
+                              dead gpus, you should remove this argument and run the gpus in the 'A' mode.  Moreover,
+                              this option will stop working when the DAG approaches 4GB. 
+      --eth_stratum_mode=MODE Sets a fixed stratum mode for ethash pools.  By default the miner will attempt
+                              to automatically determine the type of stratum the pool supports and use that mode.
+                              This automatic detection can be overriden by specifying this option.  The MODE can be
+                              set to one of the following options: stratum, nicehash, ethproxy. 
+      --eth_worker          Set the worker id that will be sent to pool.  This only applies to pools with ethproxy
+                              stratum mode.
+      --eth_epoch           Tests a specific ethash epoch. NOTE: you still need to provide a pool as if you were mining,
+                              but no shares will be submitted. Simulated mining only.
+
+Progpow options:
+      --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
+                              The [M] value selects the mode which can be either 'A' or 'B'.
+                              The 'B' mode typically results in better performance but is only available for
+                              Vega on linux and Navi (linux or windows).
+                              The [L] value selects the intensity and it's range will depend on the GPU architecture.
+                              Both values are optional, but if [L] is specified, [M] must also be specified.
+                              Example configs: --prog_config=A
+                                               --prog_config=B750
+                              CONFIG can also be a comma separated list of config values where each is
+                              applied to each GPU. For example: --prog_config=A,B750,,A288
+                              Any gpu that does not have a specific config in the list will use the first.
+      --prog_height=VALUE   Sets a fixed block height for progpow algorithms for benchmarking purposes.
+                              Note that using this option needs a pool connection but will not submit shares.
+      --prog_strict         Forces miner to always generate strictly accurate kernels.  By default the miner will
+                              generate relaxed kernels that use less computation power but can result in 
+                              occasional invalid shares.
+
+Cryptonight options:
+      --rig_id              Set the rig identifier that will be sent to the pool. This is only used for
+                              cryptonight pools.
+      --cn_config=CONFIG    Manual cryptonight configuration for the miner.  CONFIG must be in the form
+                              [P][I0][M][I1][:xyz], where [P] is an optional prefix and [:xyz] is an
+                              optional suffix.  For [P], only the value of 'L' is supported for low-end
+                              GPUs like Lexa/Baffin.  [I0] and [I1] are the thread intensity values normally
+                              ranging from 1 to 16, but larger values are possible for 16GB gpus.  [M] is the
+                              mode which can be either '.', -', '+' or '*'.  Mode '.' means that the miner
+                              should choose or scan for the best mode.  Mode '*' both a good default more and
+                              _should_ be used if you mine on a Vega 56/64 with modded mem timings.  The
+                              exceptions to this rule are small pad variants (cnv8_trtl and cnv8_upx2), they
+                              should still use '+'. For Polaris gpus, only the '-' and '+' modes are available.
+                              
+                              NOTE: in TRM 0.5.0 auto-tuning functionality was added, making manual configuration
+                              of the CN config modes unnecessary except for rare corner cases.  For more info, 
+                              see the tuning docs and how-to documents bundled with the release. 
+                              
+                              Example configs: --cn_config=15*15:AAA
+                                               --cn_config=14-14
+                                               --cn_config=L4+3
+                              CONFIG can also be a comma separated list of config values where each is
+                              applied to each GPU. For example: --cn_config=8-8,16+14:CBB,15*15,14-14
+                              Any gpu that does not have a specific config in the list will use the first
+                              config in the list.
+      --no_cpu_check        Disables cpu verification of found shares before they are submitted to the pool.
+                              Note: only CN algos currently supports cpu verification.
+      --no_lean             Disables the CN lean mode where ramp up threads slowly on start or restart after
+                              network issues or gpu temp throttling. 
+      --no_interleave=DEVS  Lists gpu devices where CN thread interleave logic should be not be used. 
+                              The argument is a comma-separated list of devices like for the -d option. 
+                              Use this argument if some device(s) get a worse hashrate together with a lot
+                              of interleave adjust log messages. 
+      --alloc_patch=DEVS    Lists gpu devices that loses hashrate between TRM v0.4.5 and later versions. With this 
+                              argument a simpler mem allocation strategy is used, and the old (higher) hashrate should
+                              be restored. Auto-tuning mode can still be used.
+      --auto_tune=MODE      Enable the auto-tune mode upon startup. Only available for CN variants. MODE must 
+                              be either NONE, QUICK or SCAN. The QUICK mode checks a few known good configurations
+                              and completes within 1 min. The SCAN mode will check all possible combos and will
+                              run for 20-30 mins. Setting MODE to NONE disable the auto-tune feature. The default
+                              mode is QUICK. 
+      --auto_tune_runs(=N)  Executes multiple runs for the auto tune, each time decreasing the unit of pads used -1
+                              in one of the threads (15+15 -> 15+14 -> 14+14 -> 14+13 -> ...). You can specify the
+                              explicit nr of runs or let the miner choose a default value per gpu type (typically 3-4).
+      --auto_tune_exit      If present, the miner will exit after completing the auto-tuning process. This is helpful
+                              when you want to scan for optimal settings and then use the resulting command line arg
+                              printed by the miner.
+      --allow_large_alloc   If present, and when the driver indicates there is enough GPU vram available, the miner
+                              will be more aggressive with the initial memory allocation. In practice, this option
+                              means that Vega GPUs under Linux will start the auto-tuning process at 16*15 rather
+                              than 16*14 or 15*15.
+
+MTP options:
+      --allow_all_devices   Some algos can't be mined on e.g. 4GB gpus. Those gpus will be disabled automatically
+                              by the miner. This argument overrides this logic and allows mining on all specified
+                              or detected devices.
+
+X16* options:
+      --hash_order=VALUE    Sets a fixed hash order for algorithms like x16r for benchmarking purposes.
+                              Note that using this option needs a pool connection but will not submit shares.
+                              The standard benchmark hash order for x16r is --hash_order=0123456789abcdef.
+Nimiq options:
+      --nimiq_worker=VALUE  Sets the worker/device name for nimiq to pass to the pool(s).
+      --nimiq_no_proxy      Disables the automatic Nimiq proxy executed as a separate process. This means that the
+                              host and port passed to the miner must be pointing to a proxy.
+      --nimiq_proxy=VALUE   Overrides the default path to the Nimiq proxy. The default is trm_nimiq_proxy-win.exe.
+                              and trm_nimiq_proxy-linux in the current miner director.
+      --nimiq_port=VALUE    Overrides the default local port (4444) used for the Nimiq proxy. This can be used if your
+                              system is already using port 4444 for some other tcp/ip service.
