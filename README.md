@@ -1,58 +1,108 @@
-# teamredminer v0.7.8
+# teamredminer v0.7.9
+This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
-Download is available in the [releases section](https://github.com/todxx/teamredminer/releases).
+**Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
 
 TRM discord server: https://discord.gg/RGykKqB
 
-GPUs supported and tested:
-- RX 5700(XT)/5600(XT)/5500(XT) for kawpow/ethash/nimiq only.
-- Radeon VII
-- RX Vega 64/56, Vega FE
-- RX 580/570/480/470
-- RX 560/550
-
-Software Requirements:
-- For cryptonight algos and lyra2rev3 on linux, only amdgpu-pro 18.30 and later drivers are supported.  ROCm is not supported.
+Below is a list of mining operating systems and management software that have built-in support for teamredminer:
+ - [MMPOS](https://mmpos.eu/)
+ - [SimpleMining OS](https://simplemining.net/)
+ - [Hive OS](https://hiveos.farm/)
+ - [Minerstat](https://minerstat.com/)
+ - [Awesome Miner](https://www.awesomeminer.com/)
+ - [PiMP OS](https://getpimp.org/)
 
 This miner supports a range of algorithms.  Please see the list below for details.  The miner is configured via command line only, please run with the --help option to print a short help message for how to use the command line options.
 
-The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.  
+This miner includes the following algorithms and their respective dev fees:
 
-This miner includes the following algorithms and respective dev fees:
-- Ethash on Polaris GPUs    0.75%
-- Ethash on all other GPUs  1.0%
-- Kawpow                    2.0%
-- Nimiq                     2.5%
-- Cryptonight R:            2.5%
-- Cryptonight v8 upx2:      2.5%
-- Cryptonight v8 turtle:    2.5%
-- Cryptonight v8 half:      2.5%
-- Cryptonight v8 double:    2.5%
-- Cryptonight v8 rwz:       2.5%
-- Cryptonight v8:           2.5%
-- Cryptonight heavy:        2.5%
-- Cryptonight haven:        2.5%
-- Cryptonight saber:        2.5%
-- Cryptonight conceal:      2.5%
-- Chukwa-512 (Turtlecoin):  2.5%
-- x16r:                     2.5%
-- x16rv2:                   2.5%
-- x16s:                     2.5%
-- x16rt:                    2.5%
-- MTP:                      2.5%
-- Cuckatoo31:               2.5%
-- Cuckarood29:              2.5%
-- Lyra2rev3:                2.5%
-- Lyra2z:                   3%
-- Phi2:                     3%
+|        Algorithm          |  Fee |
+| ------------------------- | ---- |
+| Ethash on Polaris GPUs    | 0.75%|
+| Ethash on all other GPUs  | 1.0% |
+| Kawpow                    | 2.0% |
+| Nimiq                     | 2.5% |
+| Cryptonight R             | 2.5% |
+| Cryptonight v8 upx2       | 2.5% |
+| Cryptonight v8 turtle     | 2.5% |
+| Cryptonight v8 half       | 2.5% |
+| Cryptonight v8 double     | 2.5% |
+| Cryptonight v8 rwz        | 2.5% |
+| Cryptonight v8            | 2.5% |
+| Cryptonight heavy         | 2.5% |
+| Cryptonight haven         | 2.5% |
+| Cryptonight saber         | 2.5% |
+| Cryptonight conceal       | 2.5% |
+| Chukwa-512 (Turtlecoin)   | 2.5% |
+| x16r                      | 2.5% |
+| x16rv2                    | 2.5% |
+| x16s                      | 2.5% |
+| x16rt                     | 2.5% |
+| MTP                       | 2.5% |
+| Cuckatoo31                | 2.5% |
+| Cuckarood29               | 2.5% |
+| Lyra2rev3                 | 2.5% |
+| Lyra2z                    | 3.0% |
+| Phi2                      | 3.0% |
+
+GPUs supported and tested:
+- Navi - RX 5700(XT)/5600(XT)/5500(XT) for kawpow/ethash/nimiq only.
+- Vega - RX Vega 64/56, Vega FE, Radeon VII (Vega 2)
+- Polaris - RX 580/480/570/470/560/460/550
+
+Some algorithms are not supported on some GPU architectures and/or drivers.  Below is the compatiblity table:
+
+|                          | Navi | Vega | Polaris |
+| ------------------------ |:----:|:----:|:-------:|
+| Ethash                   |  Y   |  Y   |   Y     |
+| Kawpow                   |  Y   |  Y   |   Y     |
+| Nimiq                    |  Y   |  Y   |   Y     |
+| Cryptonight R            |  N   |  L   |   L     |
+| Cryptonight v8 upx2      |  N   |  L   |   L     |
+| Cryptonight v8 turtle    |  N   |  L   |   L     |
+| Cryptonight v8 half      |  N   |  L   |   L     |
+| Cryptonight v8 double    |  N   |  L   |   L     |
+| Cryptonight v8 rwz       |  N   |  L   |   L     |
+| Cryptonight v8           |  N   |  L   |   L     |
+| Cryptonight heavy        |  N   |  L   |   L     |
+| Cryptonight haven        |  N   |  L   |   L     |
+| Cryptonight saber        |  N   |  L   |   L     |
+| Cryptonight conceal      |  N   |  L   |   L     |
+| Chukwa-512               |  N   |  L   |   L     |
+| x16r                     |  N   |  Y   |   Y     |
+| x16rv2                   |  N   |  Y   |   Y     |
+| x16s                     |  N   |  Y   |   Y     |
+| x16rt                    |  N   |  Y   |   Y     |
+| MTP                      |  N   |  L   |   L     |
+| Cuckatoo31               |  N   |  Y   |   Y     |
+| Cuckarood29              |  N   |  Y   |   Y     |
+| Lyra2rev3                |  N   |  L   |   L     |
+| Lyra2z                   |  N   |  L   |   L     |
+| Phi2                     |  N   |  L   |   L     |
+
+Support legend:
+ - Y = Supported
+ - N = Not supported
+ - L = Limited support: algos are supported on windows and linux with amdgpu-pro drivers, not supported on ROCm drivers.
+
 
 The miner reports GPU hash rates every 30 seconds.  These are the full GPU hash rates before dev fee deduction (your pool hashrate will be slightly lower). 
 
+The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
+
 For reporting bugs and/or for features requests, please open an issue on this project's github [issue tracker](https://github.com/todxx/teamredminer/issues).
 
-Happy hashing ;)
+For example command lines please see the batch/shell scripts in the miner download packages.
+For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.9
+- Fixes for mixed rig mining on Linux.
+- Added --eth_epoch argument for easier epoch testing.
+- Added --eth_aggr_mode for automatic aggressive 'B' mode on Polaris 8GB gpus.
+- Added --watchdog_disable argument.
+
 Changes in v0.7.8
 - Upgrade for the upcoming Haven hard fork (July 20, 2020).
 - Tiny Nimiq optimizations (1-2% max, mostly Vega and Navi).
