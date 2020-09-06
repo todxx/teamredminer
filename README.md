@@ -1,4 +1,4 @@
-# teamredminer v0.7.9
+# teamredminer v0.7.10
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -97,6 +97,24 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.10
+
+Release notes:
+1) Ethash 4GB rigs, especially on win, _should_ use --eth_alloc_epoch=N with N being the max epoch that the gpus can allocate. This will avoid DAG reallocation issues.
+2) For Navi rigs having issues with eth+zil or Nicehash mining with frequent DAG switching, try using --eth_dag_slowdown=9.
+
+- Added default log filename (trm_<algo>_<yyyymmdd_hhmmss>.log)
+- Added ethash forced initial allocated epoch ( --eth_alloc_epoch=N). Note: HIGHLY recommended for 4GB rigs.
+- Added ethash family DAG build slowdown configuration (--eth_dag_slowdown=N, default value 4).
+- Added ethash family DAG build staggering across gpus (disable with --eth_no_stagger).
+- Added ethash family intensity ramp-up (disable with --eth_no_ramp_up).
+- Added option for forcing dev fee region (see --dev_location).
+- Added MTP for Navi gpus.
+- Added MTP ramp-up after pad rebuild.
+- Fixed error printouts on failed watchdog script execution on Linux.
+- Stats: now shows more clocks and temps, and also adds gpu state in hashrate prints (see --short_stats to disable).
+- Added checks for and enabling compute mode and disabling crossfire on Windows (see --enable_compute).
+
 Changes in v0.7.9
 - Fixes for mixed rig mining on Linux.
 - Added --eth_epoch argument for easier epoch testing.
