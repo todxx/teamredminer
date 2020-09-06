@@ -74,7 +74,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | x16rv2                   |  N   |  Y   |   Y     |
 | x16s                     |  N   |  Y   |   Y     |
 | x16rt                    |  N   |  Y   |   Y     |
-| MTP                      |  N   |  L   |   L     |
+| MTP                      |  Y   |  Y   |   Y     |
 | Cuckatoo31               |  N   |  Y   |   Y     |
 | Cuckarood29              |  N   |  Y   |   Y     |
 | Lyra2rev3                |  N   |  L   |   L     |
