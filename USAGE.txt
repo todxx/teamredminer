@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.9
+          Team Red Miner version 0.7.10
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -36,9 +36,19 @@ Options:
                               the interface(s) and port to listen to. Default is 127.0.0.1:4028. For
                               external access, use e.g. 0.0.0.0:4028. It's also valid to only specify the
                               port, e.g. 4029.
-      --log_file=FILENAME   Enables logging of miner output into the file specified by FILENAME.
+      --log_file(=FILENAME) Enables logging of miner output into the file specified by FILENAME.  If no filename
+                              is provided, the miner will log to trm_<algo>_<yyyymmdd_hhmmss>.log in the current
+                              working directory.  If the log file already exists, the miner will append.
   -l, --log_interval=SEC    Set the time interval in seconds for averaging and printing GPU hashrates.
                               SEC sets the interval in seconds, and must be > 0.
+      --short_stats         Disables the full gpu state output in each hashrate output, like it was before 0.7.10.
+      --dev_location=LOC    Selects a specific location for the dev fee connection. Only use this if you see
+                              continuous dev fee connection issues reported by the miner. The connection
+                              management normally works well in all locations. Available options are:
+                              world     - Anywhere in the world except for mainland China.
+                              cn        - Mainland China.
+                              non-gcp   - Countries with blocked access to Google Services (e.g. Iran, Cuba).
+      --enable_compute      (Windows only) Enables compute mode and disables crossfire on necessary gpus.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
@@ -139,6 +149,15 @@ Ethash options:
                               stratum mode.
       --eth_epoch           Tests a specific ethash epoch. NOTE: you still need to provide a pool as if you were mining,
                               but no shares will be submitted. Simulated mining only.
+      --eth_alloc_epoch=N   Allocates enough memory for the given epoch from the start. The miner will try to allocate more
+                              if it needs to later during mining. It's recommended for rigs with one or more 4GB cards to test
+                              and set this to the max possible value to avoid reallocations at epoch switches. Optimal Linux
+                              rigs should be able to handle epoch 380, Windows rigs a little less (373-374).
+      --eth_dag_slowdown=N  Slows down the DAG generation. Pass a single digit 1-9. 1 means minimal slowdown, 9 means max
+                              slowdown. Default value: 4.
+      --eth_no_stagger      Disables the staggering of gpus when building a new DAG. The default behavior is to stagger
+                              GPUs so they don't all enter the DAG build process at exactly the same time.
+      --eth_no_ramp_up      Disables the ramping up of intensity for each gpu.
 
 Progpow options:
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
@@ -157,6 +176,11 @@ Progpow options:
       --prog_strict         Forces miner to always generate strictly accurate kernels.  By default the miner will
                               generate relaxed kernels that use less computation power but can result in 
                               occasional invalid shares.
+      --prog_dag_slowdown=N Slows down the DAG generation. Pass a single digit 1-9. 1 means minimal slowdown, 9 means max
+                              slowdown. Default value: 2.
+      --prog_no_stagger      Disables the staggering of gpus when building a new DAG. The default behavior is to stagger
+                              GPUs so they don't all enter the DAG build process at exactly the same time.
+      --prog_no_ramp_up      Disables the ramping up of intensity for each gpu.
 
 Cryptonight options:
       --rig_id              Set the rig identifier that will be sent to the pool. This is only used for
