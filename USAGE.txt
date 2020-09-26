@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.10
+          Team Red Miner version 0.7.11
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -49,6 +49,7 @@ Options:
                               cn        - Mainland China.
                               non-gcp   - Countries with blocked access to Google Services (e.g. Iran, Cuba).
       --enable_compute      (Windows only) Enables compute mode and disables crossfire on necessary gpus.
+      --long_timestamps     Enables microsec timestamps in the logs instead of seconds only.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
@@ -63,6 +64,7 @@ Pool config options:
       --pool_broken_rpc     Tells the miner to only allow a single outstanding rpc request on the pool
                               connection.  This is a work-around for pools that violate the json rpc
                               specification regarding rpc IDs.
+      --pool_debug          Logs all pool traffic.
 
 Global pool options:
       --pool_connect_TO=SEC Set the time-out for attempting to connect to a pool. SEC is the time to wait in
@@ -149,15 +151,26 @@ Ethash options:
                               stratum mode.
       --eth_epoch           Tests a specific ethash epoch. NOTE: you still need to provide a pool as if you were mining,
                               but no shares will be submitted. Simulated mining only.
-      --eth_alloc_epoch=N   Allocates enough memory for the given epoch from the start. The miner will try to allocate more
-                              if it needs to later during mining. It's recommended for rigs with one or more 4GB cards to test
-                              and set this to the max possible value to avoid reallocations at epoch switches. Optimal Linux
+      --eth_alloc_epoch=N   Allocates enough memory for the given epoch from the start.  The miner will try to allocate more
+                              if it needs to later during mining.  It's recommended for rigs with one or more 4GB cards to test
+                              and set this to the max possible value to avoid reallocations at epoch switches.  Optimal Linux
                               rigs should be able to handle epoch 380, Windows rigs a little less (373-374).
-      --eth_dag_slowdown=N  Slows down the DAG generation. Pass a single digit 1-9. 1 means minimal slowdown, 9 means max
-                              slowdown. Default value: 4.
-      --eth_no_stagger      Disables the staggering of gpus when building a new DAG. The default behavior is to stagger
+      --eth_dag_slowdown=N  Slows down the DAG generation.  Pass a single digit 0-9. 0 means no slowdown (<= 0.7.9 behavior),
+                              1 means minimal slowdown, 9 means max.  Default value: 4 for a slight slowdown.
+      --eth_no_stagger      Disables the staggering of gpus when building a new DAG.  The default behavior is to stagger
                               GPUs so they don't all enter the DAG build process at exactly the same time.
       --eth_no_ramp_up      Disables the ramping up of intensity for each gpu.
+      --eth_direct_abort    Uses a different mechanism to abort ongoing gpu jobs.  Recommended for Vegas in ROCm environments
+                              to minimize stale shares.  Will apply to Vega and Polaris gpus in the rig only. 
+      --eth_dag_alloc_patch Some motherboards with outdated bios can see hw errs typically on the first or last gpu in the system.
+                              Use this argument to force a patched dag allocation strategy that most often solves the issue.
+                              Upgrading your bios often solves the issue as well.
+      --eth_hashwatch(=M,M) Defines a min/max watchdog hashrate in MH/s expected when gpus are hashing.  If a GPU falls outside
+                              of this range for too long it will be considered faulty and the watchdog will be triggered.  The
+                              default min/max values are 2 MH/s and 150 MH/s.  To activate with default values, use
+                              --eth_hashwatch.  To set your own values, use e.g. --eth_hashwatch=1.25,60.  The same range is used
+                              for all gpus in the rig.  A negative value for one side disables it, e.g. use --eth_hashwatch=-1,1000
+                              to handle gpu resets that result in huge fake hashrates but no minimum check.
 
 Progpow options:
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
@@ -176,9 +189,9 @@ Progpow options:
       --prog_strict         Forces miner to always generate strictly accurate kernels.  By default the miner will
                               generate relaxed kernels that use less computation power but can result in 
                               occasional invalid shares.
-      --prog_dag_slowdown=N Slows down the DAG generation. Pass a single digit 1-9. 1 means minimal slowdown, 9 means max
-                              slowdown. Default value: 2.
-      --prog_no_stagger      Disables the staggering of gpus when building a new DAG. The default behavior is to stagger
+      --prog_dag_slowdown=N  Slows down the DAG generation.  Pass a single digit 0-9.  0 means no slowdown (<= 0.7.9 behavior),
+                              1 means minimal slowdown, 9 means max.  Default value: 4 for a slight slowdown.
+      --prog_no_stagger      Disables the staggering of gpus when building a new DAG.  The default behavior is to stagger
                               GPUs so they don't all enter the DAG build process at exactly the same time.
       --prog_no_ramp_up      Disables the ramping up of intensity for each gpu.
 

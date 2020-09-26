@@ -1,4 +1,4 @@
-# teamredminer v0.7.10
+# teamredminer v0.7.11
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -97,6 +97,22 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.11
+
+1) Ethash additions: printing share diff in GH (always enabled), hashrate watchdog (see --eth_hashwatch).
+2) Better debug support: --long_timestamps, --pool_debug.
+3) We've found certain motherboard/bios combinations that due to kernel and/or driver bugs have issues with the first or last gpu in rigs. If you see excessive hw errors reported on a single gpu, and switching around gpus still always generates errors in the first or last gpu, try using --eth_dag_alloc_patch.
+
+Release notes:
+- Added DAG allocation patch under linux for certain mobo/bios combinations (see --eth_dag_alloc_patch).
+- Added ethash hashrate watchdog (see --eth_hashwatch).
+- Added ethash abort mechanism for Vegas on ROCm (see --eth_direct_abort). Not useful in other contexts.
+- Added pool traffic debug (use --pool_debug).
+- Added print of share difficulty for ethash family algos. Unit is always GH.
+- Added microsec timestamp resolution in logs (use --long_timestamps).
+- Regression bug: argon2/chukwa was broken in 0.7.10, now working again.
+- Turned off compute mode checks for non-Polaris gpus.
+
 Changes in v0.7.10
 
 Release notes:
