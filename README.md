@@ -1,4 +1,4 @@
-# teamredminer v0.7.11
+# teamredminer v0.7.12
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -98,6 +98,13 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.12
+
+1) Bugfix release: v0.7.11 could crash with rejected ethash shares.
+
+Release notes:
+- Fixed print format bug on ethash rejected shares.
+
 Changes in v0.7.11
 
 1) Ethash additions: printing share diff in GH (always enabled), hashrate watchdog (see --eth_hashwatch).
