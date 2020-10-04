@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.12
+          Team Red Miner version 0.7.13
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -50,6 +50,12 @@ Options:
                               non-gcp   - Countries with blocked access to Google Services (e.g. Iran, Cuba).
       --enable_compute      (Windows only) Enables compute mode and disables crossfire on necessary gpus.
       --long_timestamps     Enables microsec timestamps in the logs instead of seconds only.
+      --restart_gpus        (Windows only) Restarts all configured gpus before mining, i.e. disable+enable PCI device.
+      --uac                 (Windows only) Enable privilege escalation when the miner runs tasks like restarting gpus.
+                              You can always avoid this by running the miner directly as Administrator.  This will
+                              trigger the standard Windows escalation prompt, so you have to be available to click 'Yes'.
+                              If this is not enabled, tasks that require Administrator privileges will fail when the
+                              miner is running under a basic user account.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
@@ -155,6 +161,12 @@ Ethash options:
                               if it needs to later during mining.  It's recommended for rigs with one or more 4GB cards to test
                               and set this to the max possible value to avoid reallocations at epoch switches.  Optimal Linux
                               rigs should be able to handle epoch 380, Windows rigs a little less (373-374).
+      --eth_4g_alloc_adjust=X,Y,...  On Windows, the allocation balance is very delicate for 4GB gpus being able to reach their
+                              maximum possible DAG epoch.  The miner uses a strategy that has worked fine for our test gpus,
+                              but other setups can benefit from tweaking this number.  The valid range is [-128,+128].  Zero means
+                              no adjustment.  You provide either a single value that is used for all 4GB gpus in the rig, or a
+                              comma-separated list with values for all gpus, including non-4GB Polaris gpus.  Values for non-4GB
+                              gpus are ignored.
       --eth_dag_slowdown=N  Slows down the DAG generation.  Pass a single digit 0-9. 0 means no slowdown (<= 0.7.9 behavior),
                               1 means minimal slowdown, 9 means max.  Default value: 4 for a slight slowdown.
       --eth_no_stagger      Disables the staggering of gpus when building a new DAG.  The default behavior is to stagger

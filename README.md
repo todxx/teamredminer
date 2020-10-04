@@ -1,4 +1,4 @@
-# teamredminer v0.7.12
+# teamredminer v0.7.13
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -48,7 +48,7 @@ This miner includes the following algorithms and their respective dev fees:
 | Phi2                      | 3.0% |
 
 GPUs supported and tested:
-- Navi - RX 5700(XT)/5600(XT)/5500(XT) for kawpow/ethash/nimiq only.
+- Navi - RX 5700(XT)/5600(XT)/5500(XT) for supported algos in the table below.
 - Vega - RX Vega 64/56, Vega FE, Radeon VII (Vega 2)
 - Polaris - RX 580/480/570/470/560/460/550
 
@@ -98,6 +98,16 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.13
+
+1) Windows user with 4GB rigs - see the new guide ETHASH_4GB_HOWTO.txt for instructions.
+
+Release notes:
+- Added better default Windows dag allocation strategy on 4GB gpus.
+- Added experimental support for resetting gpus before mining (Windows only).
+- Added argument for manual adjustment of 4GB dag allocation (see --eth_4g_alloc_adjust=X,Y,Z,...).
+- Added protection against broken dev servers with additional random server selection mechanism.
+
 Changes in v0.7.12
 
 1) Bugfix release: v0.7.11 could crash with rejected ethash shares.

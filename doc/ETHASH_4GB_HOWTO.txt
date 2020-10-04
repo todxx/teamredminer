@@ -1,0 +1,151 @@
+TeamRedMiner Ethash 4GB Status
+==============================
+
+v1.0 - 2020-10-04 - First version, Windows only.
+
+Summary
+-------
+Both major coins on ethash, ETH and ETC, are approaching the hard
+limit where 4GB GPUs will no longer be able to hold the DAG necessary
+to perform max hashrate hashing. ETC is 11 epochs ahead of ETH,
+meaning it's already impossible to mine on Windows, and only has a few
+epochs left on Linux before it's impossible.
+
+This status document contains instructions on how to maximize the life
+span of your 4GB gpus when mining with TRM. This document will be
+updated continuously between TRM releases up until epoch 380.
+
+=========================================================================
+Windows
+=========================================================================
+
+Windows overall comments
+------------------------
+- All our tests have been mode on driver Adrenalin 20.4.2. Many other
+  driver versions will work equally well, we chose to lock down
+  testing to a single version.
+
+- Older drivers consume more baseline vram and will not work. You need
+  to use a recent driver like Adrenalin 20.4.2 that we use for
+  testing.
+
+- This guide and testing applies to gpus _without_ monitor(s)
+  connected. At this point, there simply isn't enough vram on the gpu
+  to both store the DAG and drive graphics.
+
+Windows TL;DR
+--------------------
+We now provide two new example .bat files, start_eth_4gb.bat and
+test_eth_4gb_epoch_374.bat. If you can run the test and cards reach
+their max speed, you're good to go for epoch 374 but need to add
+"--restart_gpus --uac --eth_alloc_epoch=374" as additional arguments
+to your current command line. The start_eth_4gb.bat contains these
+arguments. You will also need TRM v0.7.13 or later. If you don't reach
+the same hashrates as you normally do, or if you don't like the
+built-in gpu reset mechanism, continue to read below.
+
+Windows instructions
+--------------------
+1) RESET gpus right before starting the miner. The allocation is very
+   sensitive. Even coming from a fresh reboot isn't enough for some
+   gpus. Starting with TRM v0.7.13, we include experimental support
+   for automatically resetting gpus before mining. This maximizes the
+   probability of Windows allowing the large DAG allocation.
+
+   NOTE: the gpu reset is optional, but our example .bat files do
+   it. You can test without the "--restart_gpus" option, and if it
+   works fine without it, good for you! If you do need to reset gpus,
+   you have four options:
+
+   a) If you run the miner as Administrator, you can add
+      "--restart_gpus" as a miner argument and it will automatically
+      restart your gpus without requiring user interaction. Configured
+      clocks will be retained, at least this has been the case in all
+      our tests, so you typically run your clock configuration as
+      usual before starting the miner.
+   
+   b) Run the miner as a normal user and add "--restart_gpus --uac"
+      to your start command line. This will trigger a privilege
+      escalation at startup, and the standard Windows popup asking if
+      you accept running this program as Administrator. Only the
+      separate process that resets the gpus will run with admin
+      rights, the miner will then run as the normal user.
+   
+   c) Do your own reset of the necessary gpus with some tool,
+      e.g. "devcon.exe" available in the Windows Driver Kit
+      toolset. You need to google for instructions on how to use the
+      tool. This mechanism was very common in the early Vega Monero
+      mining days.
+
+   d) Disable+enable all gpus manually in the Windows Device
+      Manager. Not really recommended for anything but testing.
+
+2) ALWAYS add the argument "--eth_alloc_epoch=N". We believe most (or
+   all?) rigs should be able to do epoch 374, which means using
+   "--eth_alloc_epoch=374". If this doesn't work, as in you're not
+   getting your normal max hashrates, try a lower number. This
+   argument forces the miner to allocate the necessary vram on all
+   gpus right at startup in a prioritized way, and ensure no DAG
+   reallocations will be made until epoch 375.
+
+3) TEST your max possible epoch on beforehand. This is done by running
+   the miner in benchmark mode using "--eth_epoch=374". You just add
+   this argument last in your normal start command line with pool,
+   wallet etc. This mining mode will NOT submit any shares to your
+   pool, it's only for benchmarking. As soon as you see if you're
+   reaching max speed or not, exit the miner and remove the argument
+   from your start command.
+
+   NOTE: we also provide an example .bat file for this test,
+   test_eth_4gb_epoch_374.bat included in the zip package.
+
+4) ADVANCED mode: for some rigs, the default allocation strategy isn't
+   optimal. We provide a tweak argument that might help for such rigs.
+   The argument is called "--eth_4g_alloc_adjust=X,Y,...". This is the
+   description from our --help output:
+
+   -------------------------------------------------------------------
+   --eth_4g_alloc_adjust=X,Y,...
+
+   On Windows, the allocation balance is very delicate for 4GB gpus
+   being able to reach their maximum possible DAG epoch.  The miner
+   uses a strategy that has worked fine for our test gpus, but other
+   setups can benefit from tweaking this number.  The valid range is
+   [-128,+128].  Zero means no adjustment.  You provide either a
+   single value that is used for all 4GB gpus in the rig, or a
+   comma-separated list with values for all gpus, including non-4GB
+   Polaris gpus.  Values for non-4GB gpus are ignored.
+   -------------------------------------------------------------------
+
+   I would recommended testing values between -16 and 16. I do not
+   believe values outside that range will be helpful. If you do find
+   that this is helpful for you, please drop us a note in our Discord,
+   it's very interesting to hear if there are rigs out there only
+   being able to do epoch 374 with a manual adjustment using this
+   argument.
+
+5) Epoch 375 is here or I can't reach the same speed on the current
+   epoch, what do I do if I want to continue mining?
+
+   Your first choice is to switch to Linux. Epoch 380 should be doable
+   on most drivers, and all major mining os distributions will make
+   sure they are capable of mining the max possible epoch.
+
+   Your second choice is to switch to a different coin using ethash
+   but with a lower algo. Metaverse, Expanse, Ubiq are three examples,
+   but their returns will be much lower then ETH.
+
+   Your third choice is to switch algo. Plenty of choices available,
+   although the power draw profile for e.g. kawpow is very different
+   from ethash. You have to do your own research for making an
+   informed choice here.
+
+=========================================================================
+Linux
+=========================================================================
+
+This section will be written shortly - Linux drivers in headless mode
+should be able to do epoch 380, we will get another version out there
+before this happens.
+
+Happy mining!
