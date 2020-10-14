@@ -1,4 +1,4 @@
-# teamredminer v0.7.13
+# teamredminer v0.7.14
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -98,6 +98,15 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.14
+
+This release wraps up our work for 4GB gpus mining ethash. Linux 4GB are verified to mine up to and including epoch 381 on drivers 18.50/19.30/19.50/20.10. After that, we have added support for extended mining from epoch 382 and up. Extended mining is a trade-off between hashrate and being able to mine at all, gpus will lose additional hashrate for every extra epoch. Please see the Linux section in the ETHASH_4GB_HOWTO.txt for more details and instructions.
+
+Release notes:
+- Ethash: verified Linux support for 4GB gpus up to and including epoch 381.
+- Ethash: added support for extended 4GB mining from epoch 382 and up.
+- Kawpow: cleaned up false hw errs for some block heights.
+
 Changes in v0.7.13
 
 1) Windows user with 4GB rigs - see the new guide ETHASH_4GB_HOWTO.txt for instructions.

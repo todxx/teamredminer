@@ -1,6 +1,7 @@
 TeamRedMiner Ethash 4GB Status
 ==============================
 
+v1.1 - 2020-10-12 - Added Linux section and info around extended mining.
 v1.0 - 2020-10-04 - First version, Windows only.
 
 Summary
@@ -35,14 +36,21 @@ Windows overall comments
 
 Windows TL;DR
 --------------------
+
 We now provide two new example .bat files, start_eth_4gb.bat and
 test_eth_4gb_epoch_374.bat. If you can run the test and cards reach
 their max speed, you're good to go for epoch 374 but need to add
 "--restart_gpus --uac --eth_alloc_epoch=374" as additional arguments
 to your current command line. The start_eth_4gb.bat contains these
-arguments. You will also need TRM v0.7.13 or later. If you don't reach
+arguments. You will also need TRM v0.7.14 or later. If you don't reach
 the same hashrates as you normally do, or if you don't like the
 built-in gpu reset mechanism, continue to read below.
+
+The start_eth_4gb.bat file also enables extended mining for epoch 375
+and up. You will lose hashrate for every additional epoch after epoch
+374. The better choice is to switch to Linux first, as it enables full
+hashrate mining up until epoch 381, then run extended mining from
+there. See the separate section on extended mining for more details.
 
 Windows instructions
 --------------------
@@ -80,21 +88,24 @@ Windows instructions
    d) Disable+enable all gpus manually in the Windows Device
       Manager. Not really recommended for anything but testing.
 
-2) ALWAYS add the argument "--eth_alloc_epoch=N". We believe most (or
+2) ALWAYS add the argument "--eth_4g_max_alloc=N" for a limit
+   specified as an epoch or a raw number of MBs. We believe most (or
    all?) rigs should be able to do epoch 374, which means using
-   "--eth_alloc_epoch=374". If this doesn't work, as in you're not
+   "--eth_4g_max_alloc=374". If this doesn't work, as in you're not
    getting your normal max hashrates, try a lower number. This
    argument forces the miner to allocate the necessary vram on all
-   gpus right at startup in a prioritized way, and ensure no DAG
-   reallocations will be made until epoch 375.
+   gpus right at startup in a prioritized way, and then cap it and
+   start mining in extended mode from epoch 375 and up.
 
 3) TEST your max possible epoch on beforehand. This is done by running
-   the miner in benchmark mode using "--eth_epoch=374". You just add
-   this argument last in your normal start command line with pool,
-   wallet etc. This mining mode will NOT submit any shares to your
-   pool, it's only for benchmarking. As soon as you see if you're
-   reaching max speed or not, exit the miner and remove the argument
-   from your start command.
+   the miner in benchmark mode using "--eth_epoch=374
+   --high_sample_mode=8". You just add these arguments last in your
+   normal start command line with pool, wallet etc. This mining mode
+   will NOT submit any shares to your pool, it's only for
+   benchmarking. As soon as you see if you're reaching max speed or
+   not, exit the miner and remove the argument from your start
+   command. You can also test higher epochs to see what hashrate you
+   will get in extended mining mode.
 
    NOTE: we also provide an example .bat file for this test,
    test_eth_4gb_epoch_374.bat included in the zip package.
@@ -127,25 +138,130 @@ Windows instructions
 5) Epoch 375 is here or I can't reach the same speed on the current
    epoch, what do I do if I want to continue mining?
 
-   Your first choice is to switch to Linux. Epoch 380 should be doable
+   Your first choice is to switch to Linux. Epoch 381 should be doable
    on most drivers, and all major mining os distributions will make
    sure they are capable of mining the max possible epoch.
 
-   Your second choice is to switch to a different coin using ethash
-   but with a lower algo. Metaverse, Expanse, Ubiq are three examples,
-   but their returns will be much lower then ETH.
+   Your second choice is to continue mining with TRM in the "extended
+   mode" using the argument "--eth_4g_max_alloc=N". This means
+   allocating as much space as possible but then only storing a
+   partial DAG. Your hashrate with decrease for every additional epoch.
+
+   Your third choice is to switch to a different coin using ethash but
+   with a lower algo. Metaverse, Expanse, Ubiq are three examples, but
+   their returns will be much lower then ETH.
+
+   Your fourth choice is to switch algo. Plenty of choices available,
+   although the power draw profile for e.g. kawpow is very different
+   from ethash. You have to do your own research for making an
+   informed choice here.
+
+   Fifth choice: shut down and sell the gpus.
+
+=========================================================================
+Linux
+=========================================================================
+
+Linux TL;DR
+------------------
+
+Most or all(?) modern amdgpu-pro drivers should be able to mine epoch
+381. Add the argument "--eth_4g_max_alloc=4078" to reserve 4078MiB at
+startup, which will cover epoch 381 fully. If you fail to allocate the
+vram on startup or the miner crashes after 5-10 mins every time, lower
+the number (4078) in small steps until the miner starts. After epoch
+381, the miner will automatically switch into extended mining mode and
+continue to mine epoch 382 and up with a partial DAG but lose some
+hashrate for every additional epoch.
+
+The example start script start_eth_4gb.sh contains these arguments.
+
+Linux Instructions
+------------------
+
+1) Linux is much simpler to handle than Windows. We've verified mining
+   on epoch 381 on amdgpu-pro drivers 18.50, 19.30, 19.50, 20.10.
+
+2) PRE-ALLOCATE: You should always avoid reallocation of the DAG
+   buffers at epoch switches, which means you should instruct the
+   miner to allocate the max possible memory at startup. The easiest
+   way to do this is the use the "--eth_4g_max_alloc=4078" argument,
+   which also automatically enables extended mining after epoch
+   381. You can also add "--eth_alloc_epoch=381" to apply it to all
+   gpus in the rig, not just the 4GB gpus. The given number tells the
+   miner how many MBs to allocate for the DAG buffer. If gpus in your
+   rig fails to allocate vram with that setting, you need to lower
+   it. You can also specify separate values per gpu in a
+   comma-separated list if it's only one gpu failing to allocate
+   4078MB.
+
+3) TEST: take your normal command line and add "--eth_epoch=381
+   --high_sample_mode=8" at the end to run simulated mining on epoch 381
+   to verify that it works. You can also increase the number to higher
+   epochs to test extended mining and check what hashrates you will get
+   with partial DAGs.
+
+4) Epoch 382 is here or I can't reach the same speed on the current
+   epoch, what do I do if I want to continue mining?
+
+   Your first choice is to continue mining with TRM in the "extended
+   mode" using the argument "--eth_4g_max_alloc=N", as described in
+   the instructions above. You will lose hashrate for every new epoch,
+   so after 2-3 weeks it won't be worth it unless nethash has dropped
+   significantly and profits have gone up. 
+   
+   Your second choice is to switch to a different coin using ethash but
+   with a lower algo. Metaverse, Expanse, Ubiq are three examples, but
+   their returns will be much lower then ETH.
 
    Your third choice is to switch algo. Plenty of choices available,
    although the power draw profile for e.g. kawpow is very different
    from ethash. You have to do your own research for making an
    informed choice here.
 
-=========================================================================
-Linux
-=========================================================================
+   Fourth choice: shut down and sell the gpus.
 
-This section will be written shortly - Linux drivers in headless mode
-should be able to do epoch 380, we will get another version out there
-before this happens.
+=========================================================================
+Extended Mining
+=========================================================================
+TRM v0.7.14 adds support for "extended mining". This means that you
+can continue to mine with 4GB gpus even when they can't store the full
+DAG for the epoch. However, since the full DAG isn't available, some
+hashes will be discarded and your hashrate will decrease for every
+additional epoch.
+
+This mode is enabled using the argument "--eth_4g_max_alloc=N". Please
+see the description in the --help output (or USAGE.txt), or in the
+instructions above. Windows users should try "--eth_4g_max_alloc=374",
+Linux users should try "--eth_4g_max_alloc=4078". If you get
+allocation errors on startup, or the miner crashes after the same
+amount of time every run, lower the number slightly until it
+works. For example, on amdgpu-pro 20.10, our tests crashed after
+exactly 7 mins every run. Lowering the value from 4078 to 4076 and it
+ran for days. Amdgpu-pro 19.30 could use 4078 with no issues.
+
+NOTE: extended mining means that the optimal intensities will change
+with each epoch. Therefore, the miner will reinitiate the auto-tune
+process for every epoch switch during extended mining unless manual
+intensities were given with --eth_config when the miner was started.
+
+This is an example table with 2 x Nitro+ 470 4GBs mining at 29.65 MH/s
+each at full speed, i.e. 59.30 MH/s total, having 4078MB of DAG buffer
+space available. Power draw will stay roughly the same, so your
+efficiency will take about the same hit as the hashrate.
+
+Epoch  DAG MB  DAG %    Hashrate  Loss %
+381    4072    100.00%  59.30       0.0%
+382    4080    99.95%   58.38      -1.6%
+383    4088    99.76%   54.89      -7.4%
+384    4096    99.56%   51.46     -13.2%
+385    4104    99.37%   48.29     -18.6%
+386    4112    99.17%   45.17     -23.8%
+387    4120    98.98%   42.17     -28.9%
+388    4128    98.79%   39.35     -33.6%
+389    4136    98.60%   36.80     -37.9%
+390    4144    98.41%   34.23     -42.3%
+395    4184    97.47%   22.46     -62.1%
+400    4224    96.54%   12.55     -78.8%
 
 Happy mining!
