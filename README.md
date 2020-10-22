@@ -1,4 +1,4 @@
-# teamredminer v0.7.15
+# teamredminer v0.7.16b
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -36,6 +36,7 @@ This miner includes the following algorithms and their respective dev fees:
 | Cryptonight saber         | 2.5% |
 | Cryptonight conceal       | 2.5% |
 | Chukwa-512 (Turtlecoin)   | 2.5% |
+| Chukwa-1024 (Turtlecoin)  | 2.5% |
 | x16r                      | 2.5% |
 | x16rv2                    | 2.5% |
 | x16s                      | 2.5% |
@@ -71,6 +72,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Cryptonight saber        |  N   |  L   |   L     |
 | Cryptonight conceal      |  N   |  L   |   L     |
 | Chukwa-512               |  N   |  L   |   L     |
+| Chukwa-1024              |  N   |  L   |   L     |
 | x16r                     |  N   |  Y   |   Y     |
 | x16rv2                   |  N   |  Y   |   Y     |
 | x16s                     |  N   |  Y   |   Y     |
@@ -98,6 +100,15 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.16b
+
+BETA RELEASE - adds Turtlecoin's new algo chukwa2. Not tested as rigorously as other versions. Only use for the Turtlecoin fork.
+
+NOTE: Navi gpus are NOT supported on chukwa2 for now. Support will be added if there's sufficient interest.
+
+Release notes:
+- Added algo trtl_chukwa2 for the Turtlecoin fork on 2020-10-22.
+
 Changes in v0.7.15
 
 Small bugfix release.

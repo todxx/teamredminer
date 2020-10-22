@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.15
+          Team Red Miner version 0.7.16b
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -26,6 +26,7 @@ Options:
                               cn_saber          (bittube)
                               cn_conceal        (conceal)
                               trtl_chukwa       (turtlecoin)
+                              trtl_chukwa2      (turtlecoin)
                               nimiq             (nimiq)
 
   -h, --help                Display this help message and exit.
