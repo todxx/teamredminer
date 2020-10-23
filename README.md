@@ -1,4 +1,4 @@
-# teamredminer v0.7.16b
+# teamredminer v0.7.16c
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -100,6 +100,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.16c
+
+BETA RELEASE - small fixes for Turtlecoin's new algo chukwa2.
+
+Release notes:
+- Chukwa2: fixed kernels loading for Radeon VII gpus.
+- Chukwa2: fixed mem footprint for 2GB gpus.
+
 Changes in v0.7.16b
 
 BETA RELEASE - adds Turtlecoin's new algo chukwa2. Not tested as rigorously as other versions. Only use for the Turtlecoin fork.
