@@ -1,4 +1,4 @@
-# teamredminer v0.7.16c
+# teamredminer v0.7.17
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -100,6 +100,15 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.17
+
+Release notes:
+- BETA: Added fan control, see --help section or USAGE.txt. Enable with --fan_control.
+- Fixed deadlock bug that could happen when using multiple pools with the failover strategy.
+- Added option for not sending stale shares (see --no_stale_submit).
+- Added watchdog check for early gpu init hangs.
+- Added example watchdog scripts for win/linux.
+
 Changes in v0.7.16c
 
 BETA RELEASE - small fixes for Turtlecoin's new algo chukwa2.

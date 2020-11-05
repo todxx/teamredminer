@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.16c
+          Team Red Miner version 0.7.17
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -93,6 +93,7 @@ Global pool options:
                                 hashrate to the pool until the total hashes for each pool is balanced. 
       --no_ntime_roll       Prevents the miner from rolling ntime in the block header, only using the value
                               provided by the pool. This needs to be enabled for some pools when mining x16rt.
+      --no_stale_submit     Prevents the miner from submitting shares that are not for the most current pool job.
 
 GPU options:
       --platform=INDEX      Sets the index of the OpenCL platform to use. If not specified, platform will
@@ -114,6 +115,48 @@ GPU options:
       --opencl_order        Orders the detected or specified devices in the order OpenCL presents them.
       --list_devices        Lists the available devices for the detected or specified platform and exits
                               immediately.  Bus reordering will be implemented in the displayed order.
+
+Fan control options (BETA feature):
+      --fan_control(=CFG1,CFG2,...)  This argument enables gpu fan control by the miner.  TRM supports
+                              auto-adjusting the gpu fan speed(s) based on core, junction and/or mem temp.
+                              We also support setting a static fan speed in percent.
+
+                              Each gpu type has a fan configuration that will be used by default.  We support
+                              both overriding the default configuration per gpu type as well as setting a
+                              specific config per gpu in the rig.
+
+                              A fan config consists of four values, separate by the ':' (colon) char.  The values
+                              are: core target temp, junction target temp, mem target temp, fan speed in percent.
+                              Any value can be left empty.  These are a few examples:
+                              ::70:50      Target mem temp to 70C, start fan at 50% speed.
+                              55:::        Target core temp to 55C, start fan at default configuration's speed.
+                              55::75:80    Adjust fan so that core temp is <= 55C and mem temp is <= 75C, start
+                                           fan at 80%.
+                              :::100       Set static fan speed to 100%, never adjust based on temps.
+
+                              The fan configuration used for a gpu is derived in the following precedence order:
+                              1. The --fan_control argument was passed a list of configurations and included an
+                                 entry for gpu X.
+                              2. The default fan configuration for this gpu type was overridden with a
+                                 --fan_default_<type>=... parameter.
+                              3. Use the built-in default fan configuration for this gpu type.
+
+                              In the list above, if the chosen configuration is missing the start value for the fan
+                              the setting from the next configuration is used.
+
+                              NOTE: fan support is a beta feature and will not work better than the support the
+                              drivers provide.  For example, many times the drivers under linux don't allow forcing a
+                              fan to 100% using the sysfs pwm support.
+
+      --fan_default_polaris=CFG Set the default config used for all Polaris gpus (450/460/550/560/470/480/570/580/590).
+                              The built-in default is 55:::50 for 55C core temp and fan starting at 50%.
+      --fan_default_vega=CFG    Set the default config used for all Vega gpus (Vega 56/Vega 64).
+                              The built-in default is 55::70:50 for 55C core temp, 70C mem temp and fan at 50%.
+      --fan_default_vega2=CFG   Set the default config used for all Radeon VII gpus.
+                              The built-in default is 70::75:80 for 70C core temp, 75C mem temp and fan at 80%.
+      --fan_default_navi=CFG    Set the default config used for all Navi.
+                              The built-in default is 60::80:70 for 60C core temp, 80C mem temp and fan at 70%.
+      --fan_debug               Enable log printouts related to adjustments.
 
 Watchdog options:
       --no_gpu_monitor      Disables the ADL (Windows) or sysfs (Linux) GPU monitor for temperature and
