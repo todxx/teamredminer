@@ -1,8 +1,9 @@
-          Team Red Miner version 0.7.17
+          Team Red Miner version 0.7.18
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
                               ethash            (eth, etc, etp, others)
+                              etchash           (alias for -a ethash --eth_variant_mode=etchash)
                               kawpow            (ravencoin)
                               lyra2z      
                               phi2              (lux, argoneum)
@@ -186,6 +187,22 @@ Ethash options:
                               applied to each GPU. For example: --eth_config=A,B750,,A288
                               Any gpu that does not have a specific config in the list will use the first
                               config in the list.
+      --eth_variant_mode=X  This argument controls activation of the ethash changes for ETC from epoch 390 as described
+                              in ecip-1099. The following modes are available:
+                              pool      - Default mode. Only activates if the pool sends an algo flag containing etchash.
+                                          Once this flag is seen, all pool jobs will be assumed to be etchash unless another.
+                                          algo flag containing ethash is received.
+                              etchash   - Etchash mode. Epoch >= 390 will be assumed to be etchash, lower epochs ethash. Pool
+                                          algo flags are not used.
+                              deduce    - Ignore pool algo flags and only apply a heuristics based on the current system time
+                                          and known heights and times for ETC and ETH. This mode should work as a generic
+                                          approach when ETH reaches epoch 390 in Jan 2021. The system clock needs to be correct.
+                                          It should also handle any profit switching setups that switch freely between ethash and
+                                          etchash jobs by proxying underlying pools.
+                              auto      - As long as the pool hasn't passed an algo flag, use deduce mode. When an algo flag
+                                          is seen, switch to pool mode.
+                              ethash    - Forced ethash mode. Never apply ecip-1099.
+                              force_etc - Forced etchash mode. Always apply ecip-1099 rules. Use for ETC testnet mining.
       --eth_aggr_mode       Enables automatic use of the 'B' mode for all Polaris 8GB cards, unless they have a
                               different config provided by the --eth_config argument.  This is the same thing as 
                               manually setting all Polaris 8GB gpus in the rig to 'B' mode using --eth_config.
@@ -217,9 +234,14 @@ Ethash options:
                               specifying different values per gpu.  Values for non-4GB gpus are ignored.
       --eth_dag_slowdown=N  Slows down the DAG generation.  Pass a single digit 0-9. 0 means no slowdown (<= 0.7.9 behavior),
                               1 means minimal slowdown, 9 means max.  Default value: 4 for a slight slowdown.
-      --eth_no_stagger      Disables the staggering of gpus when building a new DAG.  The default behavior is to stagger
-                              GPUs so they don't all enter the DAG build process at exactly the same time.
-      --eth_no_ramp_up      Disables the ramping up of intensity for each gpu.
+      --eth_stagger         Enables staggering of gpus when building a new DAG.  This is more lean on PSUs that don't like
+                              going from 0-100% load on all gpus at the same time. 
+      --eth_no_stagger      Disables --eth_stagger.  Already the default behavior from 0.7.18.  Argument kept for backwards
+                              compatibility only.
+      --eth_ramp_up         Adds ramping up the intensity on all gpus after a DAG build, gpu disable/enable or network outage.
+                              Can help rigs with crashes right between the DAG build and starting mining.
+      --eth_no_ramp_up      Disables --eth_ramp_up.  Already the default behavior from 0.7.18.  Argument kept for backwards
+                              compatibility only.
       --eth_direct_abort    Uses a different mechanism to abort ongoing gpu jobs.  Recommended for Vegas in ROCm environments
                               to minimize stale shares.  Will apply to Vega and Polaris gpus in the rig only. 
       --eth_dag_alloc_patch Some motherboards with outdated bios can see hw errs typically on the first or last gpu in the system.
@@ -231,6 +253,14 @@ Ethash options:
                               --eth_hashwatch.  To set your own values, use e.g. --eth_hashwatch=1.25,60.  The same range is used
                               for all gpus in the rig.  A negative value for one side disables it, e.g. use --eth_hashwatch=-1,1000
                               to handle gpu resets that result in huge fake hashrates but no minimum check.
+      --eth_dag_cache(=EPOCH) Enables saving eth DAGs from jobs with different epochs to prevent having to rebuild them in the
+                              future if jobs with the old epochs are received again.  At most one DAG will be saved if GPU memory 
+                              space allows.  This is useful for switching pools such as eth+zil mining.  If you want to prebuild a
+                              certain epoch immediately at startup, add the optional value. Eth+zil switching miners should use
+                              --eth_dag_cache=0.  Only ethash (and not etchash) epochs can be prebuilt at this time.
+      --eth_dag_cache_resv=MEM  Sets the amount of GPU memory the miner will attempt to leave unused when running with DAG caching
+                              enabled (see --eth_dag_cache).  The argument MEM is the amount of memory to leave unused in
+                              mebibytes.  The default value is 256.
 
 Progpow options:
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
@@ -251,9 +281,10 @@ Progpow options:
                               occasional invalid shares.
       --prog_dag_slowdown=N  Slows down the DAG generation.  Pass a single digit 0-9.  0 means no slowdown (<= 0.7.9 behavior),
                               1 means minimal slowdown, 9 means max.  Default value: 4 for a slight slowdown.
-      --prog_no_stagger      Disables the staggering of gpus when building a new DAG.  The default behavior is to stagger
-                              GPUs so they don't all enter the DAG build process at exactly the same time.
-      --prog_no_ramp_up      Disables the ramping up of intensity for each gpu.
+      --prog_stagger         See --eth_stagger.
+      --prog_ramp_up         See --eth_ramp_up.
+      --prog_no_stagger      See --eth_no_stagger.
+      --prog_no_ramp_up      See --eth_no_ramp_up.
 
 Cryptonight options:
       --rig_id              Set the rig identifier that will be sent to the pool. This is only used for

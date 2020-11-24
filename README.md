@@ -1,4 +1,4 @@
-# teamredminer v0.7.17
+# teamredminer v0.7.18
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -100,6 +100,21 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.18
+
+1) Support for the ETC fork added. Run with "-a etchash" for easiest support, see "--eth_variant_mode" in the help for more info.
+
+2) ETH+ZIL miners: add "--eth_dag_cache=0" to use a second dag cache and prebuild epoch 0 immediately at miner start.
+
+3) Ethash miners relying on ramp-up and stagger for stability: the default mode of these tweaks has been changed to off. They now need to be enabled with --eth_ramp_up and --eth_stagger. While helping a number of rigs, these tweaks caused increased instability of others, making the choice of a good default mode difficult.
+
+Release notes:
+- Added etchash support (see algo etchash and --eth_variant_mode).
+- Added dag cache support, mostly intended for eth+zil mining (see --eth_dag_cache).
+- Fixed hex char parsing in enable/disable submenu, can now work with >= 10 gpus.
+- Changed the default for ethash ramp-up and staggering to false (see --eth_ramp_up and --eth_stagger).
+- Added check for broken win setups with duplicated opencl platforms and/or devices.
+
 Changes in v0.7.17
 
 Release notes:
