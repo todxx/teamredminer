@@ -1,4 +1,4 @@
-# teamredminer v0.7.18
+# teamredminer v0.7.19
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -100,6 +100,27 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.19
+
+Highlights:
+
+1) Ethash solo-miner share high-score list added, use --high_score to enable.
+
+2) Ethash single buffer dag for a small power save. Only available on recent drivers and should in theory always be an improvement. It is not verified 100% stable yet and therefore not the default in this version. Enable with --eth_dag_buf=A to test.
+
+3) Miner gpu initialization procedure rewritten. The init procedure should now hopefully be much more stable, especially on Navis in general and even more so for 5600(XT)s.
+
+Release notes:
+- General: added adjustable ratio support for quota and load_balance pool strategies (see --pool_ratio).
+- General: rewrote the miner init procedure to be more stable in general.
+- General: fixed issue where output blocking could cause mining work to stop.
+- General: reduced main binary size.
+- Ethash: reintroduced single DAG buffer support for recent drivers allowing large single allocations (see --eth_dag_buf).
+- Ethash: added high score list of the 15 highest value shares found since start (see --high_score).
+- Ethash: small improvements in keeping the gpu busy over epoch switches. 
+- Ethash: fixed bug that would cause deadlocks in rare occasions.
+- Ethash: bugfix - dag cache wasn't enabled for 4GB gpus.
+
 Changes in v0.7.18
 
 1) Support for the ETC fork added. Run with "-a etchash" for easiest support, see "--eth_variant_mode" in the help for more info.

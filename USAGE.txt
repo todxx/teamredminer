@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.18
+          Team Red Miner version 0.7.19
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -58,6 +58,8 @@ Options:
                               trigger the standard Windows escalation prompt, so you have to be available to click 'Yes'.
                               If this is not enabled, tasks that require Administrator privileges will fail when the
                               miner is running under a basic user account.
+      --high_score          Enables printouts of the top 15 shares found since miner start in the stats output.
+                              Note: this might not be enabled for all algos.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
@@ -72,6 +74,11 @@ Pool config options:
       --pool_broken_rpc     Tells the miner to only allow a single outstanding rpc request on the pool
                               connection.  This is a work-around for pools that violate the json rpc
                               specification regarding rpc IDs.
+      --pool_ratio=RATIO    Sets the hashrate ratio between pools when using multiple pools with the the 
+                              'load_balance' or 'quota' pool strategies (see --pool_strategy).  By default all
+                              pools use the ratio value 1.  For example, using this option with a value of 2 on 
+                              just one pool will make that pool receive twice the hashrate as the other pools 
+                              since their ratio will still be the default value of 1.
       --pool_debug          Logs all pool traffic.
 
 Global pool options:
@@ -88,10 +95,11 @@ Global pool options:
                               priority: The miner will use pools in the order they are listed, only moving on 
                                 to the next pool if the previous cannot establish a connection. 
                               load_balance: The miner will evenly balance the hashrate across all currently
-                                connected pools.
+                                connected pools.  The ratio of hashrate between pools can be set with --pool_ratio.
                               quota: The miner will evenly balance the total hashes completed across 
                                 all pools.  If a pool disconnects and later reconnects, the miner will move 
                                 hashrate to the pool until the total hashes for each pool is balanced. 
+                                The ratio of hashrate between pools can be set with --pool_ratio.
       --no_ntime_roll       Prevents the miner from rolling ntime in the block header, only using the value
                               provided by the pool. This needs to be enabled for some pools when mining x16rt.
       --no_stale_submit     Prevents the miner from submitting shares that are not for the most current pool job.
@@ -222,6 +230,15 @@ Ethash options:
                               if it needs to later during mining.  It's recommended for rigs with one or more 4GB cards to test
                               and set this to the max possible value to avoid reallocations at epoch switches.  Optimal Linux
                               rigs should be able to handle epoch 380, Windows rigs a little less (373-374).
+      --eth_dag_buf=X,Y,... The miner can allocate a single or dual buffers for the DAG.  For now, the default is DUAL buffers, which
+                              matches the behavior in all recent TRM releases.  However, a single buffer is slightly better, leading
+                              to a small power save for all gpu types.  Only recent drivers support single large allocations larger
+                              than 4GiB, typically from Adrenalin 20.9.1 and amdgpu-pro 20.x. The miner can automatically use single
+                              buffer mode when possible using this argument, as well a force single or dual buffers per gpu.
+                              Supported values are A(uto), S(ingle), D(ual).  You can enumerate a comma-separated list for all gpus
+                              in the rig, or a single value for all gpus.  A gpu that does not have a value in the comma-separated list
+                              will use the first value.  Hence, to enable auto mode for all gpus, pass --eth_dag_buf=A
+                              NOTE: 4GB gpus will be forced to use dual buffers. 
       --eth_4g_alloc_adjust=X,Y,...  On Windows, the allocation balance is very delicate for 4GB gpus being able to reach their
                               maximum possible DAG epoch.  The miner uses a strategy that has worked fine for our test gpus,
                               but other setups can benefit from tweaking this number.  The valid range is [-128,+128].  Zero means
