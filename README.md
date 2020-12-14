@@ -16,6 +16,8 @@ Below is a list of mining operating systems and management software that have bu
 
 This miner supports a range of algorithms.  Please see the list below for details.  The miner is configured via command line only, please run with the --help option to print a short help message for how to use the command line options.
 
+**This miner supports mining ethash with 4GB Polaris GPUs after epoch 381 on linux.  Please see the guide [here](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_4GB_HOWTO.txt)**
+
 This miner includes the following algorithms and their respective dev fees:
 
 |        Algorithm          |  Fee |
