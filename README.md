@@ -1,4 +1,4 @@
-# teamredminer v0.7.19
+# teamredminer v0.7.20
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -100,6 +100,18 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.20
+
+Highlights:
+
+ETH is now approaching the start of the 4GB death with the upcoming switch to epoch 382. TRM was the first miner to add support for mining with 4GB gpus with a partial DAG, here called "extended mining". However, it has always required manual configuration. This release adds a default conservative cap at 4072MB for DAG storage on 4GB gpus for out-of-the-box execution of the miner. For maximum performance, miners are still advised to manually tune their rig(s) with the --eth_4g_max_alloc argument. Most rigs runs stable with a higher value than 4072, which makes a significant difference for upcoming ETH epochs. 
+
+For more detailed instructions, our Ethash 4GB guide has also been updated and is available at https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_4GB_HOWTO.txt
+
+Release notes:
+- Ethash: added default capped DAG allocation for 4GBs at 4072MB (see --eth_4g_max_alloc).
+- Ethash: bugfix for crashes using --eth_dag_cache on 4GB gpus.
+
 Changes in v0.7.19
 
 Highlights:
