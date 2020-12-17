@@ -1,4 +1,4 @@
-# teamredminer v0.7.20
+# teamredminer v0.7.21
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -15,6 +15,8 @@ Below is a list of mining operating systems and management software that have bu
  - [RaveOS](https://raveos.com/)
 
 This miner supports a range of algorithms.  Please see the list below for details.  The miner is configured via command line only, please run with the --help option to print a short help message for how to use the command line options.
+
+**This miner supports mining ethash with 4GB Polaris GPUs after epoch 381 on linux.  Please see the guide [here](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_4GB_HOWTO.txt)**
 
 This miner includes the following algorithms and their respective dev fees:
 
@@ -100,6 +102,13 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.21
+
+Quick release that addresses situations where Ethash with capped DAG on 4GBs would crash after 5-10 mins when running at 4078-4080MB.
+
+Release notes:
+- Ethash: improved probability for high (4078-4080MB) ethash 4GB capped allocation running stable over time.
+
 Changes in v0.7.20
 
 Highlights:

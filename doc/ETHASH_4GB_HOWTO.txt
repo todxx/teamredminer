@@ -1,6 +1,7 @@
 TeamRedMiner Ethash 4GB Status
 ==============================
 
+v1.3 - 2020-12-17 - Moved the extended mining section.
 v1.2 - 2020-12-13 - Rewrote Linux section before epoch 382.
 v1.1 - 2020-10-12 - Added Linux section and info around extended mining.
 v1.0 - 2020-10-04 - First version, Windows only.
@@ -111,6 +112,51 @@ Linux Instructions
    informed choice here.
 
    Fourth choice: shut down and sell the gpus.
+
+=========================================================================
+Extended Mining
+=========================================================================
+TRM v0.7.14 adds support for "extended mining". This means that you
+can continue to mine with 4GB gpus even when they can't store the full
+DAG for the epoch. However, since the full DAG isn't available, some
+hashes will be discarded and your hashrate will decrease for every
+additional epoch.
+
+This mode is enabled using the argument "--eth_4g_max_alloc=N". Please
+see the description in the --help output (or USAGE.txt), or in the
+instructions above. Windows users should try "--eth_4g_max_alloc=374",
+Linux users should try "--eth_4g_max_alloc=4078". If you get
+allocation errors on startup, or the miner crashes after the same
+amount of time every run, lower the number slightly until it
+works. For example, on amdgpu-pro 20.10, our tests crashed after
+exactly 7 mins every run. Lowering the value from 4078 to 4076 and it
+ran for days. Amdgpu-pro 19.30 could use 4078 with no issues.
+
+NOTE: extended mining means that the optimal intensities will change
+with each epoch. Therefore, the miner will reinitiate the auto-tune
+process for every epoch switch during extended mining unless manual
+intensities were given with --eth_config when the miner was started.
+
+This is an example table with 2 x Nitro+ 470 4GBs mining at 29.65 MH/s
+each at full speed, i.e. 59.30 MH/s total, having 4078MB of DAG buffer
+space available. Power draw will stay roughly the same, so your
+efficiency will take about the same hit as the hashrate.
+
+Epoch  DAG MB  DAG %    Hashrate  Loss %
+381    4072    100.00%  59.30       0.0%
+382    4080    99.95%   58.38      -1.6%
+383    4088    99.76%   54.89      -7.4%
+384    4096    99.56%   51.46     -13.2%
+385    4104    99.37%   48.29     -18.6%
+386    4112    99.17%   45.17     -23.8%
+387    4120    98.98%   42.17     -28.9%
+388    4128    98.79%   39.35     -33.6%
+389    4136    98.60%   36.80     -37.9%
+390    4144    98.41%   34.23     -42.3%
+395    4184    97.47%   22.46     -62.1%
+400    4224    96.54%   12.55     -78.8%
+
+Happy mining!
 
 =========================================================================
 Windows
@@ -254,47 +300,3 @@ Windows instructions
 
    Fifth choice: shut down and sell the gpus.
 
-=========================================================================
-Extended Mining
-=========================================================================
-TRM v0.7.14 adds support for "extended mining". This means that you
-can continue to mine with 4GB gpus even when they can't store the full
-DAG for the epoch. However, since the full DAG isn't available, some
-hashes will be discarded and your hashrate will decrease for every
-additional epoch.
-
-This mode is enabled using the argument "--eth_4g_max_alloc=N". Please
-see the description in the --help output (or USAGE.txt), or in the
-instructions above. Windows users should try "--eth_4g_max_alloc=374",
-Linux users should try "--eth_4g_max_alloc=4078". If you get
-allocation errors on startup, or the miner crashes after the same
-amount of time every run, lower the number slightly until it
-works. For example, on amdgpu-pro 20.10, our tests crashed after
-exactly 7 mins every run. Lowering the value from 4078 to 4076 and it
-ran for days. Amdgpu-pro 19.30 could use 4078 with no issues.
-
-NOTE: extended mining means that the optimal intensities will change
-with each epoch. Therefore, the miner will reinitiate the auto-tune
-process for every epoch switch during extended mining unless manual
-intensities were given with --eth_config when the miner was started.
-
-This is an example table with 2 x Nitro+ 470 4GBs mining at 29.65 MH/s
-each at full speed, i.e. 59.30 MH/s total, having 4078MB of DAG buffer
-space available. Power draw will stay roughly the same, so your
-efficiency will take about the same hit as the hashrate.
-
-Epoch  DAG MB  DAG %    Hashrate  Loss %
-381    4072    100.00%  59.30       0.0%
-382    4080    99.95%   58.38      -1.6%
-383    4088    99.76%   54.89      -7.4%
-384    4096    99.56%   51.46     -13.2%
-385    4104    99.37%   48.29     -18.6%
-386    4112    99.17%   45.17     -23.8%
-387    4120    98.98%   42.17     -28.9%
-388    4128    98.79%   39.35     -33.6%
-389    4136    98.60%   36.80     -37.9%
-390    4144    98.41%   34.23     -42.3%
-395    4184    97.47%   22.46     -62.1%
-400    4224    96.54%   12.55     -78.8%
-
-Happy mining!
