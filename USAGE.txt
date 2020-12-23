@@ -1,4 +1,4 @@
-          Team Red Miner version 0.7.21
+          Team Red Miner version 0.7.22
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -34,10 +34,14 @@ Options:
       --debug               Enables debug log output.
       --disable_colors      Disables console output colors.
       --force_colors        Forces console color output even if the terminal does not seem to support them.
-      --api_listen=IP:PORT  Enables the api. IP:PORT is optional. If present, the IP:PORT combo decides
-                              the interface(s) and port to listen to. Default is 127.0.0.1:4028. For
+      --api_listen=IP:PORT  Enables the sgminer compatible api. IP:PORT is optional. If present, the IP:PORT combo
+                              decides the interface(s) and port to listen to. Default is 127.0.0.1:4028. For
                               external access, use e.g. 0.0.0.0:4028. It's also valid to only specify the
                               port, e.g. 4029.
+      --cm_api_listen=IP:PORT Enables the claymore compatible api. IP:PORT is optional. If present, the IP:PORT combo
+                              decides the interface(s) and port to listen to. Default is 127.0.0.1:3333. For
+                              external access, use e.g. 0.0.0.0:3333. It's also valid to only specify the
+                              port, e.g. 3334.
       --log_file(=FILENAME) Enables logging of miner output into the file specified by FILENAME.  If no filename
                               is provided, the miner will log to trm_<algo>_<yyyymmdd_hhmmss>.log in the current
                               working directory.  If the log file already exists, the miner will append.
@@ -278,6 +282,10 @@ Ethash options:
       --eth_dag_cache_resv=MEM  Sets the amount of GPU memory the miner will attempt to leave unused when running with DAG caching
                               enabled (see --eth_dag_cache).  The argument MEM is the amount of memory to leave unused in
                               mebibytes.  The default value is 256.
+      --eth_dag_cache_verify    Enable dag cache read and verification after a finished dag build.  This will detect situations
+                              where the dag cache had bit errors and the resulting dag is partially broken.  We have seen this
+                              happen increasingly on Vegas as the dag has grown bigger.  When detected, a new buffer will be
+                              allocated for the dag cache and the dag build restarted.
 
 Progpow options:
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].

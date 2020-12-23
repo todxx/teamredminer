@@ -1,4 +1,4 @@
-# teamredminer v0.7.21
+# teamredminer v0.7.22
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -95,6 +95,7 @@ Support legend:
 The miner reports GPU hash rates every 30 seconds.  These are the full GPU hash rates before dev fee deduction (your pool hashrate will be slightly lower). 
 
 The miner includes a read-only api based on the sgminer-5.5 API.  Both the json and text formats are supported.  For more details, we refer to the sgminer api documentation.
+The miner also includes a Claymore miner compatible API with support for a subset of the API.
 
 For reporting bugs and/or for features requests, please open an issue on this project's github [issue tracker](https://github.com/todxx/teamredminer/issues).
 
@@ -102,6 +103,19 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.7.22
+
+Highlights:
+
+1) NAVI KERNEL REWRITE! Over the last month we've been working on new kernels. The first one released is for Navi. The main feature is lower power consumption, hashrate will remain about the same but depends somewhat on clocks. NOTE: please let the miner retune any existing --eth_config arguments for all Navi gpus, the new values will be significantly lower.
+
+2) Claymore API now supported, meaning you can use EthMan to monitor TRM rigs. 
+
+Release notes:
+- Ethash: Kernel rewrite for Navi.  Should now be more stable and use less power.  Vega/Polaris still in the works.
+- General: Slightly reworked init procedure again to address some rigs running better on <= 0.7.18 than >= 0.7.19.
+- General: Added Claymore compatible API, see the --cm_api_listen option.
+
 Changes in v0.7.21
 
 Quick release that addresses situations where Ethash with capped DAG on 4GBs would crash after 5-10 mins when running at 4078-4080MB.
