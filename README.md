@@ -1,4 +1,4 @@
-# teamredminer v0.7.22
+# teamredminer v0.8.0
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -103,6 +103,46 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.0
+
+Biggest release in a long while with rewritten ethash kernels and new mining modes for all gpu types!
+
+Users are highly(!) recommended to take a few minutes to read the 0.7-to-0.8 [migration guide](doc/ETHASH_FROM_0.7_TO_0.8.txt) and the new [ethash tuning guide](doc/ETHASH_TUNING_GUIDE.txt). Key highlights:
+
+- Polaris: Efficiency and slight hashrate increase. B-mode reintroduced for added hash. B-mode must be enabled with --eth_aggr_mode or --eth_config=Bxxx.
+
+- Vega 56/64: greatly improved base kernel for efficiency. New B-mode that can shave off additional 1-2W on top of the A-mode kernel. B-mode must be enabled manually with --eth_config (--eth_aggr_mode does not apply). Tuning numbers have changed - do NOT keep your old static --eth_config values.
+
+- Radeon VII: huge boost with its new C-mode but requires a special Linux setup. Can now do 100 MH/s on most air cooled VIIs. See tuning guide.
+
+- 5700/5700XT: can shave off as much as 8-9W(!) of power using the new B-mode and dropping core clk+voltage. B-mode now the default mining mode. Unless you retune your core clk+voltage you will see a tiny power draw increase instead and not benefit from the upgrade, so read the migration guide. 
+
+- 5600XT: new B-mode has a much smaller effect. A-mode remains the default mining mode. See new tuning guide for more details.
+
+- The dag cache is NOT compatible with the new B/C-modes. ETH+ZIL switchers have to choose between caching the epoch 0 dag and using the new mining modes.
+
+- Ethash 4GB kernels NOT rewritten in this release, performance remains the same as in 0.7.x.
+
+- See the migration guide for hashrate and power draw comparisons between 0.7.21 and 0.8.0.
+
+Release notes:
+- Ethash: VII kernel rewrite and new C-mode with boost feature (see guide).
+- Ethash: Navi kernel slight optimization and new B-mode for lower core clock and power.
+- Ethash: Vega kernel rewrite and new B-mode for lower core clock and power.
+- Ethash: Polaris kernel rewrite and new B-mode for slightly higher perf.
+- Ethash: added share processing timeout and default for Binance pool (see --pool_share_limit_ms).
+- Claymore API: fixed leak that stopped serving requests after 32k api calls.
+- Claymore API: added password support (see --cm_api_password).
+- Logging: added log rotation support (see --log_rotate).
+- Logging: log files now contain the miner welcome message so the version is stored.
+- Kawpow: now mining ok at MiningPoolHub even though their seedhash is broken.
+- Fan control: added min/max fan speed range (see --fan_control).
+- General: added argument to turn off duplicate pci bus id filtering (see --allow_dup_bus_ids).
+
+Changes in v0.7.23
+
+None - discarded as internal test version.
+
 Changes in v0.7.22
 
 Highlights:

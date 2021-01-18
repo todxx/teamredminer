@@ -1,0 +1,199 @@
+TeamRedMiner Ethash 0.7.x to 0.8.0 Transition Guide 
+===================================================
+
+TL;DR
+
+- TRM v0.8.0 contains rewritten kernels for all gpu types.
+
+- Efficiency improvements for all gpus.
+
+- New B/C-modes are introduced utilizing more vram on all gpus. Must have driver
+  support for large allocations, meaning amdgpu-pro >= 20.30 or Adrenalin >=
+  20.9.1.
+
+- Polaris: Efficiency and slight hashrate increase. B-mode reintroduced for
+  added hash. B-mode must be enabled with --eth_aggr_mode.
+
+- Vega 56/64: greatly improved base kernel for efficiency. New B-mode that can
+  shave off additional 1-2W. B-mode must be enabled manually with --eth_config.
+  Tuning numbers have changed - do NOT keep your old static --eth_config values.
+
+- Radeon VII: huge boost in its new C-mode but requires a special Linux
+  setup. Can now do 100 MH/s on air cooling.
+
+- 5700/5700XT: can shave off as much as 8-9W(!) of power using the new B-mode
+  and dropping core clk+voltage. B-mode now the default mining mode.
+
+- 5600XT: new B-mode has a much smaller effect and must be enabled and tuned
+  manually. A-mode remains the default mining mode. See new tuning guide for
+  details.
+
+- For most gpus, intensity numbers are now very different from before. Please
+  remove any static --eth_config argument and let the miner run the auto-tune
+  process once.
+
+- Ethash 4GB kernels are NOT rewritten in this release, performance remains the
+  same as in 0.7.x.
+
+- The dag cache is NOT compatible with the B/C-mode. ETH+ZIL switchers have to
+  choose between caching the epoch 0 dag and using the new mining modes.
+
+
+Performance changes between 0.7.21 and 0.8.0
+============================================
+- Tests were made on Ubuntu 18.04 using amdgpu-pro 20.30.
+
+- The gpu power sensor was polled 4096 times over a few minutes, average
+  provided. Power numbers should NOT be confused with proper at-the-wall
+  measurements. The numbers here are merely provided to indicate the change in
+  power draw between versions.
+
+- Clocks and voltages listed as provided by linux sysfs. ETH epoch 389 was
+  mined.
+
+- Navis are still compared to 0.7.21 although a pre-release of the new Navi
+  kernel was made in TRM 0.7.22. The differences between 0.7.22 and 0.8.0 are
+  additional small optimizations and the new B-mode.
+
+Polaris
+Nitro+ 580 8GB Samsung, core 1150@840mV, mem 2100@840mV, ref 30
+0.7.21 A-mode A256  30.73 MH/s  sensor 79.66W   
+0.8.0  A-mode A194  30.97 MH/s  sensor 78.25W   -1.41W
+0.8.0  B-mode B232  31.13 MH/s  sensor 78.77W   -0.89W
+
+Vega 56/64
+Vega 56 ref Samsung, A-mode 1065@850mV, B-mode 1000@850mV, mem 950@850mV, TRM timings
+0.7.21 A-mode A872  50.08 MH/s  sensor 115.98W
+0.8.0  A-mode A448  50.32 MH/s  sensor 111.15W  -4.83W
+0.8.0  B-mode B450  50.31 MH/s  sensor 110.15W  -5.83W
+
+Radeon VII
+Radeon VII Hynix, core 1600MHz@881mV, mem 1000MHz with timings
+0.7.21 B-mode B740  87.87 Mh/s  sensor 185.25W
+0.8.0  B-mode B208  87.85 Mh/s  sensor 177.38W  -7.87W
+0.8.0  C-mode C322  100.4 Mh/s  sensor 192.54W  +7.29W +12.53Mh/s
+
+5700/5700XT
+Red Devil 5700XT Micron  A-Mode 1400@725mV, B-Mode 1245@675mV, Mem 912 MHz
+0.7.21        A624  56.05 MH/s  sensor 105.82W
+0.8.0 A-mode  A620  56.08 MH/s  sensor 103.61W  -2.21W
+0.8.0 B-mode  B608  56.01 MH/s  sensor  96.83W  -8.99W
+
+
+Cooling Transition
+==================
+All of the new kernels runs with less compute work needed per hash compared to
+earlier TRM versions. This typically results in lower power draw, all else being
+equal, and that it will be slightly easier to cool your gpu. However, the memory
+has exactly the same cooling requirements as previous versions, and even higher
+requirements if v0.8.0 runs at a higher hashrate.
+
+The effect is that any cooling setup not using a static fan speed but targeting
+a specific core temp is at risk of providing insufficient mem cooling. In turn,
+this can lead to increased instability. Therefore, make sure you either lower
+any dynamic fan target system based on core temp a degree or two, or if you know
+your previous fan speeds, make sure fans are not running lower than before. You
+can also use the TRM built-in fan control to target a specific mem temp for
+Vegas/Navis.
+
+
+Polaris Transition
+==================
+Polaris gpus/rigs can simply start the miner at the old clocks and voltages. The
+normal outcome is a higher hashrate at a lower power draw, but this can vary
+depending on clocks and memory straps. A slightly higher hashrate always mean
+higher pressure on the memory subsystem. You might have to clock down slightly
+to avoid hw errs or crashes, converting the added hashrate capacity into a power
+save and higher efficiency instead.
+
+The reintroduced B-mode usually adds 0.1-0.2 MH/s of extra hashrate. It is not
+enabled by default since it's often harder to run stable over time compared to
+the normal A-mode. Like in previous TRM versions, you enable it with
+--eth_aggr_mode or manual --eth_config=Bxxx arguments. You must run a driver
+that supports large allocations, i.e. amdgpu-pro >= 20.30 or Adrenalin >=
+20.9.1.
+
+Note: eth config numbers have been rescaled. Do NOT keep old --eth_config
+arguments with hardcoded configs around, let the miner run the auto-tune at
+least once before setting a new static config.
+
+
+Vega 56/64 Transition
+=====================
+Vega 56/64 can run at their old clocks and voltages and should see a power
+reduction of up to 4-5W when running at 50+ MH/s speeds, sometimes converted
+into a slightly increased hashrate and a lower power draw reduction instead.
+
+Users that care about efficiency should try the new B-mode. It needs to be
+enabled manually by adding --eth_config=Bxxx for all Vega gpus in the rig. You
+must run a driver that supports large allocations, i.e. amdgpu-pro >= 20.30 or
+Adrenalin >= 20.9.1. Typically, you can simply reduce your core clk 30-80 MHz
+compared to running in A-mode. Hashrate will be preserved or lose a minimal
+amount, and your power draw will go down 1-2W. Depending on your overall config,
+you might be able to further reduce core clk while preserving the hashrate. You
+can also try tuning down voltage just slightly after lowering core clk.
+
+The normal A-mode is chosen as default for Vega 56/64 since early tests have
+indicated that the B-mode is slightly harder to keep running stable. This is
+highly dependent on the custom timing mods in use though.
+
+Note: eth config numbers have been rescaled. Do NOT keep old --eth_config
+arguments with hardcoded configs around, let the miner run the auto-tune at
+least once before setting a new static config.
+
+
+Radeon VII Transition
+=====================
+In the v0.8.0 release we have introduced a new C-mode for Radeon VIIs that can
+increase hashrate by 10+% depending on clocks, and can now hit 100MH/s on air
+cooling.  However this new C-mode requires running on Linux, making Linux
+kernel boot parameter changes, and running the miner as root.  For full
+details, see Radeon VII section in the tuning guide.
+
+For those users upgrading to v0.8.0 but not trying to use C mode, you will see
+a significant power reduction of around 6-9W.  Your existing clocks, voltages,
+and timings should work without needing adjustment and you can just sit back
+and enjoy your power savings.
+
+Note: eth config numbers have been rescaled. Do NOT keep old --eth_config
+arguments with hardcoded configs around, let the miner run the auto-tune at
+least once before setting a new static config.
+
+
+Navi 5700XT/5700 Transition
+===========================
+If a driver that supports large allocations is installed, the miner will default
+5700XT/5700s to the new B-mode, using as much vram as possible on the gpu. The
+main benefit from using this mode is support for high hashrates at significantly
+lower core clk+voltage settings compare to A-mode and previous TRM versions.
+
+For a 5700XT/5700 tuned to previous TRM versions, our tests indicate that you
+can drop core clk ~100 MHz and voltage -50mV in B-mode while still preserving
+hashrate (although often with a tiny loss). The efficiency increase is an
+obvious trade-off win even with a small hashrate decrease. If you're on a well
+defined voltage curve, you shouldn't have to touch your voltage settings,
+lowering the core clk is enough, otherwise you should lower voltage manually as
+well. You might need to retune if gpus crash at the lower settings, slightly
+raising voltage until stable again.
+
+If you for some reason can't run in the new B-mode, you can switch to the A-mode
+manually with --eth_config=Axxx (if you're not familiar with this argument, see
+USAGE.txt for more info).
+
+
+Navi 5600XT Transition
+===========================
+The 5600XT does not have enough vram to make the new B-mode a huge power draw
+win like for 5700XT/5700s. Therefore, the miner runs in A-mode by default, and
+you should simply be able to just run at your old clocks/voltages.
+
+For users who care about efficiency, there is usually a 1-3W power save to be
+found by forcing B-mode using --eth_config=B, then slowly lowering core clk
+while making sure your original hashrate is preserved at each lower step. You
+should be able to drop it 25-30 MHz or more from a tuning that is balanced for
+A-mode. If you still run at the same voltage as before (and not with a curve
+that automatically lowers voltage with core clk), you should be able to drop it
+slightly to realize the power save.
+
+
+Happy mining!

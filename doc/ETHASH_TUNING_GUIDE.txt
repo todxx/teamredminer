@@ -1,0 +1,709 @@
+TeamRedMiner Ethash Tuning Guide
+================================
+
+History:
+v1.0 2020-01-16 (v0.8.0)
+
+General Overview
+================
+In general, TeamRedMiner behaves similarly to other AMD ethash miners. The key
+difference is our additional mining modes (B/C-modes) that use additional vram
+on the gpus for additional beneficial effects. The specific effects are
+different per gpu type and are described below in the separate sections.
+
+If you have a tuned configuration for another miner, it should generally work
+well although might not be the absolute optimum for your rig(s), especially if
+you run in B or C-mode with TRM. The main exception is for cards driving
+monitors or doing other simultaneous work. For those, you often need to specify
+a lower manual --eth_config value or the miner will collide with rendering
+tasks, having the driver reset the GPU during mining.
+
+For more help, and for issues not mentioned in this document, please join the
+TRM discord and ping us there.
+
+
+Windows General Instructions
+============================
+For optimal results, and being able to use B/C-modes, you need to use an AMD
+Adrenalin or Windows WHQL driver that supports large single buffer
+allocations. The first such driver was Adrenalin 20.9.1. Without large
+allocation support, you will only be able to run in A-mode using dual buffers,
+which also adds a small additional power draw, and not use any of the more
+advanced execution modes available in TRM.
+
+Our testing was made with the Windows WHQL driver 27.20.1034.6, i.e. the driver
+installed automatically on a Win10 with up-to-date feature updates in Jan 2021
+when it detects AMD gpus in the system. The main reason we used this driver is
+that it supports large allocations and (the standard tool) OverdriveNTool works
+for setting clocks/voltages for Navi gpus. Many AMD Adrenalin drivers don't
+interact well with OverdriveNTool, making it difficult to set up startup .bat
+files settings clocks/voltages.
+
+Host ram requirements is 4GB. However, due to how Windows handles gpu vram
+allocations, you should make sure you have at least 8GB per gpu available as
+virtual memory, set as a custom static size with min equals max.
+
+
+Linux General Instructions
+==========================
+To be able to fully use all features in TRM, specifically the B/C-modes, you
+need to use a driver that supports large single buffer allocations. This means
+amdgpu-pro 20.30-20.40 or any ROCm >= 3.0. Without large allocation support, you
+will only be able to run in A-mode using dual buffers, which also adds a small
+additional power draw, and not use any of the more advanced execution modes
+available in TRM.
+
+Our testing was made on ROCm 3.3, ROCm 4.0, amdgpu-pro 20.30 and amdgpu-pro
+20.40.
+
+Host ram requirements is minimum 4GB, but we have heard about some systems
+needing an upgrade to 8GB when using B/C-modes across many gpus. At the time of
+writing, we don't know exactly why and when this is needed, but if you
+experience instant hard crashes when allocating large amounts of vram on all
+gpus and have an extra ram stick lying around, try increasing host ram on the
+rig in question.
+
+
+ETH Configuration
+=================
+In TRM, each gpu in the rig runs with an "ethash config", either decided
+automatically by the miner at startup or passed by the user using the
+--eth_config argument. You can read more about the format of this argument in
+USAGE.txt, also bundled with the miner package and available on github.  The
+configuration consists of a letter and a number, e.g. A288 or C524. The letter
+denotes the mode, and the number the intensity. Unless specified, the miner will
+auto-tune the intensity for you during the first few minutes of execution.
+
+The first time you run TRM you should let the miner auto-tune the
+intensity. There generally isn't any upside from a performance perspective
+specifying the intensity manually, but for gpus running displays, or gpus
+becoming too hot, you might want to tune it down to lower the hashrate. The
+tuning can sometimes also shift between TRM versions, so it's not a bad idea
+letting it run the auto-tuning process every time you run the miner.
+
+If you do want to specify the config yourself to guarantee you're always running
+with the exact same settings (never bad from a stability perspective), you can
+check the chosen configs in the rightmost column in the 30 sec stats output by
+the miner. They will always vary randomly from run to run and across multiple
+gpus of the same type, it's fully normal. Enumerate all the eth configs there in
+an --eth_config argument for the miner, and you'll bypass the auto-tuning
+process in subsequent runs.
+
+
+A/B/C-mode Mining
+=================
+The mining modes available in TRM differs between gpu types and are described in
+each separate section below. They differ both in what they do and how they
+can/should be used. Two things are always true though: the A-mode is a regular
+mining mode similar to all other AMD ethash miners out there, and the B/C-modes
+require much more vram, often as much as possible.
+
+NOTE: using B/C-mode means that the multiple DAG cache (--eth_dag_cache),
+typically used for ZIL+ETH switching, is not available.
+
+
+High Sample Tuning Mode
+=======================
+When testing different tunings for ethash, assessing if you've crossed the
+boundary where your gpu is unstable and produces bad hash calculations (called
+"hw errs" in TRM) is imperative. TRM has a special argument for this named
+--high_sample_mode, currently not mentioned in the --help section since it isn't
+supported for all algos.
+
+When testing new tuning, we suggest that you always run TRM with the added
+argument --high_sample_mode=8. This will lower the internal difficulty 256x,
+meaning each gpu will produce 256x more shares. The cpu verification then checks
+if each share is valid and if it also matches the pool's difficulty. If the
+latter, the share is sent to the pool.
+
+This way, you can assess the nr of hw errs on a gpu 256x faster than when
+running in normal mining mode, but you also don't run in a simulation mode,
+you're earning exactly as much as during normal mining.
+
+When done tuning you can opt to keep this argument, but it will consume extra
+CPU power for verifying the extra shares and it generally confuses any API
+consumers (mining distros and other 3rd party programs). Therefore, we
+recommend removing it.
+
+
+Polaris Cards (470-580)
+=======================
+There are a multitude of tuning guides, straps, ref boost guides etc available
+for Polaris GPUs already, so we won't cover them in great detail here.
+
+Polaris Stock-to-Performance Guide
+----------------------------------
+TRM does not currently support injecting straps automatically. We rely on the
+users setting up good straps with bios flashes or manual tuning with
+amdmemtweak. The following is therefore necessary to get a Polaris gpu going at
+good ethash speed. There are many other guides out there expanding on each step
+involved, but this should get you started:
+
+NOTE: flashing a bios always presents an added risk. The guide here is presented
+      as-is using known standard tools that have been used on millions of rigs
+      worldwide, and even the few times when a bios flash goes wrong you can
+      most often recover by reflashing the original bios in recovery mode / safe
+      mode.
+
+1)  Download atiflash (or amdvbflash) for your operating system. ATI WinFlash
+    probably also works fine.
+    
+2)  List your adapters using "atiflash -i" and find the gpu you want to mod.
+
+3)  Save your current bios using "atiflash -s N original.rom" assuming your gpu
+    is adapter nr N.
+    
+4)  Copy your bios to a windows machine. Download a tool like e.g. SRB Polaris
+    Bios Editor from https://github.com/doktor83/SRBPolaris
+    
+5)  Either google around for straps to use for your memory type (visible in the
+    bios after you open the editor) or try the built-in "Pimp My Straps" feature
+    (usally good enough for a first mod). Do any other modifications you'd like
+    to include in the bios (clocks/voltages).
+    
+6)  Save the bios as "modded.rom" and flash it back to your gpu with "atiflash
+    -p N modded.rom". Reboot.
+    
+7)  Set up a tool for controlling clocks/voltages. On Windows we recommend
+    OverdriveNTool, on Linux either using a mining distro or reading up on how
+    sysfs works (this assumes a certain degree of tech savviness).
+    
+8)  Set initial clocks to 1200 MHz core clk, 1900 MHz mem clk, 900mV. These
+    settings are both generous and conservative.
+    
+9)  Start the miner and verify mining runs ok for a few mins. Then, start
+    tweaking the clocks, going through:
+
+    a) Increase the mem clk as much as possible while remaining stable.
+    b) Lower the core clk as much as possible without losing too much hashrate.
+    c) Lower the voltage as much as possible without crashing.
+
+10) If you see a 8-10 MH/s hashrate and you're on Windows, make sure compute
+    mode is enabled properly. Run the miner once with your normal arguments but
+    by adding --enable_compute as well or use the bundled
+    enable_compute.bat. Reboot after the miner exits.
+
+11) You'd usually end up with something like 1150 MHz core clk, 2100 MHz mem
+    clk, 850mV when done tuning. This is highly depending on your specific gpu,
+    mem type and straps though.
+
+12) For a last boost of 1-1.3 MH/s of hashrate, download the amdmemtweak tool
+    and apply a "ref boost", running it as root or administrator increasing the
+    refresh rate timing. You can usually increase it to 20-30 with "amdmemtweak
+    -i N --ref 20", where N is your gpu adapter number like in the bios flash
+    earlier. The TRM discord has a pinned .zip package in the ethash channel
+    containing the files needed for windows and an example .bat file.
+
+Polaris Mining Modes
+--------------------
+TRM provides A-mode and B-mode for Polaris cards. The A-mode is pretty much the
+same mode as all other AMD ethash miners run, although optimized as much as
+we've been able to. Compared to other miners, it generally shows as a slightly
+lower power draw while keeping the hashrate high.
+
+We also provide a B-mode for Polaris, using as much vram as possible on the
+gpu. This mode doesn't have as big of an impact as for other gpu types, it
+usually adds 0.2-0.5% of hashrate.
+
+The default choice for Polaris is always A-mode, using a single DAG buffer if
+the driver supports it, otherwise dual buffers. Dual buffers adds a slight power
+draw penalty due to additional instructions.
+
+To enable B-mode, you can either pass --eth_aggr_mode to enable it as the
+default choice for all Polaris gpus in the rig, or you can pass a custom
+--eth_config specifying the mode for gpu(s) to start with B.
+
+The mode intensity range is the same for A and B, namely 12 * NrCUs:
+
+470/570:    0-384
+480/580:    0-432
+
+Any higher specified number than this will be lowered to the max possible value.
+
+
+Vega10 Cards (Vega 56, Vega 64)
+===============================
+With the 0.8.0 release, we have pushed our Vega kernel with a range of new
+optimizations which most often translates into a small hashrate boost and a
+power save of 3-4W per gpu compared to earlier versions. With the new B-mode,
+it's also possible to shave off a few more watts, but it is not as stable with
+advanced custom timing mods.
+
+Note: the timing guides provided below are the same as the ones in our previous
+ethash tuning guide. There are even better mods out there, especially for
+Samsung mem gpus (typically Vega 64s and Vega 56 reference cards).  Many mining
+distros also include highly competitive Vega tunings out-of-the-box that can
+reach 52-53 MH/s for Samsungs.
+
+Vega 56 Hynix Stock-to-Performance Guide (A-mode)
+-------------------------------------------------
+The Vega 56 GPUs with Hynix HBM2 memory are generally known to be
+underperforming their Samsung siblings. With TRM, they can often reach 50 MH/s.
+
+The tuning setup we have come to like in our tests is the following:
+
+1) Start with your core clk at 1100 MHz while pushing the mem clock to 950
+   MHz. If you know that your mem can't handle 950 MHz, lower it from the
+   start. Use 875mV for voltage.
+
+1) Start with the following modded mem timings as a baseline:
+
+   --cl 18 --ras 23 --rcdrd 23 --rcdwr 11 --rc 34 --rp 13
+   --rrds 3 --rrdl 4 --rtp 6 --faw 12 --cwl 7 --wtrs 4 --wtrl 4
+   --wr 11  --rfc 164 --REF 17000
+
+2) The guess is that this setup will hit 46-46.5 MH/s for you. The key to
+   improving performance is --rcdrd. Proceed to lower that value one step at the
+   time, stopping and restarting the miner between each change. You must be on
+   the lookout for hw errors which means you've reached your GPU's limit.
+
+3) If you're part of the lucky crowd and your GPU can handle a rcdrd value as
+   low as 15-16, you should now be seeing a 50-50.2 MH/s hashrate. If your card
+   starts producing hw errors, you need to increase rcdrd until you're
+   stable. NOTE: you must _blast_ your fans to make sure the HBM temp is kept in
+   check. You should always monitor the gpu mem temp as displayed by TRM in the
+   stats output. You can also use the TRM built-in fan control to target a
+   specific mem temp, see USAGE.txt for info on how to use --fan_control.
+
+4) Lower the core clk as much as possible without losing hashrate. If you ended
+   up ith a rcdrd value > 16, there should be room to lower it from 1100
+   MHz. For a 50 MH/s hashrate, you probably need the 1100 MHz core clk to
+   sustain it.
+
+5) Lower voltage to 850/840/830/820 mV, as low as possible while
+   remaining stable.
+
+6) For better efficency (but lower hashrate), tune down your core clk
+   and try to further lower the voltage.
+
+7) See the separate part for B-mode below for a potential additional power save.
+
+Using this setup, we have been running Gigabyte Vega 56 Hynix cards for > 50
+MH/s with no hw errors. 
+
+Vega 64 Samsung Stock-to-Performance Guide (A-mode)
+---------------------------------------------------
+The hardcore Vega 64 Samsung setup these days is to flash it with a
+corresponding Vega 56 bios and apply advanced timings and powerplay table
+mods. This lowers the HBM2 (mem) voltage to 1.25V and therefore the power draw
+while still being able to run a high mem clock and produce a nice 50+ MH/s
+hashrate, sometimes as much as 53-54 MH/s. We do not provide such an example
+below, but recommend googling around for it or visit our Discord for more
+info. For a hassle-free setup, you should check out mining distros specialized
+on Vega tuning such as MMP OS and RaveOS.
+
+If you're still on a Vega 64 bios, try the following for a 50-51 MH/s setup:
+
+1) Set clocks to core clk 1075 MHz, mem clk 1107 MHz, voltage at 850 mV. Your
+   card may need to clock down the mem clk to 1050-1080 MHz to be stable with no
+   hw errs.
+
+2) Use the following modded timings:
+
+   --CL 20 --RAS 30 --RCDRD 14 --RCDWR 12 --RC 44 --RP 14 --RRDS 3
+   --RRDL 6 --RTP 5 --FAW 12 --CWL 8 --WTRS 4 --WTRL 9 --WR 14
+   --REF 17000 --RFC 249
+
+3) Hopefully it runs stable and you should observe a hashrate around 50.5-50.9
+   MH/s. If your GPU can't handle the timings, you need to relax them to less
+   aggressive variants available in the AMD mem tweak thread on Bitcointalk, or
+   come join the TRM discord for further suggestions.
+
+4) For better efficiency (but lower hashrate), tune down your core clk and try
+   to further lower voltage while remaining stable.
+
+5) We reiterate: _blast_ your fans and monitor your mem temp as shown by the
+   miner. Check USAGE.txt for our built-in --fan_control argument and how to
+   target fans for a specific mem temp.
+
+Vega 56 Samsung flashed 64 bios Stock-to-Performance Guide (A-mode)
+-------------------------------------------------------------------
+From a tuning perspective, we treated these cards like regular Vega 64
+GPUs. You might need to increase core clk somewhat compared to true
+Vega 64s to compensate for the fewer compute units, otherwise follow
+the guide for Vega 64 Samsung.
+
+In general, the flashed cards couldn't handle a maxed out mem clk at
+1107 MHz, rather needed to clock down to 1060-1075 MHz. Start stable,
+and add a step where you slowly increase the mem clk again.
+
+Vega 56 Samsung (56 bios) Stock-to-Performance Guide (A-mode)
+-------------------------------------------------------------
+It is possible to run these gpus at very high hashrates by loosening straps
+enough to run a higher mem clk, but we have not created and tested such timings
+ourselves and would only be presenting work done by others by including them at
+the time of writing. Therefore, we only present an example that reaches 49-50 MH/s
+on a V56 Samsung ref:
+
+1) Set your core clk significantly to 1000 MHz, mem clk to 940 MHz. We ran our
+   tests in power states core P3+mem P3. Start with 850 mV for voltage.
+
+2) Apply the following timing modifications:
+
+   --RAS 26 --RCDRD 12 --RC 38 --RRDS 3 --RRDL 4 --REF 21000
+
+3) Start mining, you should hit 49-50 MH/s.
+
+4) Lower voltage as much as possible. We ended up at 825 mV.
+
+Vega 56/64 B-mode Mining (after tuning for A-mode)
+--------------------------------------------------
+TRM provides A-mode, B-mode and C-mode for Vegas. The C-mode is intended for
+Radeon VIIs and will never really have a benefit over B-mode on Vega10.
+
+For Vega 56/64, the A-mode is already very capable of delivering high hashrates
+at an efficient power draw. However, the B-mode creates a slight shift in core
+vs mem clock ratio necessary to sustain a specific hashrate. It will use all
+available vram on the gpu. Early reports show that at many custom timing mods,
+the B-mode is slightly harder to keep stable over time.
+
+The default mode for Vegas is A-mode. To enable B-mode, you must specify a
+manual --eth_config with each Vega config starting with B. The --eth_aggr_mode
+does NOT currently apply for Vegas.
+
+If you have tuned your Vegas for A-mode and then switch to B-mode, you should be
+able to lower your core clk 30-80 MHz for the same hashrate. It may vary
+slightly. The goal is efficiency: by lowering the core clk we're aiming to
+shave off an additional ~2W per gpu. You may also be able to lower voltage
+slightly after you've lowered the core clk.
+
+The mode intensity range for Vegas is 12 * NrCUs:
+
+Vega 56:    0-672
+Vega 64:    0-768
+
+Any higher specified number than this will be lowered to the max possible value.
+
+
+Radeon VII (Vega20)
+===================
+As of TRM version 0.8.0 there are now significant improvements for VII hashrates
+allowing VIIs to easily achieve over 100Mh/s.  The best of these hashrates can
+currently only be achieved on Linux and require modifying some of the default
+kernel parameters for amdgpu drivers.  For more details read below.
+
+Vega20 Mining Modes
+-------------------
+A-mode - The most basic mode using the least memory, but achieving the lowest
+         hashrate.  This mode will typically produce about ~82Mh/s at 1600MHz
+         cclk.  This mode has no special requirements and should work on all
+         operating systems and drivers.
+
+B-mode - This mode uses more memory in order to increase performance for the
+         VIIs.  This mode will typically produce about ~87Mh/s at 1600MHz cclk.
+         This is the default recommended mode for Windows or unmodified Linux.
+         This mode requires that the driver version supports large allocations
+         (allocations more than 4GB).
+
+C-mode - This mode uses even more memory and produces the best hashrates for
+         VIIs.  This mode typically produces about ~99Mh/s at 1600MHz cclk with
+         modified memory timings.  Unfortunately this mode will only work
+         correctly on Linux with modified kernel boot parameters for the amdgpu
+         kernel module and the miner running with root permissions, as well as
+         using a driver version that supports large allocations.
+
+IMPORTANT: We have seen some VIIs getting close to zero boost between A and B
+modes. The B mode should see a significant hashrate increase. Many times those
+GPUs have been running the very original bios (v105) and need to flash to v106
+that was released by AMD shortly after the Radeon VII release date. That bios
+can be tricky to find at this point. Please ping us in the TRM discord and we
+can provide it.
+
+Radeon VII Tuning for Windows and Stock Linux (B-mode)
+------------------------------------------------------
+If you are running Windows or a Linux distro on which you do not want to modify
+kernel parameters or do not want to run the miner as root, you will need to run
+VIIs in B-mode for best performance.  The miner will automatically select this
+mode for your VIIs when started. For the B-mode to work properly, your drivers
+will need to support large allocations.
+
+Typical tuning for VIIs with Hynix memory running in B mode:
+
+NOTE: These tunings are ones that we've found to be relatively stable in our
+      tests.  However we can't guarantee that they will work on all cards.
+
+1) Before starting to tune, we suggest blasting your fans to max while you work
+   on dialing in clocks and voltages.  Always keep an eye on your core and
+   memory temperatures while tuning.  Try to keep TEdge and TMem under 70C.
+
+2) Start with core clk at 1600MHz and drop memory clk to 900MHz.
+
+3) Apply the following timing changes to the memory:
+
+   --ref 7500 --rtp 6 --rrds 3 --faw 12 --ras 19 --rc 30 --rcdrd 11 --rp 11
+
+   WARNING: If you are tuning memory clock, these timings can become unstable
+            over 1000MHz memory clock.
+
+4) You should now be able to hit 87-88Mh/s.  Check that you are not getting any
+   hw errors in the miner, which would indicate that the above timings are too
+   aggressive for the memory. Use the described --high_sample_mode=8 argument to
+   quickly assess your hw err ratio.
+
+5) At this point you can start tuning your voltage lower.  We typically see that
+   the VIIs need around 881mV core voltage at 1600MHz core clk, but this will
+   vary depending on asic quality and temperatures.
+
+6) Once you have dialed in your core voltage, try lowering fans until you
+   achieve a stable, safe temperature.
+
+While the tune above is generally a good place to start, users will likely want
+to tune their cards up/down to achieve their ideal running tune.  If you are
+increasing memory clock, keep in mind that the above timings will likely become
+unstable above 1000MHz memory clock.  For going above 1000MHz memory clock, we
+suggest using the following timings:
+
+--rtp 6 --ref 7500 --rcdrd 13 --rp 13 --rrds 3 --faw 12 --ras 25 --rc 38
+
+We have seen cards run at over 1200MHz memory clock and be stable with these
+timings.
+
+Radeon VII Tuning for Linux with Custom Kernel Parameters (C-mode)
+------------------------------------------------------------------
+If you are running Linux and are able to modify the kernel boot parameters and
+run the miner with root permissions, your VIIs will be able to fully utilize the
+performance boost of C-mode.  If the miner sees that the above conditions have
+been met, it will automatically select C-mode for your VIIs.
+
+1) Setting up Kernel Params
+
+   The following linux kernel boot parameters need to be added to your grub
+   config:
+
+   amdgpu.vm_block_size=10 amdgpu.vm_size=1024
+    
+   On ubuntu based linux distributions this can be done by adding the parameters
+   to the GRUB_CMDLINE_LINUX_DEFAULT line in /etc/default/grub and then running
+   'update-grub2'.  After making these changes you will need to reboot the
+   system for the changes to take effect.  After rebooting you can verify that
+   the changes took effect by looking at the output of the following command:
+
+   dmesg | grep "drm.*block size"
+
+   If the changes were successfully applied, you will see 'block size is 10-bit'
+   in the output.  Please note that adding these parameters can sometimes result
+   in slightly reduced hashrates on non-VII cards.
+
+2) Running the miner
+
+   Next make sure you are running the miner as root. How to do this will vary
+   depending on how the users's distro is setup to run miners, but for testing
+   purposes you can either log into the system as root or use the 'sudo'
+   command.  If you successfully apply the kernel param changes and run the
+   miner as root you should see a message like the following print in the miner
+   after it starts initializing the GPUs:
+
+   [2021-01-16 17:04:51] GPU 0 Radeon VII boost applied.
+
+   After this you should see the miner automatically select mode C for your
+   VIIs.
+
+3) Tuning for VIIs with Hynix memory running in C mode:
+
+   Here we will provide two sets of sample tunings: typical and aggressive.  The
+   aggressive tune will push up hashrate at the expense of increased power
+   usage.  We suggest users make sure that their VIIs are well cooled
+   (preferably liquid) for testing the aggressive tune.
+
+   NOTE: These tunings are ones that we've found to be relatively stable in our
+         tests.  However we can't guarantee that they will work on all cards.
+
+   Typical Tune (for Hynix memory):
+   Core Clock:     1600MHz
+   Core Voltage:   900mV
+   Memory Clock:   1000MHz
+   Timings:        --ref 7500 --rtp 6 --rrds 3 --faw 12 --ras 19 
+                   --rc 30 --rcdrd 11 --rp 11
+   
+   Aggressive Tune (for Hynix memory):
+   Core Clock:     1800MHz
+   Core Voltage:   993mV
+   Memory Clock:   1150MHz
+   Timings:        --rtp 6 --ref 7500 --rcdrd 13 --rp 13 --rrds 3
+                   --faw 12 --ras 25 --rc 38
+                   
+   WARNING: The aggressive tune will typically overheat stock air cooled cards!
+
+   a) Before starting to tune, we suggest blasting your fans to max while you
+      work on dialing in clocks and voltages.  Always keep an eye on your core
+      and memory temperatures while tuning.  Try to keep TEdge and TMem under
+      70C.
+
+   b) Start with setting your core and memory clocks to the tune settings above.
+
+   c) Apply the core voltage from the tune settings above.
+
+   d) Apply the timing changes to the memory.
+
+      WARNING: The 'typical' timings above can become unstable over 1000MHz
+               memory clock.
+
+   e) You should now be able to hit 99-100Mh/s on the typical tune and around
+      111-112Mh/s on the aggressive tune.  Check that you are not getting any hw
+      errors in the miner, which would indicate that either the core voltage is
+      too low or the memory timings are too aggressive for the memory. Again,
+      use --high_sample_mode=8 to quickly measure the ratio of hw errs.
+
+   f) At this point you can start tuning your core voltage lower.  We typically
+      see that the VIIs need around 881mV at 1600MHz core clk and 968mV for
+      1800MHz core clk, but this will vary depending on asic quality and
+      temperatures.
+
+   g) Once you have dialed in your core voltage, try lowering fans until you
+      achieve a stable, safe temperature.
+
+These two suggested tunings will probably not be ideal for all users.  For
+further tuning we suggest starting from one of the above tunings and then
+lowering core clock and voltage to achieve the prefered performance and power
+level, and then lowering memory clock until a loss of hashrate can be seen.
+
+
+Navi10 (5700XT/5700/5600XT)
+==========================
+TRM v0.8.0 both contains a range of optimizations for the standard A-mode kernel
+as well as a new default mining mode for Navi10, the B-mode.  Compared to
+previous versions the A-mode has reduced power draw and often a slight hashrate
+improvement as well. A first version of this improved kernel was released in
+v0.7.22. It has since been modified in v0.8.0 to be more similar to < 0.7.22
+versions while still preserving the power draw improvements and hashrate
+increase.
+
+Navi10 A/B-mode
+---------------
+The B-mode is the biggest news for Navi10 in the v0.8.0 release, at least for
+5700XT/5700. It has been deemed stable enough in tests to become the new default
+mining mode for 5700XT/5700. You must have a driver that allows large
+allocations, otherwise the miner will downgrade to A-mode. The A-mode is a
+standard ethash mining mode, similar to other miners.
+
+The B-mode runs at a much lower balance between core clk vs mem clk, meaning for
+5700XT/5700s you can typically drop core clk -100 MHz and core voltage -50mV
+while still preserving even a high hashrate such as 55-56 MH/s, only losing
+-0.02-0.05 MH/s while saving 5-6W, sometimes even more. On 5600XT, there
+isn't enough vram available with the 6GB to produce the large effect seen on the
+bigger 5700XT/5700s, although the effect is still there.
+
+Given the above, TRM chooses B-mode as default for 5700XT/5700s since it's
+straightforward to realize the benefits for these larger gpus. For 5600XTs,
+TRM chooses the standard A-mode by default. Advanced tuners should be able to
+manually use the B-mode on 5600XTs with --eth_config=B, then carefully clocking
+down their core clock step by step, finally lowering voltage 6.25-12.5mV or
+so. This will save power, but the effect is smaller than for 5700s.
+
+The mode intensity range for Navis is 16 * NrCUs:
+
+5700XT:        0-640
+5700/5600XT:   0-576
+
+Any higher specified number than this will be lowered to the max possible value.
+
+
+5700/5700XT Stock-to-Performance Guide
+--------------------------------------
+Most 5700/5700XTs can be flashed easily. Igor's lab has created a range of tools
+for advanced Navi tweaking. This is a guide for taking a stock Navi 5700/5700XT
+to a setup that produces 56 MH/s in the new TRM B-mode. Note that not all gpus
+can handle the high hashrate and will crash repeatedly. Such gpus need to be
+clocked down and run at a less aggressive hashrate.
+
+For using the guide below, we highly recommend making sure you can run the TRM
+B-mode by using a driver that supports large single allocations (amdgpu-pro >=
+20.30 on linux, Adrenalin >= 20.9.1 on windows).
+
+NOTE: flashing a bios always presents an added risk. The guide here is presented
+      as-is using known standard tools that have been used on many rigs
+      worldwide, and even the few times when a bios flash goes wrong you can
+      most often recover by reflashing the original bios in recovery mode / safe
+      mode.
+
+1) Set up a tool to control clocks and voltages. You can use the AMD driver
+   tools, MSI Afterburner or OverdriveNTool on Windows. On linux you need to
+   read up on and understand how the sysfs api works for amdgpu-pro, or use a
+   mining distro that helps you setting clocks.
+
+2) Start with a safe configuration of 1275 MHz core, 875 MHz mem (1750 MHz for
+   drivers displaying 2x mem clock), set 850mV for voltage. Start the miner and
+   verify that mining works fine.
+
+3) Google "Igor's lab red bios editor". Read the tutorial they provide and
+   download and install the software.
+
+4) Save the bios from your gpu to disk using atiflash or amdvbflash (and keep it
+   to be able to flash back if necessary).
+
+5) Open the saved bios in RedBiosEditor, copying the saved bios from linux to a
+   win workstation if necessary. There are often two memory types available in
+   the bios, Samsung and Micron. If you're not 100% sure which type you have, do
+   the copy-up described below for both.
+
+6) Bios mod 1: strap copy-up. We want to copy the strap (the long string of
+   letters and digits) for 1500 or 1550 MHz to the higher frequency
+   entries. Copy it and paste it for all higher entries above the strap you
+   copied. Save the bios and flash to the gpu. Reboot and test mining again. You
+   should now hit approx 53 MH/s.
+
+7) Bios mod 2: reopen your (already edited once) bios. Open the trap timings
+   editor for the 1500/1550 MHz entry that you copied in the previous step by
+   clicking the "1550 MHz" button. You want to increase the DRAMTiming 12 (tREF)
+   entry to 2x the original value. Do the same thing to the higher frequency
+   entries, or copy/paste the 1550 MHz strap again after you've modified
+   it. Remember to do this for both mem types unless you know you have Micron or
+   Samsung. You can get even higher hashrates by using 3x the original tREF
+   value, but we suggest 2x as a first test. Save the bios, flash to the
+   gpu. Reboot.
+
+8) When running the miner again, you should hopefully see a higher hashrate yet
+   again. if you have a driver that supports large allocations and TRM defaults
+   to B-mode, a core clock of 1250 MHz and mem clock at 912 MHz should now
+   produce a 55.5-56.0 MH/s hashrate. If you're in A-mode, you need a core clk
+   around 1350-1400 MHz to support such high hashrates.
+
+9) Now, retune your gpu to the configuration of your choice. Start by tuning the
+   mem clk to a level where your gpu seems to run stable and produces the
+   hashrate you're looking for. Less can definitely be more if you're looking
+   for efficiency. Next, tune down the core clk as much as possible, restarting
+   the miner to check if you've lost hashrate or not. We want to find the
+   balance between core clk and mem clk so that neither of them is the clear
+   bottleneck. In B-mode, you usually see a sharp drop in hashrate when the core
+   clk is dropped -25 MHz too low. In A-mode, you will also see the hashrate
+   dropping but not as dramatic.
+
+   Last, lower the voltage step by step as much as possible. Gpus with good
+   cooling can often drop as low as 700-725mV. For dropping below 700mV, the
+   powerplay table limits need to be modified. This is not covered by this
+   quickstart guide.
+
+   Note: Micron memory is in general easier to tune for these high
+   hashrates. Samsung GDDR6 is often harder to run stable, and often needs to be
+   clocked down to target e.g. 54-55 MH/s or lower.
+
+5600XT Stock-to-Performance Guide
+---------------------------------
+The 5600XTs differ from their larger 5700 cousins with a lower mem bandwidth and
+6GB of vram instead of 8GB. As mentioned above, this means that the TRM B-mode
+cannot boost the performance at a given (lower) core clk for 5600XTs as much as
+for 5700s. The effect is much smaller, and the range where a lower core clk
+means A-mode loses hashrate but B-mode preserves it is much tighter. Therefore,
+we assume A-mode is used for 5600XTs below.
+
+1) Bios flashing on many 5600XTs is a real hassle. There are additional locks
+   and security mechanisms in place in most stock bioses. The typical approach
+   is to find an unlocked bios that can be flashed onto your gpu, then modify it
+   and reflash it. Sometimes it needs to be manually edited before flashing as
+   well, changing the identifier to match your target gpu. Forums like the Red
+   Panda Mining discord (#bios-mods channel) is one type of place where you can
+   find both unlocked and already-modded bioses to flash. Make sure you save
+   your original bios for recovery/safe mode restore flashing if things don't
+   work out!
+
+2) If you managed to find a bios to work with, the process is the same as for
+   5700XT/5700s in the guide above and won't be repeated here. You might also
+   have found an already modded bios that runs great, meaning you don't have to
+   modify it yourself.
+
+3) The rest of the process for working through core clk/mem clk/voltage is also
+   identical to the proposed process for 5700XT/5700s, although you will rather
+   end up with a 41-42 MH/s hashrate than 55-56 MH/s.
+
+
+Happy mining!
