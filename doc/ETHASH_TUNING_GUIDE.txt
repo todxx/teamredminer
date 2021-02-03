@@ -2,6 +2,7 @@ TeamRedMiner Ethash Tuning Guide
 ================================
 
 History:
+v1.1 2020-02-03 (v0.8.1, Big Navi section added)
 v1.0 2020-01-16 (v0.8.0)
 
 General Overview
@@ -704,6 +705,41 @@ we assume A-mode is used for 5600XTs below.
 3) The rest of the process for working through core clk/mem clk/voltage is also
    identical to the proposed process for 5700XT/5700s, although you will rather
    end up with a 41-42 MH/s hashrate than 55-56 MH/s.
+
+
+Navi21 (6800/6800XT/6900XT)
+===========================
+TRM v0.8.1 added basic support for Big Navi cards (Navi21). This section will
+be expanded as we do more work for this gpu generation. For now, the suggested
+tuning process is quite simple:
+
+1) Big Navis should run in A-mode (it's chosen by default). While the B-mode is
+   available, the value of the 128MB cache is degraded with a larger memory
+   footprint.
+
+2) Windows is preferred over linux for now since you can choose the "fast timings"
+   under win which adds 1.0-1.5 MH/s. Testing was made on Adrenalin 20.12.1.
+   The AMD recommended driver (20.11.3) had bugs for handling clocks on our 6800.
+
+3) To be able to lower voltage properly, you need to modify the powerplay table
+   with e.g. MorePowerTool. Install GPU-Z and MorePowerTool. Save the bios using
+   GPU-Z. Open MorePowerTool, select your Big Navi gpu in the dropdown list. If
+   necessary, load the bios to get a baseline configuration. Lower the "Power
+   and Voltage" -> "Minimum Voltage GFX (mV)" limit to the voltage you with to
+   run. Lower than 625mV is rarely stable, although we've been able to run at 612mV.
+
+   NOTE FOR 6800 USERS:
+   6800 users might also want to increase the SOC TDC limit in the same tab. It
+   was 30A for our test 6800 which caused throttling. Increase it to 32 or 33A.
+   Before doing so, you should verify in HWiNFO64 that you're really being
+   throttled though by checking the "GPU SOC TDC Limit" row. If it hits 100%,
+   you need to increase the power limit.
+
+3) Clocks suggestions as starting point for further tuning (Windows with "Fast 
+   Timing" selected, Linux can choose similar but will se lower hashrates):
+
+   6800:   1235 MHz core, 2124 MHz mem, 625 mV, SOC TDC +10% -> 62.6-62.7 MH/s.
+   6900XT: 1200 MHz code, 2138 MHz mem, 650 mV, 63.2 MH/s
 
 
 Happy mining!

@@ -1,4 +1,4 @@
-# teamredminer v0.8.0
+# teamredminer v0.8.1
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -103,11 +103,21 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.1
+
+Release notes:
+- General: basic Big Navi support added (ethash, kawpow, mtp, nimiq supported algos).
+           See the ETHASH_TUNING_GUIDE.txt for a short section on Big Navis. 
+           Driver support missing on Windows for fan control and mem temp.
+- Ethash: display gpus now use A-mode by default to prevent failed allocation and low hashrates.
+- Stats: handling of negative temperatures under Linux.
+- Eth+zil: added new pool strategy 'min_epoch' for dual pool connection switching (see start_zil_eth.bat/.sh example script).
+
 Changes in v0.8.0
 
 Biggest release in a long while with rewritten ethash kernels and new mining modes for all gpu types!
 
-Users are highly(!) recommended to take a few minutes to read the 0.7-to-0.8 [migration guide](doc/ETHASH_FROM_0.7_TO_0.8.txt) and the new [ethash tuning guide](doc/ETHASH_TUNING_GUIDE.txt). Key highlights:
+Users are highly(!) recommended to take a few minutes to read the 0.7-to-0.8 [migration guide](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_FROM_0.7_TO_0.8.txt) and the new [ethash tuning guide](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_TUNING_GUIDE.txt). Key highlights:
 
 - Polaris: Efficiency and slight hashrate increase. B-mode reintroduced for added hash. B-mode must be enabled with --eth_aggr_mode or --eth_config=Bxxx.
 
