@@ -1,4 +1,4 @@
-# teamredminer v0.8.1.1
+# teamredminer v0.8.2
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -25,6 +25,7 @@ This miner includes the following algorithms and their respective dev fees:
 | Ethash on Polaris GPUs    | 0.75%|
 | Ethash on all other GPUs  | 1.0% |
 | Kawpow                    | 2.0% |
+| Verthash                  | 2.0% |
 | Nimiq                     | 2.5% |
 | Cryptonight R             | 2.5% |
 | Cryptonight v8 upx2       | 2.5% |
@@ -54,37 +55,40 @@ GPUs supported and tested:
 - Navi - RX 5700(XT)/5600(XT)/5500(XT) for supported algos in the table below.
 - Vega - RX Vega 64/56, Vega FE, Radeon VII (Vega 2)
 - Polaris - RX 580/480/570/470/560/460/550
+- Fiji - R9 Fury/Fury X/Nano, MI8 (supported but with very limited testing).
+- Tonga/Antigua - R9 285/285X/380/380X, W7100, S7150 (beta support from 0.8.2. Only ethash+kawpow available.)
 
 Some algorithms are not supported on some GPU architectures and/or drivers.  Below is the compatiblity table:
 
-|                          | Navi | Vega | Polaris |
-| ------------------------ |:----:|:----:|:-------:|
-| Ethash                   |  Y   |  Y   |   Y     |
-| Kawpow                   |  Y   |  Y   |   Y     |
-| Nimiq                    |  Y   |  Y   |   Y     |
-| Cryptonight R            |  N   |  L   |   L     |
-| Cryptonight v8 upx2      |  N   |  L   |   L     |
-| Cryptonight v8 turtle    |  N   |  L   |   L     |
-| Cryptonight v8 half      |  N   |  L   |   L     |
-| Cryptonight v8 double    |  N   |  L   |   L     |
-| Cryptonight v8 rwz       |  N   |  L   |   L     |
-| Cryptonight v8           |  N   |  L   |   L     |
-| Cryptonight heavy        |  N   |  L   |   L     |
-| Cryptonight haven        |  N   |  L   |   L     |
-| Cryptonight saber        |  N   |  L   |   L     |
-| Cryptonight conceal      |  N   |  L   |   L     |
-| Chukwa-512               |  N   |  L   |   L     |
-| Chukwa-1024              |  N   |  L   |   L     |
-| x16r                     |  N   |  Y   |   Y     |
-| x16rv2                   |  N   |  Y   |   Y     |
-| x16s                     |  N   |  Y   |   Y     |
-| x16rt                    |  N   |  Y   |   Y     |
-| MTP                      |  Y   |  Y   |   Y     |
-| Cuckatoo31               |  N   |  Y   |   Y     |
-| Cuckarood29              |  N   |  Y   |   Y     |
-| Lyra2rev3                |  N   |  L   |   L     |
-| Lyra2z                   |  N   |  L   |   L     |
-| Phi2                     |  N   |  L   |   L     |
+|                          | Navi | Vega | Polaris | Fiji | Tonga |
+| ------------------------ |:----:|:----:|:-------:|:----:|:-----:|
+| Ethash                   |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Kawpow                   |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Verthash                 |  Y   |  Y   |   Y     |   Y  |   N   |
+| Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
+| Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 upx2      |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 turtle    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 half      |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 double    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 rwz       |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8           |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight heavy        |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight haven        |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight saber        |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight conceal      |  N   |  L   |   L     |   L  |   N   |
+| Chukwa-512               |  N   |  L   |   L     |   L  |   N   |
+| Chukwa-1024              |  N   |  L   |   L     |   L  |   N   |
+| x16r                     |  N   |  Y   |   Y     |   Y  |   N   |
+| x16rv2                   |  N   |  Y   |   Y     |   Y  |   N   |
+| x16s                     |  N   |  Y   |   Y     |   Y  |   N   |
+| x16rt                    |  N   |  Y   |   Y     |   Y  |   N   |
+| MTP                      |  Y   |  Y   |   Y     |   Y  |   N   |
+| Cuckatoo31               |  N   |  Y   |   Y     |   Y  |   N   |
+| Cuckarood29              |  N   |  Y   |   Y     |   Y  |   N   |
+| Lyra2rev3                |  N   |  L   |   L     |   L  |   N   |
+| Lyra2z                   |  N   |  L   |   L     |   L  |   N   |
+| Phi2                     |  N   |  L   |   L     |   L  |   N   |
 
 Support legend:
  - Y = Supported
@@ -103,10 +107,24 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.1.2
+
+Release notes:
+- General: added Verthash algo for Vertcoin.
+- General: added Tonga and Antigua support for ethash and kawpow.
+- General: extended support to 24 gpus (previously max 16 gpus possible).
+- General: better handling of driver issues related to gpu clocks/temps stats.
+- General: now showing sensor power in stats output.
+- General: fixed device name parsing in ROCm 4.1 and newer win drivers.
+- API: added sensor power, jnct temp and mem temp to API output.
+- Ethash: added --eth_micro_delay for weaker psus (see help section for details).
+- Ethash: fixed watchdog DEAD gpus on small gpus building kawpow DAG.
+- Kawpow: now working fully with MiningPoolHub, regardless of bad seedhash values.
+
 Changes in v0.8.1.1
 
 Release notes:
-- Patched v0.8.1 with new device ids for 6700XT support.
+- Patched v0.8.1 with new devices ids for 6700XT support.
 
 Changes in v0.8.1
 

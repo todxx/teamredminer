@@ -1,13 +1,14 @@
-          Team Red Miner version 0.8.1.1
+          Team Red Miner version 0.8.2
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
                               ethash            (eth, etp, others)
                               etchash           (etc, alias for -a ethash --eth_variant_mode=etchash)
                               kawpow            (ravencoin)
+                              verthash          (vtc)
                               lyra2z      
                               phi2              (lux, argoneum)
-                              lyra2rev3         (vtc)
+                              lyra2rev3   
                               x16r        
                               x16rv2      
                               x16s              (pgn, xsh)
@@ -190,6 +191,7 @@ Fan control options (BETA feature):
 
       --fan_default_polaris=CFG Set the default config used for all Polaris gpus (450/460/550/560/470/480/570/580/590).
                               The built-in default is 55:::50 for 55C core temp and fan starting at 50%.
+                              Note: this setting is also reused for Tonga gpus.
       --fan_default_vega=CFG    Set the default config used for all Vega gpus (Vega 56/Vega 64).
                               The built-in default is 55::70:50 for 55C core temp, 70C mem temp and fan at 50%.
       --fan_default_vega2=CFG   Set the default config used for all Radeon VII gpus.
@@ -221,7 +223,7 @@ Ethash options:
       --eth_config=CONFIG   Manual ethash configuration for the miner.  CONFIG must be in the form [M][L].
                               The [M] value selects the mode which can be 'A','B', or 'C'.
                               The 'B' mode uses additional memory and will only work on 8+GB cards.
-                              The 'C' mode uses additional memory and will only work on 16+GB cards, such as the VII, with 
+                              The 'C' mode uses additional memory and will only work on 16+GB cards, such as the VII, with
                               a correctly configured system.  See the ETHASH_TUNING_GUIDE.txt for more details.
                               The [L] value selects the intensity and it's range will depend on the GPU architecture.
                               Both values are optional, but if [L] is specified, [M] must also be specified.
@@ -318,6 +320,15 @@ Ethash options:
                               where the dag cache had bit errors and the resulting dag is partially broken.  We have seen this
                               happen increasingly on Vegas as the dag has grown bigger.  When detected, a new buffer will be
                               allocated for the dag cache and the dag build restarted.
+      --eth_no_4gb_kernels      Disable the ethash 4GB kernels and always use the regular kernels that assume the DAG will always
+                              fit in available vram on all gpus.  This is useful when mining ETC or ethash coins at lower epochs
+                              than ETH since the regular kernels have a better performance profile.
+      --eth_micro_delay=VAL     Navi gpus only: adds a delay (measured in microseconds) when reenqueueing work on the gpu(s).
+                              Weaker PSUs driving many gpus can sometimes not handle the "slew rate" when multiple gpus happen to
+                              reenqueue work at exactly the same time.  Setting this to e.g. 32 will smoothen out the transition
+                              from no load to 100% load enough to lower the slew rate on such rigs.  The typical indication of this
+                              issue is hard hangs where the rig becomes unresponsive requiring a power cycle to reboot, but it can also
+                              be regular gpu crashes.  Valid values are 1-128. Not using this argument means no delay, value zero.
 
 Progpow options:
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
@@ -404,6 +415,7 @@ X16* options:
       --hash_order=VALUE    Sets a fixed hash order for algorithms like x16r for benchmarking purposes.
                               Note that using this option needs a pool connection but will not submit shares.
                               The standard benchmark hash order for x16r is --hash_order=0123456789abcdef.
+
 Nimiq options:
       --nimiq_worker=VALUE  Sets the worker/device name for nimiq to pass to the pool(s).
       --nimiq_no_proxy      Disables the automatic Nimiq proxy executed as a separate process. This means that the
@@ -412,3 +424,10 @@ Nimiq options:
                               and trm_nimiq_proxy-linux in the current miner director.
       --nimiq_port=VALUE    Overrides the default local port (4444) used for the Nimiq proxy. This can be used if your
                               system is already using port 4444 for some other tcp/ip service.
+
+Verthash options:
+      --verthash_file=FILE  Sets the filename to be used to load/store the verthash data file.  If this option is
+                              specified when the verthash algo is used, the miner will attempt to load the verthash
+                              data from the file.  If the file does not exist, the miner will generate the verthash
+                              data and then save it in the file for future use.  If this option is not specified the
+                              miner will generate the verthash data in system memory on every start.

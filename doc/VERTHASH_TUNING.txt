@@ -1,0 +1,117 @@
+Team Red Miner Verthash Mining
+============================
+This document provides some quick pointers on how to tune the verthash
+algo used by Vertcoin.
+
+
+General background
+==================
+Verthash is a memory-intensive low power algo. That said, the core clk
+on (primarily GCN) gpus needs to be high (much higher than ethash) to
+support driving the mem controller on the gpu(s), this at least if you
+want to achieve the max possible hashrate.
+
+This algo accesses mem in 32 byte chunks. This means that RDNA
+generation gpus (Navi, Big Navi) will not perform well. Their 128 byte
+cacheline size means that 128 bytes are read for every 32 byte
+request, effectively halving the available memory bandwidth compared
+to GCN (which uses 64 byte cachelines).
+
+
+GCN gpus: Vega/Polaris
+======================
+- Your core clock needs to be quite high to support the memory subsystem.
+
+- The algo is still quite low power, even with the high core clk.
+
+- Mem clock also needs to be high.
+
+- Timings mods didn't do much in our quick tests, but further tests
+  are needed.
+
+- Polaris high-quality straps are important. More tests needed, but
+  latency-focused CN straps might be better than pure bandwidth straps
+  for ethash. Ethash-tuned gpus should generally do fine though.
+
+- In our Polaris tests, a Nitro 470 4GB (Elpida), Nitro+ 570 8GB
+  (Samsung) and Nitro+ 580 8GB (Samsung) all displayed identical
+  hashrates for the same core clk as long as memory bandwidth was
+  sufficient.
+
+
+Polaris tuning examples
+-----------------------
+Note: sensor power reported, not accurate.
+
+Type           GPU CUs CoreMHz MemMHz TEdge  VDDC   Power
+Nitro+ 570 8GB 0   32  1300    2080   44C    900 mV  79 W
+Nitro+ 470 4GB 1   32  1250    2000   47C    875 mV  56 W
+Nitro+ 580 8GB 2   36  1200    2080   40C    875 mV  72 W
+------------------------ GPU Status ---------------------------
+GPU 0 [44C, fan 44%]       verthash: 560.0kh/s, avg 525.7kh/s
+GPU 1 [47C, fan 44%]       verthash: 538.5kh/s, avg 475.5kh/s
+GPU 2 [40C, fan 44%]       verthash: 517.7kh/s, avg 456.1kh/s
+
+
+RX Vega tuning examples
+-----------------------
+Note: sensor power reported, not accurate.
+
+Note: these high core clks on linux are scaled down very aggressively
+by the driver, expect to run lower core clks for the same hashrate on
+Windows.
+
+Before increasing core clks, the V64 LC was tuned for ethash 50.8
+MH/s. The V56 ref was tuned aggressively for 53.5 MH/s with at 980 MHz
+mem clk. The V56 Hynix was tuned for 48 MH/s ethash.
+
+The V56 Hynix is an old busted card, the sensor power is most likely
+off.
+
+At the time of writing we don't know why the V64 LC is underperforming
+below, it might just have a lower effective core clk.
+
+Type           GPU CUs CoreMHz MemMHz TEdge TMem  VDDC   Power
+RX Vega 64 LC  0   64  1550    1107   36C   57C   900 mV 123 W
+RX Vega 56 ref 1   56  1550    980    60C   74C   900 mV 130 W
+Vega 56 Hynix  2   56  1500    1107   935   61C   900 mV 178 W
+------------------------ GPU Status ---------------------------
+GPU 0 [35C, fan 57%]       verthash: 1.163Mh/s, avg 1.064Mh/s
+GPU 1 [60C, fan 60%]       verthash: 1.206Mh/s, avg 1.103Mh/s
+GPU 2 [56C, fan 99%]       verthash: 1.195Mh/s, avg 1.164Mh/s
+
+
+Radeon VII tuning examples
+--------------------------
+Note: sensor power reported, not accurate.
+
+The VIIs also need a high core clk to support a higher hashrate. The
+mem clk can typically be lowered as much as possible. To reach max
+speed, the Radeon VII boost setup like for ethash mining must be in
+place. Follow the instructions in the ethash tuning guide to enable
+it.
+
+Most likely, VIIs will always be better at mining ethash than
+verthash, but these are tuning examples:
+
+Type        GPU CUs CoreMHz MemMHz TEdge TMem   VDDC   Power
+Radeon VII  0   60  1600    801    52C   60C    893 mV 123 W
+Radeon VII  1   60  1900    801    63C   69C   1043 mV 183 W
+------------------------ GPU Status ---------------------------
+GPU 0 [52C, fan  0%]       verthash: 1.543Mh/s, avg 1.508Mh/s
+GPU 1 [63C, fan  0%]       verthash: 1.843Mh/s, avg 1.802Mh/s
+
+
+Navi GPUs
+=========
+As stated above, Navis simply won't do that well on verthash due to
+architectural changes that don't work well with verthash's smaller mem
+accesses. Therefore, we don't expect RDNA gpus to run verthash, but
+these are some ethash clock examples with hashrates:
+
+Type    GPU CUs CoreMHz SocMHz MemMHz TEdge TMem  VDDC   Power
+5700XT  0   40  1250    1085   912    52C   78C   787 mV  86 W
+5600XT  1   36  1100    1266   910    49C   80C   800 mV  91 W
+------------------------ GPU Status ---------------------------
+GPU 0 [52C, fan 32%]       verthash: 859.1kh/s, avg 840.8kh/s
+GPU 1 [49C, fan 99%]       verthash: 653.0kh/s, avg 625.8kh/s
