@@ -1,4 +1,4 @@
-          Team Red Miner version 0.8.2
+          Team Red Miner version 0.8.2.1
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -431,3 +431,6 @@ Verthash options:
                               data from the file.  If the file does not exist, the miner will generate the verthash
                               data and then save it in the file for future use.  If this option is not specified the
                               miner will generate the verthash data in system memory on every start.
+      --verthash_max_uploads=N  Some motherboards have issues with all gpus in the rig uploading the verthash table
+                              at the same time.  This argument limits the number of concurrent gpus that are uploading
+                              the table at the same time at startup.  Allowed values are 1-32.  The default value is 4. 

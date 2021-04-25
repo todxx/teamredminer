@@ -1,4 +1,4 @@
-# teamredminer v0.8.2
+# teamredminer v0.8.2.1
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -107,7 +107,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
-Changes in v0.8.1.2
+Changes in v0.8.2.1
+
+Release notes:
+- Bugfix: fixed windows issue with intermittently reading zero gpu stats and blasting fans (bug in 0.8.2).
+- Verthash: added --verthash_max_uploads=N to control the upload of the verthash table to gpus at startup. Some chipsets get issues running > 4 gpus concurrently. Typical error is that multiple gpus die immediately at startup when running the full rig, but work fine if you only run 3-4 gpus.
+- Verthash: fixed support for 550 2GB gpus. 
+
+Changes in v0.8.2
 
 Release notes:
 - General: added Verthash algo for Vertcoin.

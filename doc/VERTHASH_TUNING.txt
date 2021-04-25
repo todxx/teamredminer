@@ -74,7 +74,7 @@ below, it might just have a lower effective core clk.
 Type           GPU CUs CoreMHz MemMHz TEdge TMem  VDDC   Power
 RX Vega 64 LC  0   64  1550    1107   36C   57C   900 mV 123 W
 RX Vega 56 ref 1   56  1550    980    60C   74C   900 mV 130 W
-Vega 56 Hynix  2   56  1500    1107   935   61C   900 mV 178 W
+Vega 56 Hynix  2   56  1500    935    61C   72C   900 mV 178 W
 ------------------------ GPU Status ---------------------------
 GPU 0 [35C, fan 57%]       verthash: 1.163Mh/s, avg 1.064Mh/s
 GPU 1 [60C, fan 60%]       verthash: 1.206Mh/s, avg 1.103Mh/s
