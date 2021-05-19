@@ -1,0 +1,85 @@
+Team Red Miner Dual ZIL Mining
+==============================
+This document describes how to enable dual ZIL mining in TRM together
+with a range of other primary algos. It describes both the new
+mechanism introduced in v0.8.3 and the older variant that only can be
+used when the primary algo is ethash (including etchash).
+
+
+New mechanism from v0.8.3
+-------------------------
+From v0.8.3, take any existing TRM command line configuration for
+ethash, kawpow, verthash or autolykos and add:
+
+--zil -o stratum+tcp://eu.ezil.me:5555 -u <eth wallet>.<zil wallet>.<worker> -p x --zil_end
+
+preferably at the end of the command line. The miner will pause the
+primary algo and switch to ZIL during the ZIL windows, then switch
+back to the primary algo afterwards. More primary algos might be added
+if there's enough interest. The intention is that the miner
+automatically configures the primary algo to work well with the dual
+ZIL mining. It is fully possible to add more arguments between the
+--zil and --zil_end arguments, all arguments in USAGE.txt are
+available, but the default configuration chosen by the miner should be
+optimal for most setups with the following settings:
+
+- Cached copy of the ZIL epoch 0 DAG.
+- Adjustment of memory allocated for the primary algo to fit the ZIL DAG.
+- Choose ethash A-mode for the ZIL mining.
+- Use the standard faster kernels for 4GB gpus since the DAG is max 1GB.
+
+
+Pool Support
+------------
+We have primarily tested on ezil.me, and cleared that they are ok with
+having empty connections that only mine during ZIL windows. Other
+pools like rustpool.xyz and K1Pool should work ok as well.
+
+
+Potential issues with ethash B/C-mode
+-------------------------------------
+The TRM B- and C-modes want to use as much vram as possible. The value
+of the B/C-mode is diminished as the amount of allocated vram
+decreases. This typically means you need to increase the core clk for
+a preserved hashrate.
+
+When you add dual ZIL mining to an existing mining config where one or
+more gpus are running in B/C-mode, there's an obvious conflict of
+interest: to be able to immediately start mining ZIL, you want the DAG
+for epoch zero cached and ready in vram. This will consume around 1GB,
+and therefore steal vram from the B/C-modes.
+
+The auto config mode with --zil ... --zil_end will automatically
+reduce the vram allocated for B/C-modes to make room for the cached
+ZIL DAG. If you e.g. run a rig of 5700XTs running in B-mode mining ETH
+and then add ZIL, you will most probably see a reduced hashrate during
+the ETH mining and need to increase core clk.
+
+If you want to keep your current ETH tuning, the other way is to use
+the old way of running dual ZIL mining (see section below), and simply
+not cache the ZIL DAG but rebuild DAGs as you enter/exit the ZIL
+mining windows. This will steal some mining time for each ZIL window
+instead.
+
+
+Old mechanism up until v0.8.2.1
+-------------------------------
+Before v0.8.3, TRM only supported dual ZIL mining together with any
+other ethash coin, typically ETH or ETC. This configuration was more
+complex. You needed to:
+
+- Set the pool strategy to --pool_strategy=min_epoch.
+
+- Configure multiple pools, where the first pool must be the ETH/ETC
+  primary pool.
+
+- Instruct the miner to use a DAG cache and to prebuild epoch zero
+  using --eth_dag_cache=0. This is an optional step.
+
+- When using a DAG cache, not use B/C-modes on any gpus by adding
+  e.g. --eth_config=A.
+
+This way of running dual ZIL mining is still fully supported, and the
+recommended way in some special cases (see the Potential issues
+section). See the start script bundled in the miner release for a
+working example.

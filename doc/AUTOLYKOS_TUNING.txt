@@ -1,0 +1,228 @@
+Team Red Miner Autolykos2 (ERGO) Mining
+=======================================
+This document provides some quick pointers on how to tune the
+autolykos2 algo used by ERGO.
+
+
+General background
+==================
+Autolykos2 is a memory-intensive low/medium power algo. However, with
+the small memory accesses involved the algo behaves more like algos
+like verthash rather than ethash. Performance is tied to the core clk,
+and for max speed (especially for Vegas) core clk needs to be higher
+than ethash to support driving the mem controller on the gpu(s).
+
+This algo accesses mem in 32 byte chunks. This means that RDNA
+generation gpus (Navi, Big Navi) will not perform well. Their 128 byte
+cacheline size means that 128 bytes are read for every 32 byte
+request, effectively halving the available memory bandwidth compared
+to GCN (which uses 64 byte cachelines).
+
+
+Polaris Tuning
+==============
+Polaris gpus are simple for autolykos2. We have not spent a lot of
+time on tuning, so the examples below should be seen as a starting
+point, there might be better combinations of core clk, mem clk, mem
+straps to find.
+
+- Quality ethash timings work well.
+
+- Mem clk should be high, existing ethash config is fine.
+
+- Core clk is a big factor for the hashrate.
+
+- In our Polaris tests, a Nitro 470 4GB (Elpida), Nitro+ 570 8GB
+  (Samsung) and Nitro+ 580 8GB (Samsung) all displayed identical
+  hashrates for the same core clk as long as memory bandwidth was
+  sufficient. The 580 will rebuild the table slightly faster though,
+  hence produce a slightly better avg hashrate over time.
+
+Polaris tuning examples
+-----------------------
+Note: sensor power reported, not accurate.
+
+Type           GPU CUs CoreMHz MemMHz TEdge  VDDC   Power
+Nitro+ 570 8GB   0 32  1200    2080   42C    875 mV  75 W
+Nitro+ 470 4GB   1 32  1235    2000   46C    875 mV  59 W
+Nitro+ 580 8GB   2 36  1275    2080   40C    900 mV  80 W
+----------------------- GPU Status -------------------------
+GPU 0 [42C, fan 44%]       autolykos2: 64.70Mh/s
+GPU 1 [46C, fan 44%]       autolykos2: 66.46Mh/s
+GPU 2 [40C, fan 44%]       autolykos2: 68.62Mh/s
+
+
+RX Vega 56/64 Tuning
+====================
+RX Vegas are great for autolykos2 and can reach 200 MH/s when
+stretched to the max, although at a > 200W power draw. Tuning them
+optimally is slightly more complex. Mining distros can help greatly
+here. We discuss three different tunings. Background info:
+
+- Mem timings should be used, ethash timings of some sort are good
+  choices. Other timings for Equihash, Cuckoo or CN can produce good
+  results as well.
+
+- Mem clock does not need to be high unless you're aiming for the
+  highest hashrates.
+
+- The most efficient setups makes sure the soc clk stays at a lower
+  level, and maximizes the mem clk for that level, i.e. sets it to the
+  soc clk frequency. 
+
+- Your _effective_ core clk will decide your hashrate. Vegas are
+  notorious for not running at the configured frequency when AVFS
+  p-states are used.
+
+RX Vega Simple Tuning
+---------------------
+This is for people who don't care about soc clk level and just want to
+start hashing at a decent level around 165 MH/s.
+
+1. Set ethash mem timings (see our ethash guide for examples).
+2. Set core clk to 1225 MHz
+3. Start with mem clk at 960 MHz (Vega 64) or 847 MHz (Vega 56).
+4. Set voltage to 875mV.
+5. Run the miner. Check the hashrate.
+6. Increase core clk until you hit 165 MH/s. If you hit a bottleneck
+   where increased core clk doesn't boost the hashrate, increase mem
+   clk a little more. Repeat from 4.
+7. If you crash, bump voltage a little more. Repeat from 4.
+8. If you run stable for a while, lower voltage.
+
+
+RX Vega Efficient Tuning
+------------------------
+This tuning targets 162-170 MH/s. For Vega 64, flashing a Vega 56 bios
+will be the best choice, but it isn't as critical as for ethash
+mining. The goal is to stay at soc clk 847 MHz for Vega 56 (or Vega 64
+with flashed 56 bios), and soc clk 960 MHz for Vega 64s. You might
+need to lock p-state levels using OverdriveNTool (Windows), mining
+distro helpers, or sysfs controls (Linux).
+
+Note 1: Vega 56 Hynix can follow the same guide below, but ended up
+slightly below 160 MH/s at 847 MHz soc/mem clk for us. You can then
+switch up to 960 MHz soc clk level, following the Vega 64 guide below
+instead. You can keep the mem clk lower than 960 MHz though, depending
+on what hashrate you'd like to target.
+
+Note 2: if none of the above doesn't make sense to you, the critical
+piece of information here is that RX Vegas can't use a mem clk higher
+than the current soc clk. However, a higher soc clk means a more power
+hungry gpu, meaning we can't lower voltage as much as we'd like or the
+gpu will crash. Finding the sweet spot soc clk level, and maximizing
+the use of it by setting mem clk equal to soc clk is important when
+optimizing for efficiency.
+
+ 1. Configure ethash timings.
+ 2. Vega 56: Use core p-state 2: set to 1225 MHz.
+    Vega 64: Use core p-state 3: set to 1225 MHz.
+ 3. Vega 56: Use mem p-state 2: set to 847 MHz.
+    Vega 64: Use mem p-state 3: set to 960 MHz.
+ 4. Set voltage to 850mV as a start.
+ 5. Lock core and mem p-states.
+ 6. Run the miner. Press 's' and verify that the soc clk is at 847 MHz
+    (Vega 56) or 960 MHz (Vega 64).
+ 7. Hopefully you'll reach around 165 MH/s and we're done.
+ 8. If not, increase core clk slightly. Repeat from 6.
+ 9. If you crash, increase voltage.
+10. If you've run stable for a longer period, try lowering voltage.
+
+
+RX Vega Max Performance Tuning
+------------------------------
+This tuning targets 190-200 MH/s. Power draw will be around 200-210W
+at the wall. For Vega 64, flashing a Vega 56 bios will be the best
+choice here as well, but it isn't critical. For this tuning, we just
+go with the highest p-states.
+
+For Vega 56 with Samsung mem, if you have applied timings that can
+reach 53-54 MH/s, then keep them.
+
+Note: for Vega 56 Hynix, the guide below can still be followed, but
+the target hashrate for us had to be lowered to 185 MH/s.
+
+1. Configure ethash timings.
+1. Use core p-state 7: set to 1400 MHz.
+2. Vega 56: Use mem p-state 3: set to 990 MHz if you can run ethash at 52-54 MH/s.
+   Vega 56: Use mem p-state 3: set to 950 MHz if you can run ethash at 50 MH/s.
+   Vega 64: Use mem p-state 3: set to 1107 MHz.
+
+   NOTE: if your gpu can't take the high mem clk values suggested
+            above, set it to the level you can mine ethash at.
+            
+3. Set voltage to 900mV as a start.
+3. Lock core and mem p-states.
+4. Run the miner. Check the hashrate.
+5. As long as you're underperforming the hashrate target, keep raising
+   the core clk. Under plain amdgpu-pro on linux, the scaling is
+   absurd and you might have to increase up to 1600 MHz before your
+   true effective clock is around 1400 MHz. Windows does not scale as
+   aggressively.
+6. If you crash, increase voltage.
+7. If you continue to crash even with 925mV or so, you need to give up
+   and settle for a lower hashrate target with a lowered mem clk.
+8. If you've run stable for a longer period, try lowering voltage.
+
+
+Radeon VII Tuning 
+=================
+Radeon VIIs perform reasonably well, but are limited by core clock and
+the resulting high power usage.  Typical VIIs can expect to hit between
+210-240 MH/s on air cooling, and up to 270MH/s on liquid cooling.  To
+reach the highest hashrate and efficiency you will need to run in linux
+using the same setup procedure to run ethash C mode as described in 
+the ETHASH_TUNING_GUIDE.txt (linux kernel params + running as root).
+Using a mining distro that already supports the changes needed for TRM
+ethash C mode will be the easiest option. We briefly discuss some high
+level VII tuning concepts below:
+
+- Mem timings are NOT important.  VIIs will very much be bottlenecked
+  on core clock, and memory tuning does not need to be pushed.
+
+- Mem clock can be significantly lowered to save power and keep the 
+  HBM2 cool.  Even at high hashrates, memory clk can usually be dropped
+  to around 750MHz.
+
+- The limiting factor in hashrate will be core clk.  This in turn will
+  be limited by the cooling of the card.
+
+- The TRM 'VII Boost' enabled by the ethash C mode procedure described 
+  above will increase hashrate by around 10% at the same core clock.
+
+Radeon VII tuning examples
+--------------------------
+These are rough examples that should serve as a good starting point for
+tuning.
+Note: sensor power reported, not accurate.
+
+Setup   CoreMHz SocMHz MemMHz  VDDC    Power   Peak Hashrate
+Linux*  1500    971    801     850 mV  145 W     237.5Mh/s
+Linux*  1700    971    801     925 mV  183 W     268.2Mh/s
+Windows 1500    971    801     850 mV   -       ~210.0Mh/s
+* - Linux tests performed with kernel params set as described for
+      ethash C mode.
+
+Navi GPUs
+=========
+As stated above, Navis simply won't do that well on autolykos2 due to
+architectural changes that don't work well with the smaller mem
+accesses. Therefore, we don't expect RDNA gpus to run this algo.
+
+For tuning, you can use an existing configuration for ethash as a
+starting point, then lower the core clk about -10%. 
+
+Example tunings:
+Type    GPU CUs CoreMHz SocMHz MemMHz TEdge TMem  VDDC   Power
+5700XT  0   40  1100    1085   912    41C   70C   787 mV  84 W
+5600XT  1   36   950    1266   910    40C   70C   800 mV  93 W
+------------------------ GPU Status ---------------------------
+GPU 0 [41C, fan  0%]       autolykos2: 108.8Mh/s
+GPU 1 [40C, fan 49%]       autolykos2: 82.12Mh/s
+
+Type    GPU CUs CoreMHz SocMHz MemMHz TEdge TMem  VDDC   Power
+RX6800  0   60  1075    685    1049   52C   76C   787 mV 116 W (voltage not tuned) 
+------------------------ GPU Status ---------------------------
+GPU 0 [52C, fan 28%]       autolykos2: 118.8Mh/s
+
+
