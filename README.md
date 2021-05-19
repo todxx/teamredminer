@@ -1,4 +1,4 @@
-# teamredminer v0.8.2.1
+# teamredminer v0.8.3
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -26,6 +26,7 @@ This miner includes the following algorithms and their respective dev fees:
 | Ethash on all other GPUs  | 1.0% |
 | Kawpow                    | 2.0% |
 | Verthash                  | 2.0% |
+| Autolykos2                | 2.0% |
 | Nimiq                     | 2.5% |
 | Cryptonight R             | 2.5% |
 | Cryptonight v8 upx2       | 2.5% |
@@ -65,6 +66,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Ethash                   |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Kawpow                   |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Verthash                 |  Y   |  Y   |   Y     |   Y  |   N   |
+| Autolykos2               |  Y   |  Y   |   Y     |   Y  |   N   |
 | Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
 | Cryptonight v8 upx2      |  N   |  L   |   L     |   L  |   N   |
@@ -107,6 +109,12 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.3
+
+Release notes:
+- General: added Autolykos2 algo for ERGO (very good target for Vega 56/64, see the AUTOLYKOS_TUNING.txt guide).
+- General: improved and simplified dual ZIL mining for ethash/kawpow/verthash/autolykos2 (see the new DUAL_ZIL_MINING.txt guide).
+
 Changes in v0.8.2.1
 
 Release notes:
