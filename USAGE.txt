@@ -1,11 +1,13 @@
-          Team Red Miner version 0.8.2.1
+          Team Red Miner version 0.8.3
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
                               ethash            (eth, etp, others)
                               etchash           (etc, alias for -a ethash --eth_variant_mode=etchash)
                               kawpow            (ravencoin)
+                              autolykos2        (ergo)
                               verthash          (vtc)
+                              nimiq             (nimiq)
                               lyra2z      
                               phi2              (lux, argoneum)
                               lyra2rev3   
@@ -29,7 +31,6 @@ Options:
                               cn_conceal        (conceal)
                               trtl_chukwa       (turtlecoin)
                               trtl_chukwa2      (turtlecoin)
-                              nimiq             (nimiq)
 
   -h, --help                Display this help message and exit.
       --debug               Enables debug log output.
@@ -434,3 +435,40 @@ Verthash options:
       --verthash_max_uploads=N  Some motherboards have issues with all gpus in the rig uploading the verthash table
                               at the same time.  This argument limits the number of concurrent gpus that are uploading
                               the table at the same time at startup.  Allowed values are 1-32.  The default value is 4. 
+
+Autolykos2 options:
+      --autolykos_mem_adjust=N  Sets the amount of memory in MiB that the miner should leave unused when allocating
+                              GPU buffers for autolykos.  The default value is 384 on linux and 512 on windows.  For GPUs
+                              with displays attached, the default is increased by 512.  If dual mining with ZIL, the 
+                              default value is increased by 1024.  The option can also be provided with a comma separated
+                              list of values where each value is applied to each GPU.  If an empty value is specified
+                              in the list, the default will be used for that GPU.  If a value is not specified for a GPU
+                              it will use the first value in the list.  For example:
+                                    --autolykos_mem_adjust=256,512,,256
+      --autolykos_slowdown=N  Adds a slowdown of the pad build process.  Valid values are 0-100. The default is 0, no
+                              slowdown.
+
+ZIL dual mining options:
+      --zil_start or --zil  Starts the ZIL dual mining config.  Between this and the --zil_end marker, all arguments are
+                              applied to the ZIL mining rather than the primary algo.  It's expected that the primary algo
+                              has been set up in earlier arguments.  The intention is that you can add a --zil ... --zil_end
+                              configuration to any working TRM configuration algo and things will work out of the box.
+                              This argument automatically sets a range of default settings you want to use for ZIL:
+                               - Cached copy of the ZIL epoch 0 DAG.
+                               - Adjustment of memory allocated for the primary algo to fit the ZIL DAG.
+                               - Choose ethash A-mode for the ZIL mining.
+                               - Use the standard faster kernels for 4GB gpus since the DAG is max 1GB.
+
+                              The minimal working setup is to only provide a ZIL pool that is ok with the miner ignoring
+                              the primary coin jobs and only mines during the ZIL windows.  This is an example for ezil.me:
+                              --zil -o stratum+tcp://eu.ezil.me:5555 -u <eth wallet>.<zil wallet>.<worker name> -p x --zil_end
+
+                              For more info, read the ZIL dual mining guide packaged with the TRM release.
+
+      --zil_end             Marks that we're done with the ZIL mining config and all following arguments are for the primary
+                              algo.  This argument isn't strictly necessary, but should be included for mining distros since
+                              the user has no guarantee what arguments will be added automatically at the end of the command
+                              line by the distro.
+      --stats_mode=single/dual  When adding ZIL dual mining, the stats output will by default be duplicated to add info for
+                              the ZIL mining.  Some contexts might get confused by this if they are parsing the TRM outut or 
+                              log files.  To switch to the default output, add --stats_mode=single.
