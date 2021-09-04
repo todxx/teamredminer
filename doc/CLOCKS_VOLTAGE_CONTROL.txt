@@ -1,0 +1,133 @@
+Team Red Miner Clocks/Voltages Control Support
+==============================================
+
+This document provides additional info on the clocks/voltages/timings
+control support in TeamReadMiner. Historically, we have not focused on
+building a one stop shop software that handles auxiliary features,
+we've rather concentrated on the mining algorithms and gpu kernel
+implementations and rather let external tools handle things like
+clocks and voltage control.
+
+However, since there's no longer a tool like OverdriveNTool that can
+configure Big Navi cards using automated command-line setups at
+startup, TRM v0.8.5 adds basic support on Windows only for controlling
+core clk, core voltage, mem clk, mem voltage (when applicable) and
+selecting timings from the driver's built-in available sets.
+
+We might add linux support and more features later on.
+
+
+Arguments
+---------
+These arguments are described in the --help output from the miner as
+well. All arguments are comma-separated lists of values, where any
+value can be empty if you don't want to configure that gpu.
+
+--clk_core_mhz  Sets the core clk frequency.
+
+--clk_core_mv   Sets the core voltage.
+
+--clk_mem_mhz   Sets the mem clk frequency.
+
+--clk_mem_mv    Sets the mem voltage (ignored for Navis and Big Navis).
+
+--clk_timing    Chooses e.g. the default or "fast" timings for Big Navis.
+		This is not a generic timing modifications argument, it
+		only chooses between the timing sets available in the
+		Windows Adrenalin driver.
+
+
+Examples
+--------
+Three gpu Navi10 rig, middle gpu not configured:
+
+teamredminer.exe -a ethash ... --clk_core_mhz=1275,,1250 --clk_core_mv=750,,725  --clk_mem_mhz=1820,,1800 
+
+Two gpu Big Navi rig, both using "fast timings" as well as setting clocks:
+
+teamredminer.exe -a ethash ... --clk_core_mhz=1050,1100 --clk_core_mv=675,675  --clk_mem_mhz=2120,2140 --clk_timing=1,1 
+
+
+Polaris GPUs
+------------
+Polaris gpus uses the core clk+voltage and mem clk+voltage
+arguments. The highest core and mem p-states are always configured and
+used. Clock and voltage values for lower states are scaled linearly to
+always have a lower value than higher states.
+
+For more exact control, use a different tool like OverdriveNTool.
+
+
+Rx Vega GPUs
+------------
+Like Polaris gpus, Rx Vega gpus uses the core clk+voltage and mem
+clk+voltage arguments. The highest core and mem p-states are always
+configured and used. Clock and voltage values for lower states are
+scaled linearly to always have a lower value than higher states.
+
+However, this is not enough to unlock using a < 900mV voltage for Rx
+Vegas on Windows, you need a powerplay table modification of the
+stubborn mem p2 state. This state is locked at 900mV and can't be
+changed through the ADL API, nor Radeon Settings. You will be able to
+_configure_ other p-states with < 900mV values, but the mem p2 state
+will still be blocking them, effectively driving up the voltage used
+to 900mV.
+
+To be able to lower your voltage < 900mV, do the following:
+
+1) Download the latest gpu-z version from TechPowerUp.
+
+2) Download OverdriveNTool 0.2.9 from the Guru3d forum thread, it's
+   just a dropbox link.
+
+3) Open gpu-z, select your Vega in the gpu dropdown list at the very
+   bottom of the gui. Save the bios by clicking arrow icon right next
+   to the bios version textbox.
+
+4) Open OverdriveNTool as Administrator, i.e. right-click the program
+   and choose "Run as Administrator". Select your Vega in the gpu
+   dropdown list.
+
+5) Right-click the title bar of the program, i.e. the "OverdriveNTool
+   0.2.9" text and choose the "PPTable Editor".
+
+6) If you already have a powerplay table stored in the registry, it
+   will appear and you can edit the mem p2 voltage to your targeted
+   voltage. Otherwise, it needs to be bootstrapped using your saved
+   bios: choose "Create new using bios file" and click "Open bios/reg
+   file", find your saved bios and open it.
+
+7) In the editor that appears, set the "Memory default" P2 voltage to
+   either your target voltage or a slightly lower value. This will
+   also change the "GPU default" P1 voltage since they are using the
+   same underlying voltage entry.
+
+8) Click "Save", and either let OverdriveNTool reset the gpu for you,
+   or reset it yourself in the Windows device manager, or reboot.
+
+9) You should now be able to use voltages that are >= the powerplay
+   table's new value for mem P2, either with the miner's built-in
+   support or using external tools.
+
+
+Navi and Big Navi
+=================
+All Navi gpus use the core clk+voltage and mem clk arguments, as well
+as setting a timing if available in the driver. Configuring values
+should be straightforward.
+
+However, to unlock lower core voltage values and other features, you
+need to do powerplay table modifications, much like the process for Rx
+Vegas described above. On Windows, this is typically done with
+MorePowerTool, an awesome piece of software released by Igor's
+lab. Note that Navi10 gpus can also flash a bios with modified mem
+timings and include the modifications there in the bios' default
+powerplay table.
+
+There are plenty of videos and resources available that describes this
+process, a few mins of googling should be enough, so we won't cover it
+in greater detail here.
+
+
+
+

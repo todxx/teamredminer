@@ -1,4 +1,4 @@
-          Team Red Miner version 0.8.3
+          Team Red Miner version 0.8.5
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -156,7 +156,34 @@ GPU options:
                               at index 1 and 3 and two other gpus: --nr_cu_override=,64,,64.  You can verify your
                               argument by also adding --list_devices before mining.
 
-Fan control options (BETA feature):
+Clock/voltage control options (windows only, BETA functionality):
+                              The miner has basic functionality for setting core and mem clks and their respective
+                              voltage, as well as selecting between the win driver's built-in timings.  For each
+                              available argument below, you enumerate values for gpu(s) in the rig in a comma-separated
+                              list.  Some arguments are not used for certain gpus.  You can skip gpus in the list.
+
+                              The miner always sets and uses the highest p-state for both core and mem for GCN gpus
+                              (Polaris, Vega).  Please note that Rx Vega gpus _must_ have a powerplay table modification
+                              of the mem p2 state before being able to run a voltage lower than 900mV.  Moreover, Big Navi
+                              gpus also still need to use e.g. MorePowerTool to make powerplay table modifications, for example
+                              for enabling setting a lower voltage.  The miner _might_ add support for powerplay table-related
+                              functionality in the future.
+
+      --clk_debug                 Enable start-up log printouts related to setting clocks/voltages/timings.
+      --clk_core_mhz=MHZ1,MHZ2,... Sets the core clk per gpu in MHz.
+      --clk_core_mv=MV1,MV2,...    Sets the core voltage per gpu in mV.
+      --clk_mem_mhz=MHZ1,MHZ2,...  Sets the mem clk per gpu in MHz.
+      --clk_mem_mv=MV1,MV2,...     Sets the mem voltage per gpu in mV.  Not used for Navi or Big Navi gpus.
+      --clk_timing=V1,V2,...       Selects between the driver's available mem timing sets.  Not available on all gpus and
+                                   drivers.
+
+                              Example of a partial command line for a four gpu system where with a Rx Vega 64, 580, 5700XT and
+                              6800 mining ethash or similar.   We only specify mem voltage for the Vega and 580, and only select
+                              a driver timing value for the Big Navi:
+                              teamredminer.exe ... --clk_core_mhz=1100,1000,1275,1000 --clk_core_mv=875,850,725,675
+                              --clk_mem_mhz=1107,2100,1820,2130 --clk_mem_mv=875,850,, --clk_timing=,,,1
+
+Fan control options:
       --fan_control(=CFG1,CFG2,...)  This argument enables gpu fan control by the miner.  TRM supports
                               auto-adjusting the gpu fan speed(s) based on core, junction and/or mem temp.
                               We also support setting a static fan speed in percent.
@@ -207,10 +234,23 @@ Fan control options (BETA feature):
 Watchdog options:
       --no_gpu_monitor      Disables the ADL (Windows) or sysfs (Linux) GPU monitor for temperature and
                               fan speed.
-      --temp_limit=TEMP     Sets the temperature at which the miner will stop GPUs that are too hot.
-                              Default is 85C.
-      --temp_resume=TEMP    Sets the temperature below which the miner will resume GPUs that were previously
-                              stopped due to temperature exceeding limit.  Default is 60C.
+      --temp_limit=TEMP     Sets the core temperature at which the miner will stop GPUs that are too hot.
+                              Default is 85C.  Gpu-specific values can be provided using a comma-separated list,
+                              one value per gpu.  If a gpu doesn't have a defined value, the first value in the list
+                              is used. 
+      --temp_resume=TEMP    Sets the core temperature below which the miner will resume GPUs that were previously
+                              stopped due to the core temperature exceeding limit.  Default is 60C.  Gpu-specific
+                              values can be provided using a comma-separated list, one value per gpu.  If a gpu doesn't
+                              have a defined value, the first value in the list is used. 
+      --mem_temp_limit=TEMP Sets the mem temperature at which the miner will stop GPUs that are too hot.
+                              Default is not enabled.  Only used if the gpu provides a mem temperature sensor. 
+                              Gpu-specific values can be provided using a comma-separated list, one value per gpu. 
+                              If a gpu doesn't have a defined value, the first value in the list is used. 
+      --mem_temp_resume=TEMP Sets the mem temperature below which the miner will resume GPUs that were previously
+                              stopped due to mem temperature exceeding limit.  Default is not enabled.  Only 
+                              used if the gpu provides a mem temperature sensor.  Gpu-specific values can be provided
+                              using a comma-separated list, one value per gpu.  If a gpu doesn't have a defined value,
+                              the first value in the list is used. 
       --watchdog_script(=X) Configures the gpu watchdog to shut down the miner and run the specified platform
                               and exits immediately. The default script is watchdog.bat/watchdog.sh in the
                               current directory, but a different script can be provided as an optional argument,
@@ -221,15 +261,19 @@ Watchdog options:
                               that always run with the watchdog enabled.
 
 Ethash options:
-      --eth_config=CONFIG   Manual ethash configuration for the miner.  CONFIG must be in the form [M][L].
+      --eth_config=CONFIG   Manual ethash configuration for the miner.  CONFIG must be in the form [X][M][L].
                               The [M] value selects the mode which can be 'A','B', or 'C'.
                               The 'B' mode uses additional memory and will only work on 8+GB cards.
                               The 'C' mode uses additional memory and will only work on 16+GB cards, such as the VII, with
                               a correctly configured system.  See the ETHASH_TUNING_GUIDE.txt for more details.
                               The [L] value selects the intensity and it's range will depend on the GPU architecture.
+                              The [X] prefix is optional and is Navi/Big Navi only, it enables more mem operations and
+                              leads to a lower tuning [L] value. It can be beneficial whenever the auto-tuner repeatedly
+                              hits a value close to the max possible tuning value for the gpu.
                               Both values are optional, but if [L] is specified, [M] must also be specified.
                               Example configs: --eth_config=A
                                                --eth_config=B750
+                                               --eth_config=XB
                               CONFIG can also be a comma separated list of config values where each is
                               applied to each GPU. For example: --eth_config=A,B750,,A288
                               Any gpu that does not have a specific config in the list will use the first
@@ -262,6 +306,11 @@ Ethash options:
                               set to one of the following options: stratum, nicehash, ethproxy. 
       --eth_worker          Set the worker id that will be sent to pool.  This only applies to pools with ethproxy
                               stratum mode.
+      --eth_hash_report=X   Controls hashrate reports to the configure pools.  This value is applied for all pools. Values:
+                              default   - let the miner decide based on stratum protocol used for each pool.
+                              force     - always send hashrate reports, even if the pool rejects them.
+                              on        - send a first hashrate report, disable for any pool that rejects the message.
+                              off       - never send hashrate reports.
       --eth_epoch           Tests a specific ethash epoch. NOTE: you still need to provide a pool as if you were mining,
                               but no shares will be submitted. Simulated mining only.
       --eth_alloc_epoch=N   Allocates enough memory for the given epoch from the start.  The miner will try to allocate more

@@ -1,4 +1,4 @@
-# teamredminer v0.8.4
+# teamredminer v0.8.5
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -54,6 +54,7 @@ This miner includes the following algorithms and their respective dev fees:
 
 GPUs supported and tested:
 - Navi - RX 5700(XT)/5600(XT)/5500(XT) for supported algos in the table below.
+- Big Navi - RX 6900XT, RX 6800(XT), RX 6700(XT), RX6600XT - same support as for Navi.
 - Vega - RX Vega 64/56, Vega FE, Radeon VII (Vega 2)
 - Polaris - RX 580/480/570/470/560/460/550
 - Fiji - R9 Fury/Fury X/Nano, MI8 (supported but with very limited testing).
@@ -109,6 +110,16 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.5
+
+Release notes:
+- General: added Windows clocks/voltage/built-in timings control (beta functionality). See section in --help and CLOCKS_VOLTAGE_CONTROL.txt.
+- General: fixed some issues with Windows fan control, mostly for Big Navi gpus.
+- General: added mem temp limits (stop/resume), see --mem_temp_limit and --mem_temp_resume.
+- Ethash: added support for forcing ethash pool hashrate reports (see --eth_hash_report).
+- Ethash: fixed hashrate reports for Crazypool when using failover pools.
+- Autolykos2: added extranonce subscription support for e.g. Nicehash.
+ 
 Changes in v0.8.4
 
 Release notes:
