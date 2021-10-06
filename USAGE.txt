@@ -1,10 +1,11 @@
-          Team Red Miner version 0.8.5
+          Team Red Miner version 0.8.6
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
                               ethash            (eth, etp, others)
                               etchash           (etc, alias for -a ethash --eth_variant_mode=etchash)
                               kawpow            (ravencoin)
+                              firopow           (firo)
                               autolykos2        (ergo)
                               verthash          (vtc)
                               nimiq             (nimiq)
@@ -380,7 +381,7 @@ Ethash options:
                               issue is hard hangs where the rig becomes unresponsive requiring a power cycle to reboot, but it can also
                               be regular gpu crashes.  Valid values are 1-128. Not using this argument means no delay, value zero.
 
-Progpow options:
+Progpow options (kawpow, firopow):
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
                               The [M] value selects the mode which can be either 'A' or 'B'.
                               The 'B' mode typically results in better performance but is only available for
@@ -403,6 +404,16 @@ Progpow options:
       --prog_ramp_up         See --eth_ramp_up.
       --prog_no_stagger      See --eth_no_stagger.
       --prog_no_ramp_up      See --eth_no_ramp_up.
+      --prog_micro_tune=X,Y,... This option enables a small retuning session for every new random code block.  This is important
+                               for Polaris gpus to run at their max speed.  For Vegas and Navis it usually does not improve
+                               performance.  The default AUTO mode enables it for all Polaris gpus but disables it otherwise.
+                               The only reason to disable it would be for stability purposes.  The argument value is a
+                               comma-separated list of values, one per gpu.  If a gpu is missing a value, the value for the
+                               first gpu is used.  Please note that setting a manual prog_config will effectively disable the
+                               micro-tuner as well.  Available values are:
+                               0 - turn OFF progpow micro-tuning for this gpu.
+                               1 - turn ON progpow micro-tuning for this gpu.
+                               2 - let the miner decide if micro-tuning should be enabled (AUTO).
 
 Cryptonight options:
       --rig_id              Set the rig identifier that will be sent to the pool. This is only used for

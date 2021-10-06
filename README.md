@@ -1,7 +1,9 @@
-# teamredminer v0.8.5
+# teamredminer v0.8.6
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
+
+TRM official website: https://www.teamredminer.com
 
 TRM discord server: https://discord.gg/RGykKqB
 
@@ -68,6 +70,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Kawpow                   |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Verthash                 |  Y   |  Y   |   Y     |   Y  |   N   |
 | Autolykos2               |  Y   |  Y   |   Y     |   Y  |   N   |
+| Firopow                  |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
 | Cryptonight v8 upx2      |  N   |  L   |   L     |   L  |   N   |
@@ -110,6 +113,17 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.6
+
+Release notes:
+- Firopow: new algo added for Firo's upcoming fork (see start_firo.sh/bat). Only testnet mining is available before the fork, see start_firo_testnet.sh/bat.
+- Firopow/kawpow: rewrote tuning guide (see KAWPOW_FIROPOW_TUNING.txt).
+- Firopow/kawpow: slight hashrate improvements, mainly from choosing full gpu tuning by default and adding a micro-tuning mechanism for Polaris gpus (see new argument --prog_micro_tune).
+- Autolykos2: added high score support and display of submitted share difficulty.
+- General: fixed Radeon VII support on recent win drivers. NOTE: HBCC must be DISABLED for all Vegas.
+- General: fixed broken fan control for Navis on some driver versions.
+- General: improved Windows compute mode enable with automatic elevation (with --uac) and restart of gpus.
+ 
 Changes in v0.8.5
 
 Release notes:

@@ -1,0 +1,245 @@
+Team Red Miner Kawpow/Firopow Mining
+====================================
+This document provides some pointers on how to best test and tune for
+the progpow family of algos in TRM: the Kawpow algo used by Ravencoin
+and Firopow used by Firo.
+
+
+Versions
+--------
+2021-09-30  v1.1  Rewritten when Firopow was added.
+2020-05-26  v1.0  Kawpow guide.
+
+
+General background
+------------------
+Progpow is designed to fully utilize the resources on a gpu: compute,
+local memory and global memory. This means the algorithm falls into
+the most resource-intensive category of pow algorithms to date. In
+turn, this leads to a high power draw and hot gpus.
+
+The algorithm also contains random elements that changes frequently
+with new network block heights. The compute load on the gpu will
+therefore vary accordingly. The hashrate difference between lean and
+mean blocks with easy vs heavy random math operations can vary as much
+as +-10%, this much depending on your core clock. Therefore, tuning
+for the algo without locking down your tests to a specific block
+height means you'll get random results over time. This is very
+important, and the miner therefore provides a mechanism for doing so.
+
+DISCLAIMER: please note that this algo runs MUCH HOTTER than
+e.g. ethash. You should be prepared to lower your clocks significantly
+to avoid overheating your gpus unless you have a good cooling setup.
+
+
+Tuning Clocks
+-------------
+The most important controls are (as usual) the core and memory clock
+of your gpu. This miner can set clocks and voltages for you on Windows
+from TRM 0.8.5. For linux you need to use a mining distro, tools or
+direct overdrive sysfs api writes.
+
+Progpow as configured by both Kawpow and Firopow consumes twice the
+amount of memory bandwidth as ethash. Therefore, you will not see a
+higher bandwidth than roughly half the ethash hashrate on a specific
+gpu, at least not if it's tuned well for ethash. Progpow does run an
+easier access pattern than ethash, so untuned cards can see an
+increase from the expected 0.5x ethash hashrate. It's important to
+note that this is an _upper bound_ for your progpow
+hashrate. Depending on your configured core clock many block heights
+might run at a lower effective hashrate.
+
+In order to reach the point where memory bandwidth becomes the
+bottleneck, progpow needs much more compute resources compared to
+ethash. Given the random compute element in progpow, the amount of
+compute resources required will also vary wildly between network block
+heights. If your core clock is relatively low, you will only see the
+max hashrate produced for the easiest / most lean block heights. For
+heavier block heights the gpu will not be able to produce enough
+pressure on the memory controller to sustain the maximum possible
+memory bandwidth and your effective hashrate will be lower. If you run
+a high core clock, you will reach the max possible hashrate on many
+more block heights, but also pull a lot more power overall. Therefore,
+the goal is to find a balance between the core and memory clock so
+that your gpu temperatures are under control and your power draw is
+acceptable.
+
+For very lean block heights, how much memory bandwidth the gpu can
+produce will be the bottleneck unless your core clock is very low. A
+higher mem clock will most probably produce a higher hashrate for such
+heights. Hence, checking the max possible progpow hashrate for a gpu
+is best done at such heights.
+
+For mean block heights with a high compute load, you will have to
+decide for yourself what core clock you're willing to expend power
+for. With a high core clk the gpu will pull more power for all block
+heights, the lean ones as well. At the end of the day, you will end up
+with a configuration that hits the max hashrate on X% of all block
+heights, then loses some hashrate on the rest, but the overall
+performance, power draw and gpu temperatures are acceptable to you.
+
+When testing a final configuration, it's good to verify that it runs
+ok for a while on all three types of block heights: lean, average and
+mean.
+
+A last note for Polaris gpus: TRM 0.8.6 added a micro-tuner for
+progpow algos that retunes the intensity for each new random code
+block height. This is necessary to hit the max possible hashrate on
+all block heights where the core clock is high enough. Without this
+step (i.e. using a static intensity), Polaris gpus will not maximize
+their potential.
+
+
+Tuning Intensity and Kernel Mode
+--------------------------------
+This miner very aggressively consumes a gpu's resources to achieve the
+highest possible hashrate. In some cases, you need to control the
+"intensity" used to allow for e.g. rendering tasks to execute in
+parallel with mining.
+
+Unless you specify the intensity manually, the miner will select the
+max intensity possible for the gpu. Most of the time a higher
+intensity results in a higher hashrate, but can cause problems with
+responsiveness on GPUs used for monitors.
+
+For Vegas and Navi cards, the miner also provides two different mining
+modes: A and B mode. Due to choices made by the AMD driver teams, the
+B mode is not available for Vegas on Windows or older amdgpu-pro
+drivers (<= 18.50 or so). For Navi cards, both modes are available on
+all platforms. Unless specified, the miner will choose what should be
+the optimal mode for each gpu automatically. The B mode is the obvious
+choice whenever you can run it, it is faster. However, for gpus
+running a monitor, the A mode is sometimes the better choice.
+
+The maximum intensity a gpu can run is 16 x ComputeUnits. This means:
+
+GPU  470/570  480/580  Vega56  Vega64  VII  5700xt  5700/5600xt
+Max  512      576      896     1024    960  640     576
+
+The miner will automatically cap a higher configured value than the
+max intensity for a gpu.
+
+The kernel mode and intensity are specified together using the
+--prog_config command line parameter. Please see the USAGE.txt file or
+run the miner with --help to see examples of how to use the parameter.
+
+NOTE: as mentioned earlier, TRM 0.8.6 introduced a micro-tuning
+concept for Polaris gpus (see the --prog_micro_tune argument). If you
+specify a manual intensity for a Polaris gpu, this mechanism is
+disabled.
+
+
+Tuning for monitor gpus
+-----------------------
+As mentioned, monitor gpus need to be limited manually with a lower
+intensity to provide access to the gpu for rendering tasks, or your
+system might become overly sluggish and unresponsive.
+
+Typically, take the max intensity possible for your gpu, reduce it
+with 64 and pass it in a --prog_config argument. If the system still
+feels sluggish, decrease the value further in steps of 8 until you're
+satisfied. You can also try increasing it if the system feels
+responsive enough. For Vegas and Navi cards, you can also try to
+switch between the A and B modes to see what effect it has on your
+system.
+
+Example for a three gpu system of Vega 64s, the first running a
+monitor, choosing the A node for the monitor gpu:
+
+--prog_config=A960,B1024,B1024
+
+
+Tuning Workflow
+---------------
+This is an example workflow that can be used to tune a rig for kawpow
+or firopow mining. It aims to find a balance where roughly 50% of the
+block heights will run at max hashrate, the rest with a penalty
+depending on how much additional compute resources they each require.
+
+- We have selected three block heights representing lean, average, and
+  mean random math selections:
+
+       	   Kawpow    Firopow
+  Lean:    937863    312621
+  Average: 1234567   411522
+  Mean:    1006647   335549
+
+- Create a script or command line for running the miner against any
+  pool of your choice but also adding the argument
+  --prog_height=1234567 (or 411522 for firopow). This means the miner
+  will simulate mining on our average random math height and also not
+  submit any shares to the pool. Using the example script provided
+  with TRM (start_kawpow.sh/bat), mining on Linux, only on device 0
+  and hashrate log time shortened to 15 secs, it would look as
+  follows:
+
+  ./teamredminer -a kawpow -o stratum+tcp://us.rvn.minermore.com:4501 \
+                 -u RDpPHx43bhrmdyd8L6BcpkHtjuc1vMpNSk.trmtest -p x \
+                 -d 0 -l 15 --prog_height=1234567
+
+- Crank up your fans as much as possible to keep temps in check
+  throughout the tuning process.
+
+- Start tuning by tweaking your clocks, always rerunning the same
+  script with the average block height 1234567. You can use the clock
+  examples below as your starting point, or any other clocks of your
+  choice. Use a low-ish voltage for your clocks but rather a little
+  above what you're hoping to achieve as the final configuration.
+
+- Running the script over and over again, or using live clock
+  adjustments, observe how changes to higher/lower core clk and
+  higher/lower mem clk affects the hashrate. Unless they are balanced
+  fairly well, changes to one of core/mem clk will have a more
+  significant impact on the hashrate than the other. Lower that clock
+  until you reach the point where lowering either of the two clocks
+  affects the hashrate slightly.
+
+- Modify your script or command line to use our mean block height,
+  1006647 (335549 for firopow), instead of 1234567.
+
+- Run the script repeatedly again, and try to lower voltage as much as
+  possible while still being able to mine continuously for a while on
+  the mean block height.
+
+- Lower your fans to a more comfortable level. Run mining on the mean
+  block height again and verify that gpu temps are still under control.
+
+- If you feel you ended up with a too low/high core clock, or your
+  temps are not under control, restart the process from tuning your
+  clocks with a different core clock as starting point, and find the
+  correct mem clock for a balanced core/mem clock configuration.
+
+- Last, run the lean mining level as a final test, modifying your
+  script to run block height 937863 (firopow 312621). It will probably
+  give you the highest hashrate seen so far, and hopefully have no
+  issues running.
+
+
+Memory Timings
+--------------
+Timings do not have the same significant impact on kawpow as on
+e.g. ethash or CN variants. There might be findings in the future that
+can be worth mentioning, for now we skip the subject in this guide.
+
+It _is_ important to note that the max possible hashrate for progpow
+is always bound by the memory bandwidth available though. Therefore,
+simple things like increasing REF interval will have an impact since
+it increases the effective available mem bandwidth.
+
+
+Clocks and hashrates examples
+-----------------------------
+These clocks are old reports TRM testers before the kawpow release in
+May 2020 and can be used as a starting point for your own tuning. They
+have not been tested at controlled heights, so your results may vary
+from the specified hashrates below.
+
+Type           CoreClk   MemClk    mV       prog_config    Hashrate
+-------        --------  --------  ------   -------------  ---------
+5700XT         1310 MHz  1800 MHz  750 mV   B608           23.0 MH/s
+5700           1310 MHz  1800 MHz  775 mV   A400 (monitor) 19.7 MH/s
+5600XT         1310 MHz  1800 MHz  750 mV   B608           20.0 MH/s
+Vega 64        1045 MHz  925 MHz   800 mV   B1024          25.0 MH/s
+Vega 56 Hynix   957 MHz  940 MHz   812 mV   B896           24.4 MH/s
+RX580 8GB      1175 MHz  2100 MHz  820 mV   A576           15.0 MH/s
+RX480 4GB      1100 MHz  2000 MHz  850 mV   A400           14.3 MH/s
