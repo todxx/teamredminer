@@ -1,4 +1,4 @@
-# teamredminer v0.8.6
+# teamredminer v0.8.6.2
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -69,7 +69,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Ethash                   |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Kawpow                   |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Verthash                 |  Y   |  Y   |   Y     |   Y  |   N   |
-| Autolykos2               |  Y   |  Y   |   Y     |   Y  |   N   |
+| Autolykos2               |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Firopow                  |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
@@ -113,6 +113,18 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.6.2
+
+Release notes:
+- Firopow/MTP: added a synthetic algo 'mtp_firopow' that will use the correct algo given the system time and shut down the miner at the time of the Firo fork on Oct 26. 
+- Ethash/progpow: split the ethash and progpow algos into separate binaries, mainly for some Vegas that ran into stability issues going from 0.8.5 to 0.8.6.
+- Autolykos2: added support for Tonga.
+- Advanced SSL usage: changed the default SSL behavior to _not_ provide a SNI hostname during handshake. See the updated --help section on the -o argument for how to force a SNI hostname being sent.
+
+Changes in v0.8.6.1
+
+Internal test version - unreleased.
+
 Changes in v0.8.6
 
 Release notes:

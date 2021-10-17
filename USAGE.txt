@@ -1,4 +1,4 @@
-          Team Red Miner version 0.8.6
+          Team Red Miner version 0.8.6.2
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -6,6 +6,7 @@ Options:
                               etchash           (etc, alias for -a ethash --eth_variant_mode=etchash)
                               kawpow            (ravencoin)
                               firopow           (firo)
+                              mtp_firopow       (chooses firopow or mtp and shuts down miner at the fork on Oct 26 2021)
                               autolykos2        (ergo)
                               verthash          (vtc)
                               nimiq             (nimiq)
@@ -16,7 +17,7 @@ Options:
                               x16rv2      
                               x16s              (pgn, xsh)
                               x16rt             (gin)
-                              mtp               (zcoin)
+                              mtp               (zcoin/firo before the firopow fork)
                               cuckatoo31_grin   (grin)
                               cuckarood29_grin  (grin)
                               cnv8        
@@ -84,6 +85,14 @@ Pool config options:
                               Per-pool options (such as -u, -p) will need to be explicitly specified
                               again for each new pool.  (See the example start_multipool.sh/bat file)
                               The multi-pool strategy for the miner is set with the --pool_strategy option.
+
+                              There is also special support for advanced SSL/TLS setups where you need to
+                              pass a SNI hostname to the SSL endpoint. For example, this is necessary for SSL
+                              endpoints that act as frontends for multiple hosts and need to know which one
+                              to provide a certificate for. In such cases, use the following format:
+                              -o stratum+ssl://pool.tunnel.com/pool.realhostname.com:3333
+                              This will connect to pool.tunnel.com:3333 but pass pool.realhostname.com as the SNI
+                              hostname in the SSL handshake phase. The two hostnames can of course be identical as well.
   -u, --user=USERNAME       Sets the username for pool authorization.
   -p, --pass=PASSWORD       Sets the password for pool authorization.
       --pool_force_ensub    Forces an extranonce subscribe request for supported pools unknown to the miner.
