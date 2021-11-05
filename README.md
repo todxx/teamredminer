@@ -1,4 +1,4 @@
-# teamredminer v0.8.6.2
+# teamredminer v0.8.6.3
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -113,6 +113,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.6.3
+
+Release notes:
+
+- Autolykos2: emergency release to support larger pad size from block 614400.  Some GPUs (mainly Vegas) will need higher core clocks to achieve the same performance as previous versions due to larger pads breaking some previous optimizations.  More optimizations to come in future releases.
+- Autolykos2: added argument --autolykos_ignore_diff for certain pools that aren't compatible with the ERGO reference miner pool implementation.
+- Progpow: fixed wrong --help text for --prog_micro_tune.
+
 Changes in v0.8.6.2
 
 Release notes:
