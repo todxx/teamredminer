@@ -1,4 +1,4 @@
-# teamredminer v0.8.6.3
+# teamredminer v0.8.7
 This is an optimized miner for AMD GPUs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -113,6 +113,15 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 -----------
+Changes in v0.8.7
+
+Release notes:
+
+- General: added offline benchmark mode for (almost) all algos (see --benchmark).
+- Network: improved situations with the "Dev pool failed to connect." error message appearing.
+           Users in China should preferably run with "--dev_location=cn".
+- Network: added experimental support for DNS-over-HTTPS (see --dns_https and --dns_https_sni).
+
 Changes in v0.8.6.3
 
 Release notes:

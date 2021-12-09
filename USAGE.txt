@@ -1,4 +1,4 @@
-          Team Red Miner version 0.8.6.3
+          Team Red Miner version 0.8.7
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -36,6 +36,9 @@ Options:
 
   -h, --help                Display this help message and exit.
       --debug               Enables debug log output.
+      --benchmark           Enables benchmarking mode.  All defined pools will be ignored and a single internal fake pool
+                              added automatically.  For benchmarking algos like eth and kawpow at specific epochs and block
+                              heights you also need to add algo-specific arguments like --eth_epoch=456 and --prog_height=123456.
       --disable_colors      Disables console output colors.
       --force_colors        Forces console color output even if the terminal does not seem to support them.
       --api_listen=IP:PORT  Enables the sgminer compatible api. IP:PORT is optional. If present, the IP:PORT combo
@@ -64,8 +67,11 @@ Options:
                               continuous dev fee connection issues reported by the miner. The connection
                               management normally works well in all locations. Available options are:
                               world     - Anywhere in the world except for mainland China.
-                              cn        - Mainland China.
                               non-gcp   - Countries with blocked access to Google Services (e.g. Iran, Cuba).
+                              cn        - Mainland China.
+                              eu        - EU, Russia, Ukraine and nearby.
+                              us        - US, Canada, Central/South America.
+                              asia      - Asia ex China.
       --enable_compute      (Windows only) Enables compute mode and disables crossfire on necessary gpus.
       --long_timestamps     Enables microsec timestamps in the logs instead of seconds only.
       --restart_gpus        (Windows only) Restarts all configured gpus before mining, i.e. disable+enable PCI device.
@@ -78,6 +84,18 @@ Options:
                               Note: this might not be enabled for all algos.
       --allow_dup_bus_ids   Allows multiple gpus using the same pci bus id.  This should only be used for Radeon Pro Duo
                               cards and similar hardware, it's normally an indication of a broken OpenCL environment.
+      --dns_https=URL       Enables pool DNS resolution using DNS-over-HTTPS.  This is an experimental feature.  TRM only
+                              supports the JSON-based variant, not the mechanism defined later in RFC8484.  The user must
+                              provide the full https url including the method name.  It is allowed to pass hostnames
+                              rather than raw IP addresses, but such hostnames will be resolved using system DNS.
+                              The following are a few examples that have been verified to work:
+                              
+                              --dns_https=https://8.8.8.8/resolve           (Google DNS)
+                              --dns_https=https://9.9.9.9:5053/dns-query    (Quad9)
+                              --dns_https=https://1.1.1.1/dns-query         (Cloudflare DNS service)
+      --dns_https_sni=HOST  When the --dns_https argument is used, the default behavior is to not send a SNI in the
+                              SSL/TLS connection.  Using this argument, you can force any SNI to be sent.  Please note
+                              that this is an advanced network argument and most users do not need to use it.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
@@ -239,7 +257,8 @@ Fan control options:
       --fan_default_big_navi=CFG  Set the default config used for all Big Navi (Navi21).
                               The built-in default is 50:::70 for 50C core temp and fan at 70%. The reason for
                               not including mem temp is a missing sensor in the Windows ADL library.
-      --fan_debug               Enable log printouts related to adjustments.
+      --fan_debug             Enable log printouts related to adjustments.
+      --fan_no_restore        Disables the restore of original fan profiles on miner exit.
 
 Watchdog options:
       --no_gpu_monitor      Disables the ADL (Windows) or sysfs (Linux) GPU monitor for temperature and
@@ -321,8 +340,8 @@ Ethash options:
                               force     - always send hashrate reports, even if the pool rejects them.
                               on        - send a first hashrate report, disable for any pool that rejects the message.
                               off       - never send hashrate reports.
-      --eth_epoch           Tests a specific ethash epoch. NOTE: you still need to provide a pool as if you were mining,
-                              but no shares will be submitted. Simulated mining only.
+      --eth_epoch           Tests a specific ethash epoch. NOTE: this will automatically switch the miner into benchmark mode, as
+                              if you added --benchmark. 
       --eth_alloc_epoch=N   Allocates enough memory for the given epoch from the start.  The miner will try to allocate more
                               if it needs to later during mining.  It's recommended for rigs with one or more 4GB cards to test
                               and set this to the max possible value to avoid reallocations at epoch switches.  Optimal Linux
@@ -402,8 +421,8 @@ Progpow options (kawpow, firopow):
                               CONFIG can also be a comma separated list of config values where each is
                               applied to each GPU. For example: --prog_config=A,B750,,A288
                               Any gpu that does not have a specific config in the list will use the first.
-      --prog_height=VALUE   Sets a fixed block height for progpow algorithms for benchmarking purposes.
-                              Note that using this option needs a pool connection but will not submit shares.
+      --prog_height=VALUE   Sets a fixed block height for progpow algorithms for benchmarking purposes.  This will automatically
+                              switch the miner into benchmark mode.
       --prog_strict         Forces miner to always generate strictly accurate kernels.  By default the miner will
                               generate relaxed kernels that use less computation power but can result in 
                               occasional invalid shares.
@@ -483,7 +502,7 @@ MTP options:
 
 X16* options:
       --hash_order=VALUE    Sets a fixed hash order for algorithms like x16r for benchmarking purposes.
-                              Note that using this option needs a pool connection but will not submit shares.
+                              This setting will automatically switch the miner into benchmark mode.
                               The standard benchmark hash order for x16r is --hash_order=0123456789abcdef.
 
 Nimiq options:
