@@ -1,4 +1,4 @@
-          Team Red Miner version 0.8.7
+          Team Red Miner version 0.9.0
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -36,6 +36,9 @@ Options:
 
   -h, --help                Display this help message and exit.
       --debug               Enables debug log output.
+      --hardware=HW_LIST    Specifies which types of hardware the miner should try to run, in a comma separated list.
+                              Currently supported values are 'gpu' and 'fpga'.  For example:
+                                --hardware=gpu,fpga
       --benchmark           Enables benchmarking mode.  All defined pools will be ignored and a single internal fake pool
                               added automatically.  For benchmarking algos like eth and kawpow at specific epochs and block
                               heights you also need to add algo-specific arguments like --eth_epoch=456 and --prog_height=123456.
@@ -563,3 +566,18 @@ ZIL dual mining options:
       --stats_mode=single/dual  When adding ZIL dual mining, the stats output will by default be duplicated to add info for
                               the ZIL mining.  Some contexts might get confused by this if they are parsing the TRM outut or 
                               log files.  To switch to the default output, add --stats_mode=single.
+
+FPGA Options: 
+      --fpga_devices=LIST   Sets FPGA devices to use from detected list. LIST should be a comma separated list of device 
+                              indices, e.g. -d 0,1,2,4.  If not specified, all available FPGA devices will be used.  
+                              Use --list_devices to show device indices.
+      --fpga_clk_core=LIST  Sets FPGA device core clock frequencies.  The clock frequencies should be provided as a
+                              comma separated list of values in megahertz, where each value applies to each FPGA device.
+                              If the list is shorter than the total number of devices, the remaining devices will use the 
+                              first value in the list.  For example --fpga_clk_core=600,620 will apply 600MHz clock to 
+                              FPGA 0 and 620MHz to FGPA 1.  If devices FPGA 2+ are present, they will be set to 600MHz.
+      --fpga_clk_mem=LIST   Sets FPGA device memory clock frequencies.  Format is the same as --fpga_clk_core.
+      --fpga_tcore_limit=LIST Sets FPGA device core temperature soft limits.  If the FPGA core temperature exceeds the 
+                              specified value, the miner will lower the FPGA clocks to bring the core temperature under 
+                              the specified value.  Values are in Celcius with a list format similar to --fpga_clk_core.
+      --fpga_tmem_limit=LIST Sets FPGA device memory temperature soft limits.  See --fpga_tcore_limits for description.
