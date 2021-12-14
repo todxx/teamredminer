@@ -1,0 +1,110 @@
+TeamRedMiner FPGA Guide
+=======================
+
+History:
+v1.0 2020-12-12
+
+General Overview
+================
+Starting in version v0.9.0 TeamRedMiner(TRM) now has support to mine ethash on
+two FPGA products based on Xilinx FPGAs: the Xilinx Varium C1100 and the SQRL
+Forest Kitten 33.  Mining with FPGAs is only officially supported on Linux,
+however Windows users can also mine using a Linux VM with USB passthru for the
+FPGA USB JTAG connections.  Currently TRM does not support setting voltages on
+the FPGA boards and is only able to read some of the available on-board
+telemetry (memory voltage, board power, etc).  As a result there are not many
+knobs available for tuning, though the ones that are will be discussed in the
+individual board sections below.  Next we discuss general FPGA mining setup.
+
+
+Mining Instructions
+===================
+TRM currently only communicates to FPGAs via the USB JTAG ports availabe on the
+boards.  Ensure that your FPGA boards' USB JTAG ports are connected to the host
+system where TRM will be running.  Verify that TRM can detect the attached
+devices by running 'sudo ./teamredminer --list_devices' and checking that the
+devices you expect show up in the output.  Next you will need to prepare the
+required command line arguments for TRM such as the algorithm selection, your
+mining pool's address, your pool username/wallet address and password, then use
+these to construct the command to start TRM.  For example:
+
+sudo ./teamredminer -a ethash -o stratum+tcp://eu1.ethermine.org:4444 -u 0x02197021fefa795fec661a45f60e47a6f6605281.trmtest -p x
+
+These are the minimum command arguments needed to start TRM mining with FPGAs.
+The first time TRM is run it will download the neccessary bitstreams for the
+FPGA boards being run and save them in the 'bits' local directory.  Running
+this command will start TRM and begin mining on all available FPGAs (and AMD
+GPUs) using the default clock frequency values of 450MHz for core clock and
+900MHz for memory clock.  TRM can be limited to run on specific FPGA devices
+using the --fpga_devices option (see --help or USAGE.txt for details).  Most
+users will likely want to increase these default values by using the
+--fpga_clk_core and --fpga_clk_mem options.  Additionally TRM has temperature
+monitoring for the FPGA core temperature and the memory temperature and will
+throttle mining speeds to maintain temperatures within the set limits.  By
+default the limits are both set to 90C, but they can be adjusted using the
+--fpga_tcore_limit and --fpga_tmem_limit options.  When running on a system
+with GPUs and FPGAs, the --hardware option can be used to select if TRM is to
+run only GPUs or only FPGAs.
+
+A typical command for starting TRM may look like:
+sudo ./teamredminer -a ethash -o stratum+tcp://eu1.ethermine.org:4444 -u 0x02197021fefa795fec661a45f60e47a6f6605281.trmtest_f -p x --fpga_clk_core=505 --fpga_clk_mem=1000 --fpga_tmem_limit=70 --log_file
+
+When choosing core and memory clocks, it is best to stay close to a 1:2 ratio
+between the core and memory clock frequencies.  This is where the TRM FPGA
+design is best balanced and achieves optimal results.
+
+
+For more help and for issues not mentioned in this document, please join the
+TRM discord and ping us there.
+
+
+Tuning Xilinx Varium C1100
+==========================
+The Xilinx Varium C1100 is a very well designed card from the perspective of
+power delivery, but it can be a challenge to adequately cool due to it's single
+slot passive cooling design.  Typical mining rig cooling will not suffice for
+this card and additional cooling must be provided to the card.  High static
+pressure server chassis can some times achieve good results, but the most
+reliable solution is to directly attach a blower (such as the SanAce B97's) to
+the back of the card.  Many users have found that the best way to do this is
+via a 3d-printed mounting bracket, however many users have had success with
+low-tech methods such as ample usage of tape.
+
+IMPORTANT: The C1100 must be powered through both the PCIe slot and the AUX
+power connector.  Not connecting both PCIe slot and AUX power can result in
+board components overheating.  While the on-board power delivery is well
+designed, it draws 12V current from both the PCIe edge and AUX connectors and
+requires both to handle higher power loads.
+
+Assuming the C1100 is adequately cooled, most cards will run stably at 610MHz
+core clk and 1220MHz memory clock.  Cards with exceedingily good cooling or
+very good silicon quality may be able to reach up to 660MHz core and 1310MHz
+memory clock frequencies.
+
+
+Tuning SQRL Forest Kitten 33
+============================
+Most FK33s come with an active heatsink that keeps the cards well cooled during
+typical operation.  Unfortunately, the power delivery circuitry on the card is
+somewhat lacking when it comes to running designs using large amounts of HBM
+memory bandwidth, such as TRM ethash.  Due to the VCCHBM reglator on the card
+only being rated for 20A of output current, TRM implements a 1000MHz limit for
+the memory clock frequency on this card.  Due to the 1000MHz memory clock
+limit, we recommend that users run a core clock of 505MHz to maximize
+performance while minimizing power usage.
+
+While TRM does not currently support adjusting voltages on the FK33, it is
+possible to adjust voltages on the card prior to starting TRM using external
+tools such as the SQRL bridge.  Due to the lower memory and core clock
+frequencies required by the undersized vcchbm regulator, we recommend that users
+lower their board voltages as low as they are capable of going on the FK33
+boards: 0.777V for vccint, 0.821V for vccbram, and 1.164V for vcchbm.  These
+settings will save power and help keep the vcchbm regulator cool (and reduce the
+potential for damage to the regulator).
+
+IMPORTANT: While the 1000MHz memory clock limit will prevent most boards from
+damaging their vcchbm regulators, it is important to keep the vcchbm voltage low
+to minimize current on the rail.  Running at 1000MHz memory clock with a high
+vcchbm voltage can result in current high enough to damage the regulator.
+
+
