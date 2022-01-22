@@ -1,4 +1,4 @@
-# teamredminer v0.9.0
+# teamredminer v0.9.1
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -107,6 +107,7 @@ Support legend:
 FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - Xilinx Varium C1100
 - SQRL Forest Kitten 33 - performance limited by product design, see guide for details
+- Xilinx/TUL/Osprey U50C/ECU50
 
 Supported FPGA algorithms and their respective dev fees:
 |      FPGA Algorithm       |  Fee |
@@ -126,6 +127,20 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.9.1
+#### Changes
+- FPGA: Updated FPGA_GUIDE.txt with new devices, voltage tuning, and more.
+- FPGA: Added U50C/ECU50 FPGA suppport.
+- FPGA: Added custom SC firmware for C1100 and U50C.
+- FPGA: Added TRM SC firmware programming support, see --fpga_update_fw.
+- FPGA: Added voltage control for C1100 and U50C (using new firmware), see --fpga_vcc_int, etc options.
+- FPGA: Added support for additional FK33 sensors (hbm voltage, current sensors).
+- FPGA: Added support for DNAs in the --fpga_devices option.
+- FPGA: Added --fpga_allow_unsafe option for disabling safety limits.
+- FPGA: Added timeout for ethash DAG gen on FPGAs.
+- GPU:  Added --eth_ignore_abort_fail to disable intensity adjustment due to failed aborts.
+- GPU:  Added better handling of dead gpu logging in corner cases that previously didn't mention a specific gpu.
 
 ### v0.9.0
 #### Changes

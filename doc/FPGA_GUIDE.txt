@@ -2,24 +2,39 @@ TeamRedMiner FPGA Guide
 =======================
 
 History:
-v1.0 2020-12-12
+v1.1 2021-01-21 Added voltage control and U50C/ECU50 sections.
+v1.0 2020-12-12 Initial version.
 
 General Overview
 ================
-Starting in version v0.9.0 TeamRedMiner(TRM) now has support to mine ethash on
-two FPGA products based on Xilinx FPGAs: the Xilinx Varium C1100 and the SQRL
-Forest Kitten 33.  Mining with FPGAs is only officially supported on Linux,
-however Windows users can also mine using a Linux VM with USB passthru for the
-FPGA USB JTAG connections.  Currently TRM does not support setting voltages on
-the FPGA boards and is only able to read some of the available on-board
-telemetry (memory voltage, board power, etc).  As a result there are not many
-knobs available for tuning, though the ones that are will be discussed in the
-individual board sections below.  Next we discuss general FPGA mining setup.
+From version v0.9.1 TeamRedMiner(TRM) has support to mine ethash on three FPGA
+products based on Xilinx FPGAs: the Xilinx Varium C1100, SQRL Forest Kitten 33
+and Xilinc U50C including clones like the ECU50.  Mining with FPGAs is only
+officially supported on Linux, however Windows users can also mine using a Linux
+VM with USB passthru for the FPGA USB JTAG connections.
 
+In v0.9.1, additional telemetry was added as well as voltage control integrated
+into the miner for C1100 and U50C.  FK33 voltages can still only be controlled
+through the SQRL bridge.  Voltage control through TRM also requires flashing a
+custom firmware provided by TRM.  Descriptions of the flash procedure, voltage
+control arguments, and tuning examples are included below in separate sections.
+Adding voltage control is highly recommended since the stock vccint voltage is
+higher than needed and lowering vccint is an easy way to save 7-10W of power
+per card.
+
+Due to limited voltage regulator capacity for the HBM2 memory parts of the fpga
+on FK33 (20A) and U50C (24A), TRM limits the allowed overclocking range on both
+these cards to what we believe are sensible max values that produce good
+performance while still minimizing the risk of damaging the hardware.  The C1100
+does not suffer from this problem.  However, on request we added a safety
+override mechanism in v0.9.1 for users that still want to push the hardware
+more.  See the --fpga_allow_unsafe argument in USAGE.txt for more info.  Please
+note that we recommend having excellent overall cooling before doing
+extended runs at unsafe clock levels.
 
 Mining Instructions
 ===================
-TRM currently only communicates to FPGAs via the USB JTAG ports availabe on the
+TRM currently only communicates to FPGAs via the USB JTAG ports available on the
 boards.  Ensure that your FPGA boards' USB JTAG ports are connected to the host
 system where TRM will be running.  Verify that TRM can detect the attached
 devices by running 'sudo ./teamredminer --list_devices' and checking that the
@@ -31,17 +46,20 @@ these to construct the command to start TRM.  For example:
 sudo ./teamredminer -a ethash -o stratum+tcp://eu1.ethermine.org:4444 -u 0x02197021fefa795fec661a45f60e47a6f6605281.trmtest -p x
 
 These are the minimum command arguments needed to start TRM mining with FPGAs.
-The first time TRM is run it will download the neccessary bitstreams for the
-FPGA boards being run and save them in the 'bits' local directory.  Running
-this command will start TRM and begin mining on all available FPGAs (and AMD
-GPUs) using the default clock frequency values of 450MHz for core clock and
-900MHz for memory clock.  TRM can be limited to run on specific FPGA devices
-using the --fpga_devices option (see --help or USAGE.txt for details).  Most
-users will likely want to increase these default values by using the
---fpga_clk_core and --fpga_clk_mem options.  Additionally TRM has temperature
-monitoring for the FPGA core temperature and the memory temperature and will
-throttle mining speeds to maintain temperatures within the set limits.  By
-default the limits are both set to 90C, but they can be adjusted using the
+The first time TRM is run it will download the necessary bitstreams for the FPGA
+boards being run and save them in the 'bits' local directory.  Running this
+command will start TRM and begin mining on all available FPGAs (and AMD GPUs)
+using the default clock and voltage settings for each FPGA (there are different
+default settings for each card model).  TRM can be limited to run on specific
+FPGA devices using the --fpga_devices option using device index or DNA strings
+(see --help or USAGE.txt for details).
+
+The default clocks and voltages can be fairly conservative for some boards,
+such as the C1100. Most users will likely want to adjust these default values 
+by using the --fpga_clk_core and --fpga_clk_mem options.  Additionally TRM has
+temperature monitoring for the FPGA core temperature and the memory temperature
+and will throttle mining speeds to maintain temperatures within the set limits.
+By default the limits are both set to 90C, but they can be adjusted using the
 --fpga_tcore_limit and --fpga_tmem_limit options.  When running on a system
 with GPUs and FPGAs, the --hardware option can be used to select if TRM is to
 run only GPUs or only FPGAs.
@@ -58,17 +76,158 @@ For more help and for issues not mentioned in this document, please join the
 TRM discord and ping us there.
 
 
+TRM Custom Firmware Flashing
+============================
+To enable voltage control on U50C and C1100, custom firmware for the board
+satellite controller (SC) needs to be flashed first.  All necessary support is
+integrated in the miner.  Run the miner with --fpga_update_fw added as an
+argument, and it will download and flash on all devices that either runs a
+non-TRM firmware or a TRM firmware with a lower internal version number.
+
+To test flashing on a single device, you would typically use:
+
+sudo ./teamredminer -a ethash -o stratum+tcp://eu1.ethermine.org:4444 -u 0x02197021fefa795fec661a45f60e47a6f6605281.trmtest_f -p x --hardware=fpga --fpga_update_fw --fpga_devices=0 
+
+If that works ok, shut down the miner, then flash all devices by removing the
+last argument and run again. Quit when all devices have been flashed and run
+your normal start script.
+
+NOTE 1: just like for a motherboard or gpu, flashing a firmware/bios always
+means taking a small risk.  If there's a power outage, usb cable glitch, or
+other similar event happening during the flash the process will fail and your
+board will most likely fail to power up.  It is not bricked, but needs to be
+reset by reprogramming the SC over the JTAG debug header (we can safely say that
+this has been thoroughly verified by TRM devs during development).  This should
+be possible with any jtag adapter supported by openocd but takes some knowledge
+and potentially building your own cable.  We will be able to provide some
+support around this, and if it would happen too frequently we can write a HOWTO
+guide.
+
+NOTE 2: if you're using e.g. a C1100 and switching between mining with TRM and
+working in the Alveo XRT environment, the TRM firmware _should_ be fully
+compatible, but if that isn't the case or you need to downflash for other
+reasons, you can force a reflash with the XRT tools. For a C1100 on pci bus id
+03:00.0 you would run:
+
+sudo /opt/xilinx/xrt/bin/xbmgmt program -d 0000:03:00.0 --base --force
+
+
+Voltage Tuning
+==============
+With a flashed custom TRM firmware, the U50C and C1100 can use the integrated
+voltage control in the miner.  FK33s still need to use the SQRL Bridge.  The
+tuning process is similar regardless of which tool sets the voltages.  That
+said, FK33s don't have much room to navigate due the limited HBM2 power rail,
+and should run at the suggested lowest possible voltages unless you have decided
+to override the safety limits and test a higher config.
+
+To control voltages using TRM, you use two or three arguments. The U50C does not
+support changing the mem voltage and should only use the vccint and vccbram
+arguments. Example:
+
+--fpga_vcc_int=x,y,z,...
+--fpga_vcc_bram=x,y,z,...
+--fpga_vcc_mem=x,y,z,...
+
+where x,y,z,... is the voltages in mV in device order.  See USAGE.txt or the
+miner --help output for more details.  If you have a mixed rig with different
+types of fpgas you can skip devices with empty strings.  Assuming your order is
+one FK33, one ECU50 and one C1100, you would use e.g.:
+
+--fpga_vcc_int=,750,750 --fpga_vcc_bram=,850,850 --fpga_vcc_mem=,,1200
+
+Fpga devices in TRM are by default sorted in DNA order and then enumerated
+0,1,2,... The main point is to get a static device order across reboots without
+depending on a specific usb bus id order.  Voltage arguments follow the
+enumerated device order.  However, if a device is added or removed, this can
+skew an existing configuration.  To make life easier when adding a new device,
+you can use the --fpga_devices=DNA1,DNA2,... support added in v0.9.1 to create
+your own enumeration, then add the new device DNA at the end to guarantee that
+existing voltage arguments will still be mapped correctly to the already tuned
+boards, then adding the voltages for the new device at the end of each voltage
+argument.
+
+For tuning voltages and handling crashes, this is the process we've followed:
+
+1) For stock voltages, the normal case is that vccint 850mV is much too high,
+   vccbram 850mV ok but on the low side, and vccmem 1200mV is ok.
+
+2) We start with a generous config, slightly depending on what hashrate you're
+   targeting:
+
+   60-65 MH/s: vccint 750mV, vccbram 850mV, vccmem 1200mV
+   65-70 MH/s: vccint 800mV, vccbram 865mV, vccmem 1200mV
+   70-75 MH/s: vccint 850mV, vccbram 875mV, vccmem 1200mV
+   75-   MH/s: vccint 850mV, vccbram 885mV, vccmem 1230mV
+
+3) Repeatedly run the miner, establishing a threshold for when you deem a
+   certain config stable, it could be 30 mins, 2h, 24h.  In general, if there's
+   an immediate restart due to errors coming right after the initial DAG build,
+   the same config might still run ok for days, and you might want to discard
+   such restarts when declaring if a tuning is good or not.  Instead, focus on
+   repeated crashes or error rates creeping up after having mined successfully
+   for a while.  
+
+4) The first step is to lower vccint as much as possible.  This is where we save
+   the most power compared to a stock config.  The initial tunings above are
+   quite generous, so the first step down can be -25mV or so.  After that, use
+   -10mV increments, +5mV back up when you start to experience crashes and/or
+   repeated high error rates. Most U50C can run as low as 700mV for 69.1 MH/s,
+   and C1100s at 76.9-77.4 MH/s often end up in the 740-760mV range.  There are
+   always unlucky silicon samples that need significantly more voltage though,
+   and it does depend on cooling as well.
+
+5) C1100: when vccint is stable, do the same thing with vccmem, lowering it 5 or
+   10mV at the time.  At some point you will most likely see error rates
+   creeping up.  It's up to you if you want a strict 0.00% error rate displayed
+   in the miner stats, or if you think 0.01-0.05% errors are ok.  It's important
+   to remember that when balancing right at the edge of stability temperatures
+   do come into play in a different way.  A small error rate of 0.02% can easily
+   grow into more if ambient temps would increase slightly.  Our recommendation
+   is therefore to at least increase vccmem a bit from the level where you
+   start seeing errors, preferably to a point where you see no errors at all.
+   That said, we have C1100s that run at 0.10% errors in a wide vccmem voltage
+   range and doesn't seem very sensitive to ambient temps, and the applied
+   tuning is still a winning trade.  You will have to test your cards to find
+   out.
+
+6) Last, lower vccbram. For TRM ethash mining, the vccbram rail does not use
+   much power and the power save upside isn't very significant.  However, you
+   can still try to lower vccbram in steps of -5mV for an optimal tuning.
+   Starving vccbram often leads to hard crashes.
+
+7) Handling crashes: the main point of the process above is to always know what
+   was changed in a stable config and therefore easily reset back in case of
+   issues appearing.  TRM also generally recovers the fpga from any type of
+   crash and automatically resumes mining, so in very rare crash events it might
+   even be the best trade-off to keep the more aggressive tuning.  However, when
+   pushing for hashrates close to 80 MH/s or even above, it might be difficult
+   to even find a baseline config.  A few pointers about crash types:
+
+   Hard crash: hashrate drops to 0.00 h/s. Most often vccbram being too low.
+
+   Low core utilization restarts: could be multiple things, try increasing
+                                  vccbram, then vccint.
+
+   Core crash: hashrate increases and shows a bogus high hashrate, often with an
+               increasing err rate.  Vccint is likely too low.
+
+   High error rate: try increasing vccmem, vccbram, vccint in order.  For very
+                    pushed configs above 80 MH/s, there's a limit where nothing
+                    will help.
+
+
 Tuning Xilinx Varium C1100
 ==========================
 The Xilinx Varium C1100 is a very well designed card from the perspective of
-power delivery, but it can be a challenge to adequately cool due to it's single
+power delivery, but it can be a challenge to adequately cool due to its single
 slot passive cooling design.  Typical mining rig cooling will not suffice for
 this card and additional cooling must be provided to the card.  High static
 pressure server chassis can some times achieve good results, but the most
 reliable solution is to directly attach a blower (such as the SanAce B97's) to
-the back of the card.  Many users have found that the best way to do this is
-via a 3d-printed mounting bracket, however many users have had success with
-low-tech methods such as ample usage of tape.
+the back of the card.  Many users have found that the best way to do this is via
+a 3d-printed mounting bracket, however many users have had success with low-tech
+methods such as ample usage of tape.
 
 IMPORTANT: The C1100 must be powered through both the PCIe slot and the AUX
 power connector.  Not connecting both PCIe slot and AUX power can result in
@@ -76,10 +235,33 @@ board components overheating.  While the on-board power delivery is well
 designed, it draws 12V current from both the PCIe edge and AUX connectors and
 requires both to handle higher power loads.
 
-Assuming the C1100 is adequately cooled, most cards will run stably at 610MHz
-core clk and 1220MHz memory clock.  Cards with exceedingily good cooling or
-very good silicon quality may be able to reach up to 660MHz core and 1310MHz
-memory clock frequencies.
+Assuming the C1100 is adequately cooled and with the additional of voltage
+adjustments, most cards will run stably at 630MHz core clk and 1255MHz memory
+clock.  Cards with exceedingily good cooling or very good silicon quality may be
+able to reach up to 670MHz core and 1330MHz memory clock frequencies.  If you
+experience crashes trying to reach higher clock levels, read the voltage tuning
+section for more input.
+
+This is a sample set of 7 x C1100 running at 630 MHz / 1255 MHz with voltages
+tuned down, given an example of the spread between lucky and unlucky silicon:
+
+FPGA Board CoreMHz MemMHz TCore TMem VccInt VccBRAM VccMem Power
+0    C1100   630.0 1255.0   46C  62C  740mV   866mV 1163mV   86W
+1    C1100   630.0 1255.0   48C  65C  741mV   868mV 1173mV   87W
+2    C1100   630.0 1255.0   47C  62C  739mV   866mV 1164mV   85W
+3    C1100   630.0 1255.0   47C  64C  750mV   867mV 1181mV   88W
+4    C1100   630.0 1255.0   48C  64C  741mV   867mV 1162mV   84W
+5    C1100   630.0 1255.0   47C  63C  744mV   866mV 1153mV   85W
+6    C1100   630.0 1255.0   48C  63C  746mV   867mV 1183mV   86W
+
+0  ethash: 76.90Mh/s, avg 76.45Mh/s, pool 77.53Mh/s a:264 r:0 er:0.00
+1  ethash: 76.91Mh/s, avg 75.74Mh/s, pool 80.76Mh/s a:275 r:0 er:0.00
+2  ethash: 76.91Mh/s, avg 76.45Mh/s, pool 73.42Mh/s a:250 r:0 er:0.00
+3  ethash: 76.90Mh/s, avg 76.10Mh/s, pool 76.65Mh/s a:261 r:0 er:0.00
+4  ethash: 76.90Mh/s, avg 76.45Mh/s, pool 77.83Mh/s a:265 r:0 er:0.00
+5  ethash: 76.91Mh/s, avg 76.45Mh/s, pool 65.49Mh/s a:223 r:0 er:0.00
+6  ethash: 76.90Mh/s, avg 76.45Mh/s, pool 67.55Mh/s a:230 r:0 er:0.00
+   ethash: 538.3Mh/s, avg 534.1Mh/s, pool 519.2Mh/s a:1768 r:0
 
 
 Tuning SQRL Forest Kitten 33
@@ -89,9 +271,11 @@ typical operation.  Unfortunately, the power delivery circuitry on the card is
 somewhat lacking when it comes to running designs using large amounts of HBM
 memory bandwidth, such as TRM ethash.  Due to the VCCHBM reglator on the card
 only being rated for 20A of output current, TRM implements a 1000MHz limit for
-the memory clock frequency on this card.  Due to the 1000MHz memory clock
-limit, we recommend that users run a core clock of 505MHz to maximize
-performance while minimizing power usage.
+the memory clock frequency on this card.  Due to the 1000MHz memory clock limit,
+we recommend that users run a core clock of 510MHz to maximize performance while
+minimizing power usage.  With the addition of --fpga_allow_unsafe in v0.9.1 it
+is possible to run FKs at higher clock speeds, but this is at the user's own
+risk.
 
 While TRM does not currently support adjusting voltages on the FK33, it is
 possible to adjust voltages on the card prior to starting TRM using external
@@ -108,3 +292,18 @@ to minimize current on the rail.  Running at 1000MHz memory clock with a high
 vcchbm voltage can result in current high enough to damage the regulator.
 
 
+Tuning Xilinx U50C or ECU50
+===========================
+Similar to the SQRL FK33, the U50C and ECU50 also suffer from a limited vcchbm
+power rail.  They are rated for 24A, and TRM therefore limits them to 1125 MHz
+mem clk unless the safety override argument --fpga_allow_unsafe has been
+used. For our tests, we have only had ECU50 boards with good cooling
+capabilities, meaning the results might not be directly applicable to U50C
+devices.
+
+The cards generally run very well at 570 MHz core, 1125 MHz mem for 69.14 MH/s.
+With TRM's added voltage tuning, they can often undervolt to vccint 700mV and
+vccbram 800mV for 75W of board power from the input sensors.  This also keeps
+the devices right at the max of the standard PCIe slot power rating.
+Unfortunately, controlling the vccmem voltage is not possible on U50C/ECU50
+devices.

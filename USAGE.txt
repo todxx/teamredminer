@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.0
+          Team Red Miner version 0.9.1
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -411,6 +411,9 @@ Ethash options:
                               from no load to 100% load enough to lower the slew rate on such rigs.  The typical indication of this
                               issue is hard hangs where the rig becomes unresponsive requiring a power cycle to reboot, but it can also
                               be regular gpu crashes.  Valid values are 1-128. Not using this argument means no delay, value zero.
+      --eth_ignore_abort_fail  When job abort fails, it's typically the result of the intensity being too high, and the miner
+                              therefore adjusts it down automatically.  This option _disables_ this logic, keeping the intensity but
+                              instead logs a warning.
 
 Progpow options (kawpow, firopow):
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
@@ -568,9 +571,11 @@ ZIL dual mining options:
                               log files.  To switch to the default output, add --stats_mode=single.
 
 FPGA Options: 
-      --fpga_devices=LIST   Sets FPGA devices to use from detected list. LIST should be a comma separated list of device 
-                              indices, e.g. -d 0,1,2,4.  If not specified, all available FPGA devices will be used.  
-                              Use --list_devices to show device indices.
+      --fpga_devices=LIST   Sets FPGA devices to use from detected list. LIST should be a comma separated list of either 
+                              device indices or device DNAs as shown by --list_devices.
+                                Examples:   -d 0,1,2,4
+                                            -d 40020000013ae32135111111,40020000013ae32135222222,40020000013ae32135333333
+                              If not specified, all available FPGA devices will be used.  
       --fpga_clk_core=LIST  Sets FPGA device core clock frequencies.  The clock frequencies should be provided as a
                               comma separated list of values in megahertz, where each value applies to each FPGA device.
                               If the list is shorter than the total number of devices, the remaining devices will use the 
@@ -581,3 +586,19 @@ FPGA Options:
                               specified value, the miner will lower the FPGA clocks to bring the core temperature under 
                               the specified value.  Values are in Celcius with a list format similar to --fpga_clk_core.
       --fpga_tmem_limit=LIST Sets FPGA device memory temperature soft limits.  See --fpga_tcore_limits for description.
+      --fpga_vcc_int=LIST   Sets the vcc_int voltage on boards that support it.  The voltage values should be provided as a
+                              comma separated list of values in milliVolts(mV), where each value applies to each board.
+                              If the list is shorter than the total number of devices, the remaining devices will use the 
+                              first value in the list.  For example --fpga_vcc_int=700,800 will apply 700mV vcc_int to 
+                              FPGA 0 and 800mV vcc_int to FGPA 1.  If devices FPGA 2+ are present, they will be set to 700mV.
+      --fpga_vcc_bram=LIST  Sets the vcc_bram voltage on boards that support it.  The format is the same as --fpga_vcc_int.
+      --fpga_vcc_mem=LIST   Sets the memory/HBM voltage on boards that support it.  The format is the same as --fpga_vcc_int.
+      --fpga_update_fw      Enables updating of satellite controller firmware for C1100 boards with custom TRM firmware
+                              to support features such as runtime voltage control. Only boards selected with the
+                              --fpga_devices option which are not running the latest firmware version will be updated.
+                              ***** CAUTION: Users should be careful not to interrupt the firmware updating process!   *****
+                              *****   Interruptions can result in a bricked board that is very difficult to recover.   *****
+      --fpga_allow_unsafe=LIST Disables default safety limits for the specified FPGAs.  The devices are specified with a
+                              comma separated list of DNA values, e.g. --fpga_allow_unsafe=40020000013ae32135111111
+                              ***** CAUTION: Running above safety limits can result in PERMANENT DAMAGE to the device! *****
+
