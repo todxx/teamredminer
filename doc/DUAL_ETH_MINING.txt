@@ -1,0 +1,111 @@
+Team Red Miner Dual Coin ETH Mining
+===================================
+
+TL;DR
+-----
+To mine ETH+TON on Navi gpus (which is the only supported dual algo at the moment),
+take a working TRM ethash command line and add a TON section in the
+middle or at the end:
+
+--ton -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
+
+TRM's dual mining setup let's the user split the capacity between
+ethash and the second algo using the standard --eth_config
+argument. The higher intensity, the more capacity for ethash and less
+for the dual algo. Therefore, you SHOULD remove any existing
+--eth_config arguments in your ethash command line. They're not
+applicable. Let the miner run the dual algo tuner once, then you can
+add back a static config. The dual tuner will output a list of the
+probed results.
+
+If you run ETH+TON dual mining on unsupported gpus, a warning is
+issued and they are downgraded to regular ethash mining only. This
+makes it possible to run ETH+TON on mixed rigs where Navis will run
+dual mining, other gpus plain ethash.
+
+Last, see the TON dual mining section in USAGE.txt or the miner's
+--help output for additional arguments.
+
+
+Overview
+--------
+From v0.9.2, TRM includes support for true dual mining together with
+ethash. The first release is very much an experimental alpha version,
+and support is limited to Navi and Big Navi gpus only. Subsequent
+releases will add support for Vega and Polaris gpus and potentially
+more dual mining algos - the single supported dual algo in the first
+release is TON.
+
+TRM's dual mining is configurable in the sense that the user decides
+how the gpu capacity should be split between the two algos. This is
+done with the normal --eth_config argument that decides how much gpu
+capacity will be used by ethash. The remaining capacity will be used
+by the dual algo. The eth config intensities used for single algo
+ethash should _NOT_ be carried over to a dual mining setup. The dual
+mining ethash kernel is designed differently and does not target the
+absolute max possible ethash hashrate. It rather tries to provide a
+good trade-off between running a very competitive ethash hashrate
+close to the max possible while also providing room for the dual
+algo to operate.
+
+
+Dual mining ETH+TON
+--------------------
+To dual mine ethash and TON, do as follows:
+
+1) Start with a working ethash configuration for TRM.
+
+2) If you have an --eth_config argument, remove the intensities. You
+   can keep the A/B-mode setting.
+
+3) Add a TON argument section that contains the pool(s) you want to
+   use for dual TON mining. This follows the same principle as TRM's
+   dual ZIL mining setup. This added argument will enable dual TON
+   mining on the Icemining pool:
+
+   --ton -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
+
+   It's fully possible to insert the --ton ... --ton_end arguments
+   into e.g. a Hive flight sheet's custom miner arguments section to
+   enable dual mining, while still using Hive's builtin support for
+   configuring the ethash mining.
+
+
+Clocks and Voltage Tuning
+-------------------------
+Dual mining will inevitably pull significantly more power than single
+algo ethash. The user is advised to tune a single gpu by itself first
+to assess power draw.
+
+Standard ethash clocks with a slight core voltage increase is a good
+starting point for dual mining. After that, tuning is mostly a
+function of achieving stability and how much power you want to
+consume. Increasing core clk will increase the dual algo performance,
+but at the cost of more power.
+
+
+Dual Mining Ethash Modes and Intensity
+--------------------------------------
+All ethash mining modes (A/B/C) are available in dual mining as well,
+and behave like they do for single algo ethash mining.
+
+For choosing the intensity, TRM includes a dual mining tuner that,
+unless a static eth config intensity has been provided, scans through
+a range of eth config intensities at startup and selects the optimal
+one based on a scoring model. There are built-in weights for each pair
+of algos that can be dual mined, but over time you might want to tweak
+the optimization target function using the argument
+--dual_tuner_weights=X:Y:Z. This argument is described in detail in
+USAGE.txt and the miner's --help output.
+
+As mentioned above, ethash config intensities from single algo ethash
+mining should _NOT_ be used in a dual mining setting. We recommend
+that you at least do one dual tuner run and inspect the output, or
+always let the dual tuner run at startup. The process takes 3-4
+minutes to complete.
+
+It should be noted that the dual tuner is somewhat crude and can
+sometimes produce skewed results. This is mainly because we don't want
+the process to take 10-15 minutes. The tuner outputs the results for
+all scanned configurations after completing the scan, and the user can
+pick a static config from there to add to the command line.

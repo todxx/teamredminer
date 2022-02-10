@@ -1,4 +1,4 @@
-# teamredminer v0.9.1
+# teamredminer v0.9.2
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -38,6 +38,7 @@ Supported GPU algorithms and their respective dev fees:
 | Kawpow                    | 2.0% |
 | Verthash                  | 2.0% |
 | Autolykos2                | 2.0% |
+| Ton                       | 1.0% |
 | Nimiq                     | 2.5% |
 | Cryptonight R             | 2.5% |
 | Cryptonight v8 upx2       | 2.5% |
@@ -72,6 +73,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Verthash                 |  Y   |  Y   |   Y     |   Y  |   N   |
 | Autolykos2               |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Firopow                  |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Ton                      |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
 | Cryptonight v8 upx2      |  N   |  L   |   L     |   L  |   N   |
@@ -127,6 +129,15 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.9.2
+#### Changes
+- GPU:  Added TON algo for single algo mining on all gpu generations (see TON_MINING.txt).
+- GPU:  Added dual ETH+TON mining for Navi and Big Navi gpus (see DUAL_ETH_MINING.txt). Vega and Polaris upcoming shortly.
+- GPU:  Added dual mining tuner based on scoring weights (see --dual_tuner_weights).
+- GPU:  Faster initial ethash tuning on startup.
+- FPGA: Added --fpga_max_jtag_mhz for limiting the JTAG communication frequency used.
+- FPGA: Fixed DNA for vu35p - now matches Vivado hardware manager and NextJTAG.
 
 ### v0.9.1
 #### Changes

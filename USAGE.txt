@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.1
+          Team Red Miner version 0.9.2
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -9,6 +9,7 @@ Options:
                               mtp_firopow       (chooses firopow or mtp and shuts down miner at the fork on Oct 26 2021)
                               autolykos2        (ergo)
                               verthash          (vtc)
+                              ton               (ton)
                               nimiq             (nimiq)
                               lyra2z      
                               phi2              (lux, argoneum)
@@ -48,6 +49,11 @@ Options:
                               decides the interface(s) and port to listen to. Default is 127.0.0.1:4028. For
                               external access, use e.g. 0.0.0.0:4028. It's also valid to only specify the
                               port, e.g. 4029.
+      --api2_listen=IP:PORT Enables a second api port for dual mining setups.  This api endpoint will provide data for the
+                              dual mining algo, just like if two separate miner instances were running in parallel.  The 
+                              default setting is 127.0.0.1:4029, i.e. the port is 4029 and not 4028.  For specifying your
+                              own choice, the argument is formatted like --api_listen.
+
       --cm_api_listen=IP:PORT Enables the claymore compatible api. IP:PORT is optional. If present, the IP:PORT combo
                               decides the interface(s) and port to listen to. Default is 127.0.0.1:3333. For
                               external access, use e.g. 0.0.0.0:3333. It's also valid to only specify the
@@ -570,6 +576,51 @@ ZIL dual mining options:
                               the ZIL mining.  Some contexts might get confused by this if they are parsing the TRM outut or 
                               log files.  To switch to the default output, add --stats_mode=single.
 
+TON options:
+      --ton_pool_mode=X     Specifies the TON mining dialect used.  If not set, the miner will try to deduce the correct choice
+                              from the pool hostname.  Available options are:
+                              toncoinpool - use the stratum wss protocol for toncoinpool.
+                              icemining   - use ice mining's stratum protocol over tcp/ip.
+      --wss_no_proxy        Disables the automatic wss proxy executed as a separate process used for TON pools that run their
+                              mining protocol over wss. This means that the host and port passed to the miner must be pointing
+                              to a proxy.
+      --wss_proxy=VALUE     Overrides the default path to the wss proxy. The default is trm_nimiq_proxy-win.exe and.
+                              and trm_nimiq_proxy-linux in the current miner directory as it was originally only used for.
+                              Nimiq.
+      --wss_port=VALUE      Overrides the default local port (4444) used for the wss proxy. This can be used if your
+                              system is already using port 4444 for some other tcp/ip service.
+
+TON dual mining options:
+      --ton_start or --ton  Starts the TON dual mining config.  Between this and the --ton_end marker, all arguments are
+                              applied to the TON mining rather than the primary algo, typically ethash.  It's expected that
+                              ethash has been set up in earlier arguments.  The intention is that you can add a --ton ... --ton_end
+                              configuration to any working TRM configuration algo and things will work out of the box.
+
+                              The minimal working setup is to only provide a TON pool.  Read the TON mining guide for info on
+                              supported pools. This is an example for icemining, using its beta pool address:
+                              --ton -o stratum+tcp://ton.hashrate.to:4003 -u <ton wallet>.<worker name> -p x --ton_end
+
+                              For more info, read the TON dual mining guide packaged with the TRM release.
+
+      --ton_end             Marks that we're done with the TON mining config and all following arguments are for the primary
+                              algo.  This argument isn't strictly necessary, but should be included for mining distros since
+                              the user has no guarantee what arguments will be added automatically at the end of the command
+                              line by the distro.
+      --dual_tuner_weights=X:Y:Z  The dual mining tuner needs scoring weights for how much 1 MH/s of the primary and dual algo
+                              are worth.  There are defaults built into the miner that were valid when each algo was implemented
+                              and added, but as network hashrates and market prices move, new values may need to be provided. 
+                              This argument provides three values, all expected to be positive numbers:
+                                X    Score for 1 MH/s of the primary algo (typically ethash). 
+                                Y    Score for 1 MH/s of the secondary algo (typically TON). 
+                                Z    Cost per 1 W of measured power. We recommend setting this to zero for now. 
+                              Example for ETH+TON: 
+
+                                Based on manual relative value: each MH/s of ETH is worth 100 MH/s of TON
+                                --dual_tuner_weights=100:1:0
+
+                                Based on mining calculators: $0.0437 for 1 MH/s ETH, $0.0005476 for 1 MH/s TON
+                                --dual_tuner_weights=0.0437:0.0005476:0
+
 FPGA Options: 
       --fpga_devices=LIST   Sets FPGA devices to use from detected list. LIST should be a comma separated list of either 
                               device indices or device DNAs as shown by --list_devices.
@@ -601,4 +652,5 @@ FPGA Options:
       --fpga_allow_unsafe=LIST Disables default safety limits for the specified FPGAs.  The devices are specified with a
                               comma separated list of DNA values, e.g. --fpga_allow_unsafe=40020000013ae32135111111
                               ***** CAUTION: Running above safety limits can result in PERMANENT DAMAGE to the device! *****
+      --fpga_max_jtag_mhz=XY.Z  Sets the max allowed frequency to use for fpga jtag communication.  Default is 30.0 MHz.
 

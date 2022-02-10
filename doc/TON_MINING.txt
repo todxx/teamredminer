@@ -1,0 +1,86 @@
+Team Red Miner TON Mining
+=========================
+
+TL;DR
+-----
+TRM supports two TON pools: Icemining and Ton Coin Pool. Neither pool
+requires wallet registration before starting to mine. Use the following
+pool arguments to mine:
+
+Icemining: -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x
+
+Ton Coin Pool: -o stratum+tcp://pplns.toncoinpool.io:443/stratum -u <ton wallet> -p <worker>
+
+Last, see the TON section in USAGE.txt or the miner's --help output
+for additional arguments.
+
+
+Background
+-----------
+TON is a special pow mining coin since submitted solutions aren't used
+for network blocks and chain security like in standard pow
+blockchains. Instead, TON has 10 smart contracts called "givers" that
+simply reward you for hashing and submitting solutions directly to the
+contracts. The remaining pool of available coins from the "givers" is
+expected to last until mid-2022.
+
+There is no single standard pool protocol for TON. All pools must be
+handled as separate implementations. TRM currently only support the
+following pools:
+
+- Icemining (icemining.ca, beta stratum url ton.hashrate.to)
+- TON Coin Pool (toncoinpool.io)
+
+Even though it's a new pool in the TON ecosystem, we recommend
+Icemining since it runs a well-designed pool protocol. Below you'll
+find descriptions on how to use each supported pool.
+
+
+Specifying Pool Protocol
+------------------------
+If you use the standard URLs for the supported pools, TRM will
+automatically understand what pool protocol dialect to use. However,
+if you tunnel the pool, connect by direct IP, or use some other
+network mechanism that doesn't present the normal hostname to TRM you
+must manually state which pool protocol should be used. This is done
+using the --ton_pool_mode argument. These are the available options:
+
+--ton_pool_mode=icemining
+
+--ton_pool_mode=toncoinpool
+
+
+Web Service Proxy
+-----------------
+Many TON pools use web service protocols for its communication. TRM
+does not include support for ws:// or wss:// in order to not violate
+open source licenses, and we don't intend to spend the time
+implementing support from scratch. Instead, we ship a proxy binary
+that is compiled from a published open source project originally
+written for mining Nimiq, which also uses wss:// for pool protocol
+communication. The source code is available here:
+
+https://github.com/Kerney666/trm_nimiq_proxy
+
+The proxy is bundled in our release package and will be executed
+automatically for you when necessary.
+
+
+How to mine at Icemining
+------------------------
+Simply point TRM to the pool like for any other mining algorithm. TRM
+will automatically split the worker name from the wallet if we find
+that it ends with '.yourworkername'. It is not an official format for
+specifying the worker. Replace ./teamredminer with teamredminer.exe
+on Windows.
+
+./teamredminer --a ton o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x
+
+
+How to mine at Ton Coin Pool
+----------------------------
+Use the following format to mine at Ton Coin Pool. Replace
+./teamredminer with teamredminer.exe on Windows.
+
+./teamredminer -a ton -o stratum+tcp://pplns.toncoinpool.io:443/stratum -u <ton wallet> -p <worker>
+
