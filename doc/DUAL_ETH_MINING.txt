@@ -9,6 +9,12 @@ middle or at the end:
 
 --ton -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
 
+If you don't to dual mine on all devices, you can add a device
+selection argument inside the --ton .. --ton_end clause. If you only
+want to dual mine on gpu 0 and gpu 3 you would use:
+
+--ton -d 0,3 -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
+
 TRM's dual mining setup let's the user split the capacity between
 ethash and the second algo using the standard --eth_config
 argument. The higher intensity, the more capacity for ethash and less
@@ -69,6 +75,13 @@ To dual mine ethash and TON, do as follows:
    into e.g. a Hive flight sheet's custom miner arguments section to
    enable dual mining, while still using Hive's builtin support for
    configuring the ethash mining.
+
+4) If you only want to dual mine on a smaller selection of gpus, you
+   can add a device selection argument inside the ton argument
+   list. For example, if you want to dual mine on gpu 0, 1 and 4 in
+   the rig but just do plain ethash on the rest you would use:
+
+   --ton -d 0,1,4 -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
 
 
 Clocks and Voltage Tuning
