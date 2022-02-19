@@ -3,13 +3,17 @@ Team Red Miner TON Mining
 
 TL;DR
 -----
-TRM supports two TON pools: Icemining and Ton Coin Pool. Neither pool
-requires wallet registration before starting to mine. Use the following
-pool arguments to mine:
+
+TRM supports three TON pools: Icemining, Ton Coin Pool, and Whales Ton
+Pool using their tcp stratum endpoint. Whales Ton Pool needs wallet
+registreation with their Telegram bot before starting to mine.
+Use the following pool arguments to mine:
 
 Icemining: -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x
 
 Ton Coin Pool: -o stratum+tcp://pplns.toncoinpool.io:443/stratum -u <ton wallet> -p <worker>
+
+Whales Ton Pool: -o stratum+tcp://tcp.whalestonpool.com:4001 -u <ton wallet> -p x
 
 Last, see the TON section in USAGE.txt or the miner's --help output
 for additional arguments.
@@ -29,6 +33,8 @@ handled as separate implementations. TRM currently only support the
 following pools:
 
 - Icemining (icemining.ca, beta stratum url ton.hashrate.to)
+            (also used by Whales Ton Pool)
+
 - TON Coin Pool (toncoinpool.io)
 
 Even though it's a new pool in the TON ecosystem, we recommend
@@ -83,4 +89,14 @@ Use the following format to mine at Ton Coin Pool. Replace
 ./teamredminer with teamredminer.exe on Windows.
 
 ./teamredminer -a ton -o stratum+tcp://pplns.toncoinpool.io:443/stratum -u <ton wallet> -p <worker>
+
+
+How to mine at Whales Ton Pool
+------------------------------
+First, make sure you've registered your wallet with the Telegram
+bot. Go to https://tonwhales.com/ to read more.  Next. use the
+following format to mine at Whales Ton Pool. Replace ./teamredminer
+with teamredminer.exe on Windows.
+
+./teamredminer -a ton -o stratum+tcp://tcp.whalestonpool.com:4001 -u <ton wallet> -p x
 

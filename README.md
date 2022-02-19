@@ -1,4 +1,4 @@
-# teamredminer v0.9.2.1
+# teamredminer v0.9.2.2
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -129,6 +129,11 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.9.2.2
+#### Changes
+- GPU:  Added Vega support for dual ETH+TON.
+- GPU:  Added automatic TON pool dialect for Whales Ton Pool at tcp.whalestonpool.com.
 
 ### v0.9.2.1
 #### Changes

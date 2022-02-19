@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.2.1
+          Team Red Miner version 0.9.2.2
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -606,6 +606,18 @@ TON dual mining options:
                               algo.  This argument isn't strictly necessary, but should be included for mining distros since
                               the user has no guarantee what arguments will be added automatically at the end of the command
                               line by the distro.
+      --dual_intensity=X,Y,Z,... The Vega and Polaris implementation can adjust the intensity of the dual mining with a factor
+                              between 0.0 and 1.0, where 1.0 means running as much dual algo as possible.  This option is
+                              recommended for forcing down power draw without lowering core clk, which will have an impact on the 
+                              ethash hashrate as well.  For now, this option is ignored for Navi and Big Navi, support will be added
+                              in a future release.
+                              
+                              The argument is provided either as a single global value or a list of values per gpu.  Examples:
+                              
+                                --dual_intensity=0.75            All gpus use 75% of max possible TON gpu availability.
+                                --dual_intensity=0.75,1.0,0.5    Separate values for the first three gpus in the rig, remaining gpus
+                                                                 use the first value for 75%.
+                              
       --dual_tuner_weights=X:Y:Z  The dual mining tuner needs scoring weights for how much 1 MH/s of the primary and dual algo
                               are worth.  There are defaults built into the miner that were valid when each algo was implemented
                               and added, but as network hashrates and market prices move, new values may need to be provided. 
