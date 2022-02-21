@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.2.2
+          Team Red Miner version 0.9.3
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -581,6 +581,10 @@ TON options:
                               from the pool hostname.  Available options are:
                               toncoinpool - use the stratum wss protocol for toncoinpool.
                               icemining   - use ice mining's stratum protocol over tcp/ip.
+                              tonpool     - use tonpool's version of ice mining's stratum protocol over wss.
+      --wss_force_proxy     Force enabled the automatic wss proxy executed as a separate process used for TON pools that run their
+                              mining protocol over wss.  The miner normally enables this automatically, but if a raw IP address
+                              or aliased hostname is used for connecting this argument might be necessary.
       --wss_no_proxy        Disables the automatic wss proxy executed as a separate process used for TON pools that run their
                               mining protocol over wss. This means that the host and port passed to the miner must be pointing
                               to a proxy.

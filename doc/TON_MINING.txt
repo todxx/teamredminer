@@ -4,16 +4,24 @@ Team Red Miner TON Mining
 TL;DR
 -----
 
-TRM supports three TON pools: Icemining, Ton Coin Pool, and Whales Ton
-Pool using their tcp stratum endpoint. Whales Ton Pool needs wallet
-registreation with their Telegram bot before starting to mine.
-Use the following pool arguments to mine:
+TRM supports four TON pools:
+
+- Icemining
+- Ton Coin Pool (using built-in wss proxy)
+- Whales Ton Pool (using their tcp stratum endpoint)
+- TON Pool (using the built-in wss proxy)
+
+Whales Ton Pool and TON Pool needs wallet registration with their
+Telegram bots before starting to mine.  Use the following pool
+arguments to mine:
 
 Icemining: -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x
 
 Ton Coin Pool: -o stratum+tcp://pplns.toncoinpool.io:443/stratum -u <ton wallet> -p <worker>
 
 Whales Ton Pool: -o stratum+tcp://tcp.whalestonpool.com:4001 -u <ton wallet> -p x
+
+TON Pool: -o stratum+tcp://eu1.stratum.ton-pool.com:443/stratum -u <ton wallet> -p x
 
 Last, see the TON section in USAGE.txt or the miner's --help output
 for additional arguments.
@@ -29,17 +37,16 @@ contracts. The remaining pool of available coins from the "givers" is
 expected to last until mid-2022.
 
 There is no single standard pool protocol for TON. All pools must be
-handled as separate implementations. TRM currently only support the
+handled as separate implementations. TRM currently support the
 following pools:
 
 - Icemining (icemining.ca, beta stratum url ton.hashrate.to)
-            (also used by Whales Ton Pool)
 
 - TON Coin Pool (toncoinpool.io)
 
-Even though it's a new pool in the TON ecosystem, we recommend
-Icemining since it runs a well-designed pool protocol. Below you'll
-find descriptions on how to use each supported pool.
+- Whales TON Pool (tonwhales.com)
+
+- TON Pool (ton-pool.com)
 
 
 Specifying Pool Protocol
@@ -51,9 +58,11 @@ network mechanism that doesn't present the normal hostname to TRM you
 must manually state which pool protocol should be used. This is done
 using the --ton_pool_mode argument. These are the available options:
 
---ton_pool_mode=icemining
+--ton_pool_mode=icemining (used by Icemining and Whales TON Pool)
 
 --ton_pool_mode=toncoinpool
+
+--ton_pool_mode=tonpool
 
 
 Web Service Proxy
@@ -100,3 +109,10 @@ with teamredminer.exe on Windows.
 
 ./teamredminer -a ton -o stratum+tcp://tcp.whalestonpool.com:4001 -u <ton wallet> -p x
 
+
+How to mine at Ton Pool
+-----------------------
+Use the following format to mine at Ton Pool. Replace ./teamredminer
+with teamredminer.exe on Windows.
+
+./teamredminer -a ton -o stratum+tcp://eu1.stratum.ton-pool.com:443/stratum -u <ton wallet> -p <worker>

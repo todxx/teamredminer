@@ -3,13 +3,13 @@ Team Red Miner Dual Coin ETH Mining
 
 TL;DR
 -----
-To mine ETH+TON on Navi gpus (which is the only supported dual algo at the moment),
+To mine ETH+TON (which is the only supported dual algo at the moment),
 take a working TRM ethash command line and add a TON section in the
 middle or at the end:
 
 --ton -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
 
-If you don't to dual mine on all devices, you can add a device
+If you don't want to dual mine on all devices, you can add a device
 selection argument inside the --ton .. --ton_end clause. If you only
 want to dual mine on gpu 0 and gpu 3 you would use:
 
@@ -24,14 +24,10 @@ applicable. Let the miner run the dual algo tuner once, then you can
 add back a static config. The dual tuner will output a list of the
 probed results.
 
-Power draw will be HIGH, especially on Vegas and Polaris gpus. Use
+Power draw will often be HIGH, especially on Vegas and Polaris
+gpus. It depends on what clocks you're coming from for ethash. Use
 core clock adjustments and the argument --dual_intensity (see --help
 or USAGE.txt) to keep power draw in check.
-
-If you run ETH+TON dual mining on unsupported gpus, a warning is
-issued and they are downgraded to regular ethash mining only. This
-makes it possible to run ETH+TON on mixed rigs where Navis will run
-dual mining, other gpus plain ethash.
 
 Last, see the TON dual mining section in USAGE.txt or the miner's
 --help output for additional arguments.
@@ -40,10 +36,9 @@ Last, see the TON dual mining section in USAGE.txt or the miner's
 Overview
 --------
 From v0.9.2, TRM includes support for true dual mining together with
-ethash. This second release now includes support for Vegas, Navis and
-Big Navi gpus.  A subsequent releases will add support for POlaris
-gpus and potentially more dual mining algos - the single supported
-dual algo currently is TON.
+ethash. All AMD gpus are now supported. Subsequent releases might add
+support more dual mining algos - the single supported dual algo
+currently is TON.
 
 TRM's dual mining is configurable in the sense that the user decides
 how the gpu capacity should be split between the two algos. This is
@@ -85,6 +80,15 @@ To dual mine ethash and TON, do as follows:
 
    --ton -d 0,1,4 -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
 
+5) Vega/Polaris only: if power draw is too high, or your card end up
+   with strange low hashrates for either eth or ton, use the
+   --dual_intensity argument to use less power and avoid being power
+   throttled. This argument will limit the gpu capacity used for the
+   dual algo. Accepted values are 0.0-1.0, where 0.6 means 60%
+   capacity is used. You can provide individual values per gpu in a
+   comma-separate list. See USAGE.txt or the miner's --help output for
+   more info.
+
 
 Tuning
 ------
@@ -117,16 +121,22 @@ relatively high. B-mode is the default mode chosen for Vegas when dual
 mining (or C-mode for Radeon VIIs if available).
 
 Polaris
-<added when support is available>
+Polaris gpus run dual mining quite well. You can often use your
+standard eth clocks, and gain 600-750 MH/s ton for an additional power
+draw of 35-45W at the wall per gpu. Use clocks/voltages or the
+--dual_intensity argument to lower power draw at the cost of either
+lower hashrates for both algos, or just lower the dual algo using
+--dual_intensity.
 
 
 Dual Mining Ethash Modes and Intensity
 --------------------------------------
 All ethash mining modes (A/B/C) are available in dual mining as well,
 and behave like they do for single algo ethash mining. The B/C-modes
-are often very helpful when dual mining since they help keep a higher
-eth hashrate even when lowering the core clk in order to keep power
-draw in check.
+are often very helpful when dual mining on Vegas and Navis since they
+help keep a higher eth hashrate even when lowering the core clk in
+order to keep power draw in check. For Polaris gpus, the mode does not
+have the same effect as for Navis and Vegas.
 
 For choosing the intensity, TRM includes a dual mining tuner that,
 unless a static eth config intensity has been provided, scans through
@@ -151,9 +161,9 @@ pick a static config from there to add to the command line.
 
 Last, there is an additional tuning parameter called
 --dual_intensity=X,Y,Z,... Currently, it's only used by the
-implementation for Vegas (and soon Polaros). It will be ignored by
-Navi/Big Navi gpus. The argument limits the gpu resources that the
-dual algo mining will use. The argument is passed in a list of either
-a single value for all gpus, or a list of values per gpu. The range is
+implementation for Vegas and Polaris. It will be ignored by Navi/Big
+Navi gpus for now. The argument limits the gpu resources that the dual
+algo mining will use. The argument is passed in a list of either a
+single value for all gpus, or a list of values per gpu. The range is
 0.0-1.0, and 0.7 means that the dual mining will use 70% of the
 available resources after ethash.
