@@ -80,14 +80,15 @@ To dual mine ethash and TON, do as follows:
 
    --ton -d 0,1,4 -o stratum+tcp://ton.hashrate.to:4002 -u <ton wallet>.<worker> -p x --ton_end
 
-5) Vega/Polaris only: if power draw is too high, or your card end up
-   with strange low hashrates for either eth or ton, use the
-   --dual_intensity argument to use less power and avoid being power
-   throttled. This argument will limit the gpu capacity used for the
-   dual algo. Accepted values are 0.0-1.0, where 0.6 means 60%
-   capacity is used. You can provide individual values per gpu in a
-   comma-separate list. See USAGE.txt or the miner's --help output for
-   more info.
+5) If power draw is too high, or your card end up with strange low
+   hashrates for either eth or ton, use the --dual_intensity argument
+   to use less power and avoid being power throttled. This argument
+   will limit the gpu capacity used for the dual algo. Accepted values
+   are 0.0-1.0, where 0.6 means 60% capacity is used. You can provide
+   individual values per gpu in a comma-separate list. See USAGE.txt
+   or the miner's --help output for more info. Note that this argument
+   is now available for all gpus, not just Vega and Polaris as was the
+   case in the first releases.
 
 
 Tuning
@@ -97,12 +98,21 @@ algo ethash. The user is advised to tune a single gpu by itself first
 to assess power draw. Especially Vega and Polaris gpus need to be
 handled delicately at first when testing.
 
+Monitor gpus
+All gpus with display(s) connected will have its dual intensity
+throttled down to 0.65 automatically. This is the best way to avoid
+sluggish behavior. If you want to override this, pass your own
+--dual_intensity=X argument overriding the default choice. 
+
 Navi/Big Navi
 Standard ethash clocks with a slight core voltage increase is a good
 starting point for dual mining. After that, tuning is mostly a
 function of achieving stability and how much power you want to
 consume. Increasing core clk will increase the dual algo performance,
-but at the cost of more power.
+but at the cost of more power. Navis can now also use the
+--dual_intensity=X argument to throttle the dual algo. Using
+--dual_intensity=0.6 means the dual algo runs using 60% of the gpu
+capacity available to it.
 
 Vega
 Test on a single gpu and be prepared for a 30-40% increase in power
@@ -160,10 +170,9 @@ all scanned configurations after completing the scan, and the user can
 pick a static config from there to add to the command line.
 
 Last, there is an additional tuning parameter called
---dual_intensity=X,Y,Z,... Currently, it's only used by the
-implementation for Vegas and Polaris. It will be ignored by Navi/Big
-Navi gpus for now. The argument limits the gpu resources that the dual
-algo mining will use. The argument is passed in a list of either a
-single value for all gpus, or a list of values per gpu. The range is
-0.0-1.0, and 0.7 means that the dual mining will use 70% of the
-available resources after ethash.
+--dual_intensity=X,Y,Z,... It is now available for all supported
+gpus. The argument limits the gpu resources that the dual algo mining
+will use. The argument is passed in a list of either a single value
+for all gpus, or a list of values per gpu. The range is 0.0-1.0, and
+0.7 means that the dual mining will use 70% of the available resources
+after ethash.

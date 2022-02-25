@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.3
+          Team Red Miner version 0.9.4
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -622,6 +622,9 @@ TON dual mining options:
                                 --dual_intensity=0.75,1.0,0.5    Separate values for the first three gpus in the rig, remaining gpus
                                                                  use the first value for 75%.
                               
+      --dual_tuner_step=X   Sets which step size the dual tuner should use when probing different eth config intensities.  A lower 
+                              value will mean more accurate results but will also take longer.  Valid values are 1,2,4,8,16,32,64. 
+      --dual_tuner_period=X Sets the number of seconds the dual tuner should run for each probed config.  Default is 7 secs. 
       --dual_tuner_weights=X:Y:Z  The dual mining tuner needs scoring weights for how much 1 MH/s of the primary and dual algo
                               are worth.  There are defaults built into the miner that were valid when each algo was implemented
                               and added, but as network hashrates and market prices move, new values may need to be provided. 

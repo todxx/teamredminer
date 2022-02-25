@@ -1,4 +1,4 @@
-# teamredminer v0.9.3
+# teamredminer v0.9.4
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -129,6 +129,16 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.9.4
+#### Changes
+- GPU:  Navi/Big Navi rewrite for eth+ton, increased hashrates on both algos and more stable setup.
+- GPU:  Navi/Big Navi eth+ton rigs with stale eth issues should be fixed.
+- GPU:  Pool outage for dual algo now results in eth mining only instead of pausing. This will reduce crashes.
+- GPU:  Fixed a potential deadlock when mining eth+ton. Rigs that have gotten strange "crashes" should upgrade, especially when coupled with a network or pool outage.
+- GPU:  Added --dual_tuner_step and --dual_tuner_period to configure the dual tuner accuracy.
+- GPU:  Fixed race bug for ethash where gpus could accidentally build a dag for epoch 0 at startup.
+- GPU:  RaveOS fix for running the TRM wss proxy for Nimiq and certain TON pools.
 
 ### v0.9.3
 #### Changes
