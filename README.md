@@ -1,4 +1,4 @@
-# teamredminer v0.9.4
+# teamredminer v0.9.4.1
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -112,6 +112,7 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - Xilinx/TUL/Osprey U50C/ECU50
 
 Supported FPGA algorithms and their respective dev fees:
+
 |      FPGA Algorithm       |  Fee |
 | ------------------------- | ---- |
 | Ethash                    | 4.0% |
@@ -129,6 +130,12 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.9.4.1
+#### Changes
+- GPU:  Fixed eth+ton issue that could lead to a higher eth shares stale rate. Primarily for large gpus (6800/6900XT) with aggressive tuning.
+- GPU:  Internal split of binaries helping some Vegas and Navis with crash issues on ethash from 0.9.2 and forward.
+- FPGA: Added initial support for TUL TH53/TH55.
 
 ### v0.9.4
 #### Changes

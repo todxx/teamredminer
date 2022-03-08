@@ -307,3 +307,21 @@ vccbram 800mV for 75W of board power from the input sensors.  This also keeps
 the devices right at the max of the standard PCIe slot power rating.
 Unfortunately, controlling the vccmem voltage is not possible on U50C/ECU50
 devices.
+
+
+Tuning TUL TH53/TH55
+===========================
+The TUL TH53/TH55 cards have a well designed thermal solution that is more than
+capable of keeping the cards cool for running ethash at even the highest
+clocks.  Unfortunately the power delivery for the HBM was originally designed
+for 24A, and TRM therefore limits the memclk to 1125MHz unless the safety 
+override argument --fpga_allow_unsafe has been used.  (We are working with TUL
+to validate how much additional current the HBM rail can safely supply given
+the very well designed thermal solution on the board.  Once verified with TUL,
+we will raise the safety limit.)
+
+The cards generally run very well at 575 MHz core, 1125 MHz mem for 69.14 MH/s.
+While the cards are capable of adjusting vccint, TRM does not yet support
+voltage tuning for the TH53/TH55. Unfortunately controlling the vccmem voltage
+is not possible on TH53/TH55 devices, and the default vcchbm is 1.40V.
+
