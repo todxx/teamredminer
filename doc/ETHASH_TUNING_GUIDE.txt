@@ -1,16 +1,27 @@
-TeamRedMiner Ethash Tuning Guide
-================================
+TeamRedMiner Ethash Tuning Guide (non R-mode)
+=============================================
 
 History:
+v1.2 2022-05-01 (v0.10.0, R-mode references added)
 v1.1 2020-02-03 (v0.8.1, Big Navi section added)
 v1.0 2020-01-16 (v0.8.0)
 
 General Overview
 ================
-In general, TeamRedMiner behaves similarly to other AMD ethash miners. The key
-difference is our additional mining modes (B/C-modes) that use additional vram
-on the gpus for additional beneficial effects. The specific effects are
-different per gpu type and are described below in the separate sections.
+NOTE NOTE NOTE: if you want to use the TRM R-mode for mining,
+available on all AMD gpus except Polaris generation cards, please skim
+through this document first, then read the
+ETHASH_TUNING_GUIDE_R-MODE.txt guide. This guide concerns mining in
+the A/B/C-modes that are available in all TRM versions, both before
+and after the R-mode release in v0.10.0.
+
+In general, TeamRedMiner behaves similarly to other AMD ethash
+miners. The key difference is our additional mining modes (B/C-modes)
+that use additional vram on the gpus for additional beneficial
+effects. The specific effects are different per gpu type and are
+described below in the separate sections. The last major mining mode
+added in v0.10.0, called R-mode, is _not_ covered in this document. It
+is significant enough to warrant its own separate guide.
 
 If you have a tuned configuration for another miner, it should generally work
 well although might not be the absolute optimum for your rig(s), especially if
@@ -468,8 +479,14 @@ been met, it will automatically select C-mode for your VIIs.
 
 1) Setting up Kernel Params
 
-   The following linux kernel boot parameters need to be added to your grub
-   config:
+   If you run TRM v0.10.0 or later, the miner release comes with an
+   integrated support script that sets the necessary kernel boot
+   parameters for you. Add --kernel_vm_mode=C (or RC to automatically
+   reboot) as a command line parameter, run the miner once, exit and
+   reboot.
+
+   If you're on an earlier TRM version, you need to manually add the
+   following linux kernel boot parameters to your grub config:
 
    amdgpu.vm_block_size=10 amdgpu.vm_size=1024
     

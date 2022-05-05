@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.4.2
+          Team Red Miner version 0.9.4.6
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -48,11 +48,12 @@ Options:
       --api_listen=IP:PORT  Enables the sgminer compatible api. IP:PORT is optional. If present, the IP:PORT combo
                               decides the interface(s) and port to listen to. Default is 127.0.0.1:4028. For
                               external access, use e.g. 0.0.0.0:4028. It's also valid to only specify the
-                              port, e.g. 4029.
+                              port, e.g. 4029.  Multiple instances of this argument is now possible for separate endpoints.
       --api2_listen=IP:PORT Enables a second api port for dual mining setups.  This api endpoint will provide data for the
                               dual mining algo, just like if two separate miner instances were running in parallel.  The 
                               default setting is 127.0.0.1:4029, i.e. the port is 4029 and not 4028.  For specifying your
-                              own choice, the argument is formatted like --api_listen.
+                              own choice, the argument is formatted like --api_listen.  Multiple instances of this argument is
+                               now possible for separate endpoints.
 
       --cm_api_listen=IP:PORT Enables the claymore compatible api. IP:PORT is optional. If present, the IP:PORT combo
                               decides the interface(s) and port to listen to. Default is 127.0.0.1:3333. For
@@ -105,6 +106,20 @@ Options:
       --dns_https_sni=HOST  When the --dns_https argument is used, the default behavior is to not send a SNI in the
                               SSL/TLS connection.  Using this argument, you can force any SNI to be sent.  Please note
                               that this is an advanced network argument and most users do not need to use it.
+      --kernel_vm_mode=X    (Linux only). Automates setting the necessary kernel parameters in /etc/default/grub on Linux
+                              systems based on Debian/Ubuntu.  This covers most mining distros.  The system can be rebooted
+                              automatically using /sbin/reboot when the kernel parameters are modified.  If the correct
+                              parameters already are in place the miner and helper script will do nothin. This means that
+                              this argument can always be present on the command line.  Valid values are:
+                                N  -  no mode configured, removes existing parameters for C- or R-mode.  No reboot on change.
+                                C  -  old Radeon VII C-mode.  No reboot on change.
+                                R  -  new R-mode for all gpus except Polaris.  No reboot on change.
+                                RN -  no mode configured, removes existing parameters for C- or R-mode.  Reboots on change.
+                                RC -  old Radeon VII C-mode.  Reboots on change.
+                                RR -  new R-mode for all gpus except Polaris.  Reboots on change.
+      --kernel_vm_mode_script=X  (Linux only).  Specifies the script to call for setting new kernel mode parameters.
+                              The script must act like the default TRM script included in the miner distribution package,
+                              called ubuntu_mode_script.sh.  This argument should normally not be necessary.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.
@@ -352,18 +367,14 @@ Ethash options:
       --eth_epoch           Tests a specific ethash epoch. NOTE: this will automatically switch the miner into benchmark mode, as
                               if you added --benchmark. 
       --eth_alloc_epoch=N   Allocates enough memory for the given epoch from the start.  The miner will try to allocate more
-                              if it needs to later during mining.  It's recommended for rigs with one or more 4GB cards to test
-                              and set this to the max possible value to avoid reallocations at epoch switches.  Optimal Linux
-                              rigs should be able to handle epoch 380, Windows rigs a little less (373-374).
-      --eth_dag_buf=X,Y,... The miner can allocate a single or dual buffers for the DAG.  For now, the default is DUAL buffers, which
-                              matches the behavior in all recent TRM releases.  However, a single buffer is slightly better, leading
-                              to a small power save for all gpu types.  Only recent drivers support single large allocations larger
-                              than 4GiB, typically from Adrenalin 20.9.1 and amdgpu-pro 20.x. The miner can automatically use single
-                              buffer mode when possible using this argument, as well a force single or dual buffers per gpu.
-                              Supported values are A(uto), S(ingle), D(ual).  You can enumerate a comma-separated list for all gpus
-                              in the rig, or a single value for all gpus.  A gpu that does not have a value in the comma-separated list
-                              will use the first value.  Hence, to enable auto mode for all gpus, pass --eth_dag_buf=A
-                              NOTE: 4GB gpus will be forced to use dual buffers. 
+                              if it needs to later during mining.  
+      --eth_dag_buf=X,Y,... The miner can allocate a single or dual buffers for the DAG.  For now, the default is AUTO.  A single
+                              buffer is slightly better, leading to a small power save for all gpu types.  Only recent drivers support
+                              single large allocations larger than 4GiB, typically from Adrenalin 20.9.1 and amdgpu-pro 20.x. The miner
+                              can automatically use single buffer mode when possible using this argument, as well a force single or dual
+                              buffers per gpu.  Supported values are A(uto), S(ingle), D(ual).  You can enumerate a comma-separated list
+                              for all gpus in the rig, or a single value for all gpus.  A gpu that does not have a value in the
+                              comma-separated list will use the first value.
       --eth_big_mode_adjust=X,Y,...  When using B- or C-modes, the miner runs better the more vram it can allocate.  Unfortunately the
                               drivers aren't accurate reporting how much memory it's possible to allocate, especially on Windows.
                               The miner will use a safe conservative number of 256MiB (Linux) and 512MiB (Windows) as an offset from
@@ -371,10 +382,6 @@ Ethash options:
                               a comma-separated list with values for one or more gpus.  Values for gpus not running B/C-mode will be
                               ignored.  If a gpu doesn't have a value in the list, the first provided value is used instead.
                               The allowed interval is [-64, 2048]. The higher number, the less vram is allocated on the gpu.
-      --eth_4g_max_alloc=X,Y,...  This argument allows mining on 4GB gpus after they no longer can store the full DAG in vram.
-                              You pass either the max epoch to allocate memory for, or the raw nr of MB to allocate.  You can
-                              provide a single value that applies to all 4GB gpus in the rig, or use a comma-separated list for
-                              specifying different values per gpu.  Values for non-4GB gpus are ignored.
       --eth_dag_slowdown=N  Slows down the DAG generation.  Pass a single digit 0-9. 0 means no slowdown (<= 0.7.9 behavior),
                               1 means minimal slowdown, 9 means max.  Default value: 4 for a slight slowdown.
       --eth_stagger         Enables staggering of gpus when building a new DAG.  This is more lean on PSUs that don't like
@@ -408,9 +415,6 @@ Ethash options:
                               where the dag cache had bit errors and the resulting dag is partially broken.  We have seen this
                               happen increasingly on Vegas as the dag has grown bigger.  When detected, a new buffer will be
                               allocated for the dag cache and the dag build restarted.
-      --eth_no_4gb_kernels      Disable the ethash 4GB kernels and always use the regular kernels that assume the DAG will always
-                              fit in available vram on all gpus.  This is useful when mining ETC or ethash coins at lower epochs
-                              than ETH since the regular kernels have a better performance profile.
       --eth_micro_delay=VAL     Navi gpus only: adds a delay (measured in microseconds) when reenqueueing work on the gpu(s).
                               Weaker PSUs driving many gpus can sometimes not handle the "slew rate" when multiple gpus happen to
                               reenqueue work at exactly the same time.  Setting this to e.g. 32 will smoothen out the transition
@@ -560,7 +564,6 @@ ZIL dual mining options:
                                - Cached copy of the ZIL epoch 0 DAG.
                                - Adjustment of memory allocated for the primary algo to fit the ZIL DAG.
                                - Choose ethash A-mode for the ZIL mining.
-                               - Use the standard faster kernels for 4GB gpus since the DAG is max 1GB.
 
                               The minimal working setup is to only provide a ZIL pool that is ok with the miner ignoring
                               the primary coin jobs and only mines during the ZIL windows.  This is an example for ezil.me:
@@ -670,4 +673,7 @@ FPGA Options:
                               comma separated list of DNA values, e.g. --fpga_allow_unsafe=40020000013ae32135111111
                               ***** CAUTION: Running above safety limits can result in PERMANENT DAMAGE to the device! *****
       --fpga_max_jtag_mhz=XY.Z  Sets the max allowed frequency to use for fpga jtag communication.  Default is 30.0 MHz.
+
+      --fpga_eth_clk_dag=LIST Sets FPGA core clock frequencies to be used during Ethash DAG building. By default these
+                              will be set to 90% of the regular core clock. The format is the same as --fpga_clk_core.
 

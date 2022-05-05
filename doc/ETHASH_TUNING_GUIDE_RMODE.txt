@@ -1,0 +1,234 @@
+TeamRedMiner Ethash R-mode Tuning Guide
+=======================================
+
+History:
+v1.0 2022-05-03 (v0.9.4.6 public beta release)
+
+General Overview
+================
+This guide describes the new "R-mode" introduced in TRM v0.10.0. It
+assumes the reader has already read the older ETHASH_TUNING_GUIDE.txt
+and is familiar with ethash mining with TeamRedMiner in general.
+
+TRM R-mode greatly improves efficiency for ethash mining on a range of
+AMD gpus. It is the most complex and advanced work we've done to
+date. It is linux only. At this point we do not anticipate being able
+to port it to windows. R-mode contains a number of elements coercing
+the hardware into working better in an ethash mining setup. In other
+words, we're hacking around quite hard. The upside is most definitely
+worth it. However, the downside is that in rare cases the combination
+of rig hardware, gpus, opencl version, kernel module simply doesn't
+work well. We expect R-mode to work in maybe 95-97% of all cases. When
+it works as expected, it generally runs very stable.
+
+R-mode is available for all gpus except Polaris and earlier. It needs
+a special set of amdgpu kernel boot parameters configured, just like
+our previous Radeon VII C-mode.
+
+In general, R-mode has the same trade-off effect for all gpus: you can
+now run a lower core clk (and therefore lower core voltage) while
+sustaining very very close to the same ethash hashrate as before,
+sometimes increasing it as well. On some gpus, like Radeon VIIs, the
+effect is rather converted into a higher hashrate instead. An
+important difference between R-mode and our previous B/C-modes is that
+R-mode does not degrade over time as the DAG grows.
+
+Given the above, R-mode is a much improved version of our older B-mode
+for Vegas and Navis, and C-mode for Radeon VIIs/MI50/MI60/MI100. Note
+that R-mode is also available for Big Navis without incurring a
+hashrate penalty, like the B- or C-mode would. The older A/B/C-modes
+are still available in the miner and can be used just as before.
+
+
+R-mode effect on various gpus
+=============================
+The effect of R-mode on different gpus can be summarized as follows:
+
+- 6900XT/6800XT/6800: small powersave of -2-3W by lowering core clk,
+  might not be worth the effort.
+  
+- 6700XT: good effect, 1000 MHz core enough for 1075 MHz mem clk.
+
+- 6600XT: our tests indicate there's no real point using it, but we're
+  waiting for more user feedback.
+
+- 5700XT/5700: big winner. Core clk 1050-1075 MHz is now enough to
+  sustain 56 MH/s. Can almost always run at sub-700mV core voltage.
+  
+- 5600XT: big winner. Core clk 950 MHz supports 42 MH/s, core voltage
+  can be dropped low.
+
+- Radeon VII family: solid win, hashrate restored to original C-mode
+  levels and slightly more, average boost 2-3 MH/s per gpu.
+
+- Vega 56/64: a small hashrate boost and/or powersave from being able
+  to use lower core clk. For 51-52 MH/s a core clk of 925-950 MHz is
+  often enough.
+
+
+Requirements / Enabling R-mode
+==============================
+R-mode needs a modern linux kernel and amdgpu driver setup, and a
+specific set of amdgpu kernel boot parameters:
+
+amdgpu.vm_block_size=11 amdgpu.vm_size=2048
+
+We do not expect things to run well on opencl versions before
+20.40. Testing has primarily been done on newer opencl versions such
+as 21.40.2 and 21.50.2.
+
+There are three ways of setting the necessary kernel boot parameters:
+
+1) Using the new integrated support in the miner.
+2) Mining distro integrated support.
+3) Manually.
+
+
+Enabling R-mode using miner integrated support
+----------------------------------------------
+To simplify setting up for R-mode, and also making sure it's set
+properly after e.g. mining distro upgrades, we've added a bundled
+shell script called "ubuntu_mode_script.sh" which is integrated
+directly into the miner.
+
+This setup will work on all Linux distros that uses a
+/etc/default/grub file. This includes most mining distros incl Hive,
+Minerstat OS, SMOS. The script will set the correct parameters, run
+update-grub, and reboot if anything was modified and it was asked to do so.
+
+To use it, just add the miner argument --kernel_vm_mode=X, where X is
+one of:
+
+N  - set no specific mode.
+C  - set old Radeon VII C-mode.
+R  - set new R-mode.
+RN - set no specific mode and reboot if there was a change.
+RC - set old Radeon VII C-mode and reboot if changed.
+RR - set new R-mode and reboot if changed.
+
+This way, you can add "--kernel_vm_mode=RR" to e.g. your Hive flight
+sheet custom arguments and leave it there. After any distro upgrade or
+clean reinstall, the miner will set up the R-mode parameters and
+reboot automatically the first time it's executed.
+
+
+Enabling R-mode using integrated mining distro support
+------------------------------------------------------
+If your mining distro has integrated support for TRM R-mode, you
+should use that instead. At the time of writing, only MMP OS has
+support with its "enable-trm-boost" argument. Please refer to MMP
+specific documentation for more details.
+
+
+Enabling R-mode manually
+------------------------
+For users not running grub and/or a Debian/Ubuntu-derived linux
+distro, we refer to online sources for how to modify the kernel boot
+parameters. As long as the two provided parameters are passed to the
+amdgpu kernel module at boot, R-mode should work ok.
+
+
+Verifying R-mode is set up correctly
+------------------------------------
+Regardless of mechanism used, you can verify that the correct
+parameters are set after a reboot by running "dmesg | egrep fragment"
+from a shell, and you should see output such as:
+
+[    2.820075] [drm] vm size is 2048 GB, 3 levels, block size is 11-bit, fragment size is 9-bit
+[    4.117304] [drm] vm size is 2048 GB, 3 levels, block size is 11-bit, fragment size is 9-bit
+[    7.358746] [drm] vm size is 2048 GB, 3 levels, block size is 11-bit, fragment size is 9-bit
+[    8.554411] [drm] vm size is 2048 GB, 3 levels, block size is 11-bit, fragment size is 9-bit
+[   12.099354] [drm] vm size is 2048 GB, 3 levels, block size is 11-bit, fragment size is 9-bit
+[   12.609303] [drm] vm size is 2048 GB, 3 levels, block size is 11-bit, fragment size is 9-bit
+
+If the vm size is 2048 GB and the block size is 11-bit, you're all
+set. Please note that Polaris gpus will _not_ have the parameters set,
+they'll still show something else. Since R-mode can't be used on
+Polaris gpus, it doesn't matter.
+
+
+Switching to mining in R-mode
+=============================
+Whenever the R-mode kernel parameters are set, the miner will use
+R-mode as the default on Vegas, VIIs and all Navi gpus. However, if
+you're passing an --eth_config argument to the miner the modes
+specified there will be used instead.
+
+IMPORTANT NOTE: before switching to R-mode you SHOULD tune down your
+core clk -200 MHz on all gpus except the Radeon VII family (which can
+keep the same clocks). This is extremely important. By running e.g. a
+1350 MHz core clk on a 5700XT, you will put a huge (and unneccessary)
+pressure on the memory subsystem in R-mode as only 1050-1100 MHz is
+required for the same hashrate, and we've many times found that the
+high core clk results in hard rig hangs needing a power cycle.
+
+When R-mode is running on a rig, the typical process is as follows:
+
+1) Verify all gpus are mining successfully, without any unexpected low
+   hashrates.
+
+2) Find the core clk necessary to support the hashrate you're running
+   by moving it up or down. We want to end up as low as possible. You
+   will typically see tiny hashrate drops as you lower it until you
+   reach a certain point where it drops sharply. This is where you'll
+   mine most efficiently.
+
+3) Lower core voltage as much as possible while keeping gpus stable.
+
+One side effect of using newer drivers is that memory errors often
+generate a process crash rather that a hard gpu hang + reboot. This
+means most mining distros don't pick up which gpu was the cause of the
+crash. This is a general issue with using newer drivers in the
+21.40-21.50 range that needs to be addressed by distros going forward.
+
+For now, if you see an unexpected miner restart or similar reported by
+your mining distro, but without a subseqeuent reboot, you can often
+issue a "dmesg -T" command in a shell and check the kernel logs for
+more info. Look for logs similar to this:
+
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu: VM_L2_PROTECTION_FAULT_STATUS:0x00000000
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu:          Faulty UTCL2 client ID: CB (0x0)
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu:          MORE_FAULTS: 0x0
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu:          WALKER_ERROR: 0x0
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu:          PERMISSION_FAULTS: 0x0
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu:          MAPPING_ERROR: 0x0
+[Tue May  3 13:38:05 2022] amdgpu 0000:09:00.0: amdgpu:          RW: 0x0
+
+From the above, we see that the gpu at pci bus address 09:00.0 was the
+culprit and typically needs its tuning adjusted.
+
+
+Dual mining TON in R-mode
+=========================
+R-mode dual mining is only interesting if you're looking for a power
+efficient setup. With summer and high temperatures approaching, it's
+also a way to control heat. If you run a dual mining setup with a high
+core clk to maximize the dual mining algo, you should keep mining in
+A- or B-mode.
+
+For e.g. 5700XT/5700 and 5600XTs, R-mode provides options for still
+keeping your eth hashrate at max, but also add a smaller amount of
+dual mining using a core clk around 950 MHz (5600XT) or 1000-1050 MHz
+(5700/5700XT). This will add a much smaller dual algo hashrate, but
+still keep the eth hashrate close to max. It will consume a much
+smaller amount of power for the added dual algo though, hence making
+it easier to control temps.
+
+
+Dual mining ZIL in R-mode
+=========================
+The current implementation of R-mode does not allow a second cached
+DAG. Mining directly to zil switching pools like ezil.me means the DAG
+will be rebuilt switching to/from ZIL. However, on 8GB gpus using the
+--zil ... --zil_end mechanism for dual zil mining, the gpu will be
+able to run with a cached ZIL dag. That mining will not be in R-mode
+though, but in A-mode, meaning that the configured core clk for the
+main R-mode mining will be too low for ZIL and hashrate will suffer
+slightly.
+
+It is possible to integrate a cached ZIL dag into the R-mode ethash
+mining setup, but it needs more work. It might be included in a future
+release.
+
+
+Happy mining!
