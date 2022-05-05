@@ -1,6 +1,87 @@
 # teamredminer v0.9.4.6
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
+## This is a public beta release and only available through the download links below
+
+We've chosen to release v0.9.4.6 as a public beta to gather more user feedback without triggering automatic updates in mining distros. The main reason is that we still have some outlier configurations that don't respond as expected to the new R-mode. When it works as intended, which is maybe 95-97% of all rigs we've tested on, things generally run very well. If you don't use the new R-mode, or you're a Windows miner, you still have an upside running this new version for the "smooth power" rewrite described below. 
+
+This rewrite is targeting ethash family algorithms. There are two distinct parts:
+
+1) Smooth power transitions. This affects all gpus, and both windows and linux. This is mainly a (theoretical) stability feature that improves power draw on a very small scale level, making sure the gpu activity and resulting power draw is as smooth as possible, avoiding psu slew rate spikes. The nice side effect is that it in most cases also improves hashrate slightly, on all gpus.
+
+2) R-mode. This is our most advanced mode work so far. It is linux only, like the previous C-mode for Radeon VIIs. R-mode is applicable for all non-Polaris gpus. It also needs special linux kernel boot parameters set, like the Radeon VII C-mode. R-mode will be used by default when the necessary linux kernel parameters are set. A huge difference between the new R-mode and previous B/C-modes is that the R-mode does not degrade over time as the dag grows. The efficiency improvements on many gpus are significant. Biggest winners are 5700XT/5700/5600XT. Please(!) read the [R-mode tuning guide](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_TUNING_GUIDE_RMODE.txt) for more details and before switching to R-mode.
+
+Download links:
+
+- Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz
+- Windows: Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-win.zip
+- HiveOS custom miner package: https://dl.teamredminer.com/beta/trm_beta-0.9.4.6.tgz
+
+
+HiveOS test instructions
+------------------------
+You need a modern Hive image to run the new version in R-mode. Running on older linux kernels will not end well, we experienced hard crashes in early testing. Our testing was mainly performed on reimaged installations of 0.6-212, 0.6-216, and 0.6-217. You're free to test whatever version you're currently running, but be prepared for hard hangs potentially requiring power cycling. Older kernel versions might also _seem_ to run ok but then result in a higher-than-usual amount of stale pool shares.
+
+To simplify miner upgrade, we've taken the time to build a custom miner package for Hive. Set up a new flight sheet as follows:
+
+1) Create new flight sheet.
+2) Select ETH and your wallet of choice, then some dummy pool.
+3) In the miner search textbox, type "custom", then click "Show all", and select "Custom".
+4) Copy/paste https://dl.teamredminer.com/beta/trm_beta-0.9.4.6.tgz as the installation url. The miner name will be derived automatically.
+5) Depending on your pool, choose a Wallet and worker template. %WAL%.%WORKER_NAME% is usually a good choice.
+6) Type your pool url(s) in the "Pool URL" field. This must be done - the pool you selected in step 2 will not be used.
+7) In "Extra config arguments", add "--kernel_vm_mode=RR" and any other TRM arguments you want to add.
+
+The --kernel_vm_mode=RR argument runs the miner's integrated support for setting the necessary kernel boot parameters using a bundled script. The argument value "RR" means "(R)eboot if necessary and set (R)-mode". You can keep the argument in the flight sheet. This way the R-mode arguments will be restored automatically after a Hive update.
+
+
+MMP OS test instructions
+------------------------
+For MMP, simply download the miner package and overwrite the existing teamredminer binary. MMP should run with the amd opencl driver 21.40.2 or 21.50.2, 20.40 has not worked well in our tests. Procedure:
+
+Step 1: upgrade miner binary
+1) Set up TRM 0.9.4.2 (or some other version) running on the rig.
+2) Open up a shell on your MMP rig using the remote console or a ssh session.
+3) Type or copy/paste the following commands:
+```
+sudo su -
+cd /opt/mmp/miners/teamredminer
+wget https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz
+tar xvzf teamredminer-v0.9.4.6-linux.tgz
+mv teamredminer teamredminer.old
+mv teamredminer-v0.9.4.6-linux/teamredminer teamredminer
+rm -rf teamredminer-v0.9.4.6-linux
+```
+4) Optional: restart the miner, check logs to verify the version running is 0.9.4.6.
+
+Step 2: enable R-mode support
+1) Disable the "System watchdog" for your rig.
+2) Open up a shell on your MMP rig using the remote console or a ssh session.
+3) Run "mmp update".
+4) Run "mmp upgrade" (necessary to get the enable-trm-boost command).
+5) Let the system reboot.
+6) After reboot, open a new shell.
+7) Run "enable-trm-boost". Confirm that you see "ENABLE_VMSIZE[TRM BOOST] is set to enabled but its currently disabled - enabling! [WARN]", **if not rerun "enable-trm-boost" _again_**.
+8) Reboot with the "srb" command or "sudo reboot".
+9) R-mode should now be available and used by default on supported gpus.
+
+
+Other distros
+-------------
+We might include more distro-specific descriptions here further on, but the general way of testing the new version is to loosely follow the MMP OS manual upgrade path:
+
+1) Set up an older version of TRM mining, for example v0.9.4.2.
+2) Drop to a shell/terminal on your rig and locate the directory where the TRM binary is stored.
+3) Download the beta version using `wget https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz`
+4) Unpack the downloaded file: `tar xvzf teamredminer-v0.9.4.6-linux.tgz`
+5) Move the current TRM binary out of the way: `mv teamredminer teamredminer.old`
+6) Move the downloaded binary: `mv teamredminer-v0.9.4.6-linux/teamredminer teamredminer`
+7) Manually edit `/etc/default/grub` and add the necessary kernel boot parameters (see the [R-mode tuning guide](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_TUNING_GUIDE_RMODE.txt)).
+8) Change your tuning before rebooting. We recommend lowering core clk -200 MHz on all gpus except the Radeon VII family.
+9) Reboot. You should now be mining in R-mode. Increase core clk slowly again until you hit your old hashrate.
+
+---------------------------------------
+
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
 
 TRM official website: https://www.teamredminer.com
