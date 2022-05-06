@@ -14,7 +14,7 @@ This rewrite is targeting ethash family algorithms. There are two distinct parts
 Download links:
 
 - Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz
-- Windows: Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-win.zip
+- Windows: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-win.zip
 - HiveOS custom miner package: https://dl.teamredminer.com/beta/trm_beta-0.9.4.6.tgz
 
 
