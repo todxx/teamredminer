@@ -15,7 +15,7 @@ Download links:
 
 - Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz
 - Windows: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-win.zip
-- HiveOS custom miner package: https://dl.teamredminer.com/beta/trm_beta-0.9.4.6.tgz
+- HiveOS custom miner package: https://dl.teamredminer.com/beta/trm_beta-0.9.4.6b.tgz
 
 
 HiveOS test instructions
@@ -27,7 +27,7 @@ To simplify miner upgrade, we've taken the time to build a custom miner package 
 1) Create new flight sheet.
 2) Select ETH and your wallet of choice, then some dummy pool.
 3) In the miner search textbox, type "custom", then click "Show all", and select "Custom".
-4) Copy/paste https://dl.teamredminer.com/beta/trm_beta-0.9.4.6.tgz as the installation url. The miner name will be derived automatically.
+4) Copy/paste https://dl.teamredminer.com/beta/trm_beta-0.9.4.6b.tgz as the installation url. The miner name will be derived automatically.
 5) Depending on your pool, choose a Wallet and worker template. %WAL%.%WORKER_NAME% is usually a good choice.
 6) Type your pool url(s) in the "Pool URL" field. This must be done - the pool you selected in step 2 will not be used.
 7) In "Extra config arguments", add "--kernel_vm_mode=RR" and any other TRM arguments you want to add.
