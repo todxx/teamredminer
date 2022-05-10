@@ -1,9 +1,9 @@
-# teamredminer v0.9.4.6
+# teamredminer v0.9.4.7
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 ## This is a public beta release and only available through the download links below
 
-We've chosen to release v0.9.4.6 as a public beta to gather more user feedback without triggering automatic updates in mining distros. The main reason is that we still have some outlier configurations that don't respond as expected to the new R-mode. When it works as intended, which is maybe 95-97% of all rigs we've tested on, things generally run very well. If you don't use the new R-mode, or you're a Windows miner, you still have an upside running this new version for the "smooth power" rewrite described below. 
+We've chosen to release v0.9.4.7 and the previous v0.9.4.6 as public betas to gather more user feedback without triggering automatic updates in mining distros. With the v0.9.4.7 release, we believe we've solved the issue with some Navi gpus simply not responding well to R-mode, rather dropping to e.g. 48-50 MH/s instead of expected 55-56 MH/s for a 5700/5700XT. We're expecting to push this version in a proper public release shortly unless we hear about any additional issues. If you don't use the new R-mode, or you're a Windows miner, you still have an upside running this new version for the "smooth power" rewrite described below. 
 
 This rewrite is targeting ethash family algorithms. There are two distinct parts:
 
@@ -13,9 +13,9 @@ This rewrite is targeting ethash family algorithms. There are two distinct parts
 
 Download links:
 
-- Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz
-- Windows: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-win.zip
-- HiveOS custom miner package: https://dl.teamredminer.com/beta/trm_beta-0.9.4.6b.tgz
+- Linux: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.7-linux.tgz
+- Windows: https://dl.teamredminer.com/beta/teamredminer-v0.9.4.7-win.zip
+- HiveOS custom miner package: https://dl.teamredminer.com/beta/trm_beta-0.9.4.7.tgz
 
 
 HiveOS test instructions
@@ -27,7 +27,7 @@ To simplify miner upgrade, we've taken the time to build a custom miner package 
 1) Create new flight sheet.
 2) Select ETH and your wallet of choice, then some dummy pool.
 3) In the miner search textbox, type "custom", then click "Show all", and select "Custom".
-4) Copy/paste https://dl.teamredminer.com/beta/trm_beta-0.9.4.6b.tgz as the installation url. The miner name will be derived automatically.
+4) Copy/paste https://dl.teamredminer.com/beta/trm_beta-0.9.4.7.tgz as the installation url. The miner name will be derived automatically.
 5) Depending on your pool, choose a Wallet and worker template. %WAL%.%WORKER_NAME% is usually a good choice.
 6) Type your pool url(s) in the "Pool URL" field. This must be done - the pool you selected in step 2 will not be used.
 7) In "Extra config arguments", add "--kernel_vm_mode=RR" and any other TRM arguments you want to add.
@@ -46,13 +46,13 @@ Step 1: upgrade miner binary
 ```
 sudo su -
 cd /opt/mmp/miners/teamredminer
-wget https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz
-tar xvzf teamredminer-v0.9.4.6-linux.tgz
+wget https://dl.teamredminer.com/beta/teamredminer-v0.9.4.7-linux.tgz
+tar xvzf teamredminer-v0.9.4.7-linux.tgz
 mv teamredminer teamredminer.old
-mv teamredminer-v0.9.4.6-linux/teamredminer teamredminer
-rm -rf teamredminer-v0.9.4.6-linux
+mv teamredminer-v0.9.4.7-linux/teamredminer teamredminer
+rm -rf teamredminer-v0.9.4.7-linux
 ```
-4) Optional: restart the miner, check logs to verify the version running is 0.9.4.6.
+4) Optional: restart the miner, check logs to verify the version running is 0.9.4.7.
 
 Step 2: enable R-mode support
 1) Disable the "System watchdog" for your rig.
@@ -72,10 +72,10 @@ We might include more distro-specific descriptions here further on, but the gene
 
 1) Set up an older version of TRM mining, for example v0.9.4.2.
 2) Drop to a shell/terminal on your rig and locate the directory where the TRM binary is stored.
-3) Download the beta version using `wget https://dl.teamredminer.com/beta/teamredminer-v0.9.4.6-linux.tgz`
-4) Unpack the downloaded file: `tar xvzf teamredminer-v0.9.4.6-linux.tgz`
+3) Download the beta version using `wget https://dl.teamredminer.com/beta/teamredminer-v0.9.4.7-linux.tgz`
+4) Unpack the downloaded file: `tar xvzf teamredminer-v0.9.4.7-linux.tgz`
 5) Move the current TRM binary out of the way: `mv teamredminer teamredminer.old`
-6) Move the downloaded binary: `mv teamredminer-v0.9.4.6-linux/teamredminer teamredminer`
+6) Move the downloaded binary: `mv teamredminer-v0.9.4.7-linux/teamredminer teamredminer`
 7) Manually edit `/etc/default/grub` and add the necessary kernel boot parameters (see the [R-mode tuning guide](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_TUNING_GUIDE_RMODE.txt)).
 8) Change your tuning before rebooting. We recommend lowering core clk -200 MHz on all gpus except the Radeon VII family.
 9) Reboot. You should now be mining in R-mode. Increase core clk slowly again until you hit your old hashrate.
@@ -212,7 +212,11 @@ For command line options see the [USAGE.txt](USAGE.txt) file that comes with the
 
 ## Release Notes
 
-### v0.9.4.6
+### v0.9.4.7 (public beta)
+#### Changes
+- GPU:  Hopefully fixed R-mode low hashrate issues on random Navi gpus.
+
+### v0.9.4.6 (public beta)
 #### Changes
 - GPU:  R-mode introduced. See separate documentation. Applicable for Vegas/VIIs/Navi10/Big Navi.
 - GPU:  Smooth power transitions for ethash family algos.
