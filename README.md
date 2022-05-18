@@ -1,4 +1,7 @@
 # teamredminer v0.10.0
+
+## This is the official public release of R-mode. There are no significant differences between the earlier v0.9.4.7 beta and v0.10.0. If you want to read the older README file with test instructions for the beta releases, please click [here](https://github.com/todxx/teamredminer/tree/v0.9.4.7-beta#readme).
+
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
