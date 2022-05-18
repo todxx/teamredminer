@@ -1,4 +1,4 @@
-          Team Red Miner version 0.9.4.6
+          Team Red Miner version 0.10.0
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -120,6 +120,11 @@ Options:
       --kernel_vm_mode_script=X  (Linux only).  Specifies the script to call for setting new kernel mode parameters.
                               The script must act like the default TRM script included in the miner distribution package,
                               called ubuntu_mode_script.sh.  This argument should normally not be necessary.
+      --gpu_sdma=on|off     Controls whether direct sdma operations are used by the driver to copy memory from/to
+                              the gpu. This argument is only needed in very special situations. For example, the AMD BC-250
+                              does not support sdma and needs --gpu_sdma=off. If you experience hangs directly at gpu
+                              initialization, but other miners or older TRM versions work fine, try --gpu_sdma=off.
+                              This setting is an environment setting and controls all gpus.
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported.

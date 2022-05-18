@@ -2,6 +2,7 @@ TeamRedMiner Ethash R-mode Tuning Guide
 =======================================
 
 History:
+v1.1 2022-05-18 (v0.10.0 public release)
 v1.0 2022-05-03 (v0.9.4.6 public beta release)
 
 General Overview
@@ -55,7 +56,7 @@ The effect of R-mode on different gpus can be summarized as follows:
 - 5700XT/5700: big winner. Core clk 1050-1075 MHz is now enough to
   sustain 56 MH/s. Can almost always run at sub-700mV core voltage.
   
-- 5600XT: big winner. Core clk 950 MHz supports 42 MH/s, core voltage
+- 5600XT: decent winner. Core clk 950 MHz supports 42 MH/s, core voltage
   can be dropped low.
 
 - Radeon VII family: solid win, hashrate restored to original C-mode
@@ -115,9 +116,10 @@ reboot automatically the first time it's executed.
 Enabling R-mode using integrated mining distro support
 ------------------------------------------------------
 If your mining distro has integrated support for TRM R-mode, you
-should use that instead. At the time of writing, only MMP OS has
-support with its "enable-trm-boost" argument. Please refer to MMP
-specific documentation for more details.
+should use that instead. At the time of writing, MMP OS and RaveOS
+have support with the "enable-trm-boost" (MMP) and "trm-mode" (RaveOS)
+commands. Please refer to documentation for your specific distro for
+more details.
 
 
 Enabling R-mode manually
@@ -200,7 +202,7 @@ culprit and typically needs its tuning adjusted.
 
 Dual mining TON in R-mode
 =========================
-R-mode dual mining is only interesting if you're looking for a power
+R-mode dual mining is mostly interesting if you're looking for a power
 efficient setup. With summer and high temperatures approaching, it's
 also a way to control heat. If you run a dual mining setup with a high
 core clk to maximize the dual mining algo, you should keep mining in
