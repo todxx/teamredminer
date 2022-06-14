@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.0
+          Team Red Miner version 0.10.1
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -420,15 +420,27 @@ Ethash options:
                               where the dag cache had bit errors and the resulting dag is partially broken.  We have seen this
                               happen increasingly on Vegas as the dag has grown bigger.  When detected, a new buffer will be
                               allocated for the dag cache and the dag build restarted.
-      --eth_micro_delay=VAL     Navi gpus only: adds a delay (measured in microseconds) when reenqueueing work on the gpu(s).
+      --eth_micro_delay=VAL,VAL,...  Adds a delay (measured in microseconds) when reenqueueing work on the gpu(s).
                               Weaker PSUs driving many gpus can sometimes not handle the "slew rate" when multiple gpus happen to
                               reenqueue work at exactly the same time.  Setting this to e.g. 32 will smoothen out the transition
                               from no load to 100% load enough to lower the slew rate on such rigs.  The typical indication of this
                               issue is hard hangs where the rig becomes unresponsive requiring a power cycle to reboot, but it can also
-                              be regular gpu crashes.  Valid values are 1-128. Not using this argument means no delay, value zero.
+                              be regular gpu crashes.  Valid values are 0-256.  Values per gpu can be provided in a comma-separated list.
+                              Gpus with no values specified in the list will use the first value. The default values for this argument in:
+                              single algo ethash mining are:
+                                Polaris: 64
+                                Vega:    0
+                                Navi:    0
       --eth_ignore_abort_fail  When job abort fails, it's typically the result of the intensity being too high, and the miner
                               therefore adjusts it down automatically.  This option _disables_ this logic, keeping the intensity but
                               instead logs a warning.
+      --eth_smooth_power=X,Y,...  The "smooth power" scheduling approach was added in 0.10.0 and is available for all gpu types.
+                              It's generally a good feature that adds a little bit of hashrate and also improves stability in most
+                              cases, and it's enabled by default on all gpus.  However, there are rigs that don't react well and
+                              starts crashing.  If so, you can use this argument to control the feature per gpu in your rig.
+                              Valid values are 0 or 1. For a 5 gpu rig you could use --eth_smooth_power=0,1,1,1,0 to disable smooth
+                              power on the first and last gpu.  If you don't specify a value for a gpu, the first value in the list
+                              is used.  This means you can disable the feature for a full rig using --eth_smooth_power=0.
 
 Progpow options (kawpow, firopow):
       --prog_config=CONFIG  Manual progpow configuration for the miner.  CONFIG must be in the form [M][L].
@@ -681,4 +693,3 @@ FPGA Options:
 
       --fpga_eth_clk_dag=LIST Sets FPGA core clock frequencies to be used during Ethash DAG building. By default these
                               will be set to 90% of the regular core clock. The format is the same as --fpga_clk_core.
-
