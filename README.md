@@ -1,7 +1,4 @@
-# teamredminer v0.10.0
-
-## This is the official public release of R-mode. There are no significant differences between the earlier v0.9.4.7 beta and v0.10.0. If you want to read the older README file with test instructions for the beta releases, please click [here](https://github.com/todxx/teamredminer/tree/v0.9.4.7-beta#readme).
-
+# teamredminer v0.10.1
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -133,6 +130,19 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.1
+#### Changes
+- FPGA: Added new more efficient ethash bitstreams that use less power and can run at lower voltage.
+- FPGA: Added new SC firmware for C1100 and U50C/ECU50 that allows voltages down to 625mV vccint and 1050mV vcchbm.
+- FPGA: Added 32-bit linux armhf build for running on zynq/raspberry pi boards.
+- FPGA: Added support for the Osprey E300, this will be integrated into the onboard firmware.
+- FPGA: Fixed API not reporting correct Alive/Sick/Dead status for FPGAs.
+- GPU:  Reworked smooth power for improved stability, primarily on Polaris and Vega gpus.
+- GPU:  Added --eth_smooth_power to control the smooth power scheduling feature.
+- GPU:  Fixed cases of stuck ethash tuning during single algo mining.
+- GPU:  Fixed rare network-related crashes for ethash mining, often with ssl enabled.
+- GPU:  Fixed bug causing Autolykos hashrate drop on VIIs.
 
 ### v0.10.0 (R-mode public release)
 #### Changes
