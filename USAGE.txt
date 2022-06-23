@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.1
+          Team Red Miner version 0.10.2
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -693,3 +693,4 @@ FPGA Options:
 
       --fpga_eth_clk_dag=LIST Sets FPGA core clock frequencies to be used during Ethash DAG building. By default these
                               will be set to 90% of the regular core clock. The format is the same as --fpga_clk_core.
+

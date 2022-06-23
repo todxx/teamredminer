@@ -1,4 +1,4 @@
-# teamredminer v0.10.1
+# teamredminer v0.10.2
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -110,6 +110,8 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - Xilinx Varium C1100
 - SQRL Forest Kitten 33 - performance limited by product design, see guide for details
 - Xilinx/TUL/Osprey U50C/ECU50
+- TUL TH53/55
+- Osprey E300
 
 Supported FPGA algorithms and their respective dev fees:
 
@@ -130,6 +132,13 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.2
+#### Changes
+- GPU:  Tweaked Polaris ethash tuning to work better with the new smooth-power setup.
+- GPU:  Fix for Autolykos crashing on Polaris and 4GB GPUs.
+- GPU:  Fix for Eth+Ton dual mining crashes with new smooth-power setup.
+- GPU:  README about smooth power available: [smooth power overview](https://github.com/todxx/teamredminer/blob/master/doc/ETHASH_SMOOTH_POWER.md).
 
 ### v0.10.1
 #### Changes

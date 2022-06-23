@@ -2,8 +2,9 @@ TeamRedMiner FPGA Guide
 =======================
 
 History:
-v1.1 2021-01-21 Added voltage control and U50C/ECU50 sections.
-v1.0 2020-12-12 Initial version.
+v1.2 2022-06-06 Added section for Osprey E300.
+v1.1 2022-01-21 Added voltage control and U50C/ECU50 sections.
+v1.0 2021-12-12 Initial version.
 
 General Overview
 ================
@@ -324,4 +325,26 @@ The cards generally run very well at 575 MHz core, 1125 MHz mem for 69.14 MH/s.
 While the cards are capable of adjusting vccint, TRM does not yet support
 voltage tuning for the TH53/TH55. Unfortunately controlling the vccmem voltage
 is not possible on TH53/TH55 devices, and the default vcchbm is 1.40V.
+
+
+Tuning Osprey E300
+===========================
+The Osprey E300 cards have a well designed thermal solution as well as power
+delivery.  The limiting factor in ethash performance on these cards tends to
+be silicon quality, as these boards use a lower speed grade silicon than most
+other FPGA boards (they use -2 grade instead of -2LV grade).  This lower speed
+grade results in parts that have a much wider range in quality.  We have seen
+some parts that will easily run 650MHz/1300MHz core/mem clks, while others
+have struggled to run above 575MHz/1150Mhz core/mem clks.  We suggest that
+each card be individually tuned to determine it's optimal performance.
+
+Note that support for the E300s requires running TRM locally on the Zynq
+control board and requires adding the option --fpga_e300 to enable hardware
+support for the E300 Zynq jtag interfaces.  Here is an example of how to start
+TRM on the E300 Zynq (make sure to use the linux-armhf TRM release):
+
+./teamredminer -a ethash -o stratum+tcp://eu1.ethermine.org:4444 -u 0x02197021fefa795fec661a45f60e47a6f6605281.trmtest -p x --fpga_e300
+
+Currently TRM does not have support for controlling voltages on the E300s, and
+voltages will need to be controlled via the Osprey firmware webui.
 
