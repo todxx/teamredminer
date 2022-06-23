@@ -41,11 +41,11 @@ using a Siglent SDS2104X Plus and a 300kHz CP6220 current probe.
 
 
 Clearly visible, all miners except TRM 0.10.2 suffer from repeated
-up/down spikes, i.e. deviations from the average power draw. Lolminer
+up/down swings, i.e. deviations from the average power draw. Lolminer
 is exhibiting the worst behavior. Phoenix and TRM 0.9.4.2 behave
-similarly with Phoenix having slightly less pronounced spikes but
+similarly with Phoenix having slightly less pronounced swings but
 occuring more frequently. The outlier is TRM 0.10.2 that has a smooth
-continuous draw without any spikes at all deviating from the average
+continuous draw without any swings at all deviating from the average
 level.
 
 To verify that the new behavior in TRM 0.10.2 does indeed translate
