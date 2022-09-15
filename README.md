@@ -1,4 +1,4 @@
-# teamredminer v0.10.2
+# teamredminer v0.10.3
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -132,6 +132,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.3
+#### Changes
+- GPU:  Added next height pad prebuild for Ergo/Autolykos2 to raise effective hashrate over time.
+- GPU:  Better execution of R/B/C modes for ethash with dual zil mining.
+- GPU:  Added R-mode zil cache support with --eth_dag_cache=0.
+- GPU:  Added argument --eth_no_job_logs to suppress pool job logging.
+- GPU:  Fixed some issues pools using miningcore, mainly ergo and verthash pools.
 
 ### v0.10.2
 #### Changes

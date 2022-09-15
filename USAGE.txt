@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.2
+          Team Red Miner version 0.10.3
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -431,9 +431,12 @@ Ethash options:
                                 Polaris: 64
                                 Vega:    0
                                 Navi:    0
-      --eth_ignore_abort_fail  When job abort fails, it's typically the result of the intensity being too high, and the miner
+      --eth_ignore_abort_fail   When job abort fails, it's typically the result of the intensity being too high, and the miner
                               therefore adjusts it down automatically.  This option _disables_ this logic, keeping the intensity but
                               instead logs a warning.
+      --eth_no_job_logs         Suppresses all logs for new jobs received from pool(s).  Applies to all ethash family mining sessions,
+                              i.e. in a dual eth+zil setup, logs for both eth and zil pools will be suppressed.  Pool jobs that
+                              switches to a new epoch will still be logged.
       --eth_smooth_power=X,Y,...  The "smooth power" scheduling approach was added in 0.10.0 and is available for all gpu types.
                               It's generally a good feature that adds a little bit of hashrate and also improves stability in most
                               cases, and it's enabled by default on all gpus.  However, there are rigs that don't react well and
@@ -564,8 +567,14 @@ Autolykos2 options:
                               default value is increased by 1024.  The option can also be provided with a comma separated
                               list of values where each value is applied to each GPU.  If an empty value is specified
                               in the list, the default will be used for that GPU.  If a value is not specified for a GPU
-                              it will use the first value in the list.  For example:
+                              it will use the first value in the list.  The amount of vram used need to hold both the main
+                              buffers and any prebuild buffer for the next height.  For example:
                                     --autolykos_mem_adjust=256,512,,256
+      --autolykos_prebuild=N  Configures the speed for the next height pad prebuild.  A higher value means a faster prebuild
+                              but with larger power fluctuations and likely a larger hashrate drop as long as the prebuild is
+                              running.  Valid values are 0-9, where 0 means no prebuild at all and 9 is the fastest variant.
+                              The default value is 4.  You can choose to specify a single value for all gpus, or a
+                              comma-separated list of values per gpu.
       --autolykos_slowdown=N  Adds a slowdown of the pad build process.  Valid values are 0-100. The default is 0, no
                               slowdown.
       --autolykos_ignore_diff Ignores the difficulty sent by the pool and only uses the 256-bit target provided in jobs.

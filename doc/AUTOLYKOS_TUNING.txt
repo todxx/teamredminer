@@ -3,6 +3,8 @@ Team Red Miner Autolykos2 (ERGO) Mining
 This document provides some quick pointers on how to tune the
 autolykos2 algo used by ERGO.
 
+v1.1 2022-09-13
+v1.0 ?
 
 General background
 ==================
@@ -17,6 +19,28 @@ generation gpus (Navi, Big Navi) will not perform well. Their 128 byte
 cacheline size means that 128 bytes are read for every 32 byte
 request, effectively halving the available memory bandwidth compared
 to GCN (which uses 64 byte cachelines).
+
+
+Pad prebuild
+============
+Autolykos needs a big pad filled with random data specific for every
+block height. This means that every 120 secs (on average) the
+algorithm will switch to the next pad. Earlier TRM versions did a
+complete stop to rebuild the pad, which lowered the effective hashrate
+over time. In v0.10.3, pad prebuild was added. It is enabled by
+default for all gpus, and will try to consume as much memory as
+possible for a second copy of the pad buffer. The miner will then
+prebuild the next pad concurrently with hashing, and in most cases it
+will be fully ready when the next switch takes place.
+
+During the prebuild phase, hashrate will drop slightly, and power
+consumption will go up. To control this, the prebuild speed can be
+controlled using the argument --autolykos_prebuild. The range is 0-9,
+when 0 means no prebuild, 9 means max speed. You can pass one argument
+for all gpus, or a comma-separated list per gpu. The max speed will be
+aggressive with the pad rebuild, raising power temporarily, but the
+chance that the pad is fully ready as the next switch takes place is
+higher. We believe the default value of 4 is a good choice.
 
 
 Polaris Tuning
@@ -43,25 +67,35 @@ Polaris tuning examples
 Note: sensor power reported, not accurate.
 
 Type           GPU CUs CoreMHz MemMHz TEdge  VDDC   Power
-Nitro+ 570 8GB   0 32  1200    2080   42C    875 mV  75 W
+Nitro+ 570 8GB   0 32  1200    2080   42C    875 mV  73 W
 Nitro+ 470 4GB   1 32  1235    2000   46C    875 mV  59 W
 Nitro+ 580 8GB   2 36  1275    2080   40C    900 mV  80 W
 ----------------------- GPU Status -------------------------
-GPU 0 [42C, fan 44%]       autolykos2: 64.70Mh/s
-GPU 1 [46C, fan 44%]       autolykos2: 66.46Mh/s
-GPU 2 [40C, fan 44%]       autolykos2: 68.62Mh/s
+GPU 0 [42C, fan 44%]       autolykos2: 64.24Mh/s
+GPU 1 [46C, fan 44%]       autolykos2: 66.09Mh/s
+GPU 2 [40C, fan 44%]       autolykos2: 68.19Mh/s
 
 
 RX Vega 56/64 Tuning
 ====================
-RX Vegas are great for autolykos2 and can reach 200 MH/s when
-stretched to the max, although at a > 200W power draw. Tuning them
-optimally is slightly more complex. Mining distros can help greatly
-here. We discuss three different tunings. Background info:
+For historical reference, RX Vegas used to be outperforming other gpus
+on autolykos (relatively speaking), being able to reach a full 200
+MH/s. This was due to a TRM-specific optimization that only worked
+well before the autolykos pad started growing. In today's autolykos,
+RX Vegas typically run in the 120-140 MH/s range depending on tuning.
+
+The tuning examples below are the same as when RX Vegas were running
+at higher hashrates. They are still applicable, but should be seen as
+starting points. There might be better tunings available among the community.
+
+RX Vegas are always slightly complex to tune well. Mining distros can
+help greatly here. We discuss three different tunings. Background
+info:
 
 - Mem timings should be used, ethash timings of some sort are good
   choices. Other timings for Equihash, Cuckoo or CN can produce good
-  results as well.
+  results as well. You can check the TRM discord for more tuning
+  examples.
 
 - Mem clock does not need to be high unless you're aiming for the
   highest hashrates.
@@ -74,37 +108,41 @@ here. We discuss three different tunings. Background info:
   notorious for not running at the configured frequency when AVFS
   p-states are used.
 
+
 RX Vega Simple Tuning
 ---------------------
 This is for people who don't care about soc clk level and just want to
-start hashing at a decent level around 165 MH/s.
+start hashing at a decent level around 120-135 MH/s. 
 
 1. Set ethash mem timings (see our ethash guide for examples).
-2. Set core clk to 1225 MHz
+2. Set core clk to 1250 MHz
 3. Start with mem clk at 960 MHz (Vega 64) or 847 MHz (Vega 56).
 4. Set voltage to 875mV.
 5. Run the miner. Check the hashrate.
-6. Increase core clk until you hit 165 MH/s. If you hit a bottleneck
-   where increased core clk doesn't boost the hashrate, increase mem
-   clk a little more. Repeat from 4.
+6. Increase core clk until you hit your target hashrate. If you hit a
+   bottleneck where increased core clk doesn't boost the hashrate,
+   increase mem clk a little more. Repeat from 4.
+  
 7. If you crash, bump voltage a little more. Repeat from 4.
 8. If you run stable for a while, lower voltage.
 
 
 RX Vega Efficient Tuning
 ------------------------
-This tuning targets 162-170 MH/s. For Vega 64, flashing a Vega 56 bios
-will be the best choice, but it isn't as critical as for ethash
-mining. The goal is to stay at soc clk 847 MHz for Vega 56 (or Vega 64
-with flashed 56 bios), and soc clk 960 MHz for Vega 64s. You might
-need to lock p-state levels using OverdriveNTool (Windows), mining
-distro helpers, or sysfs controls (Linux).
+This tuning is a more efficient approach than the simple tuning above,
+maxing out the potential hashrate at 960 MHz (Vega 64) or 847 MHz
+(Vega 56) mem clk. For Vega 64, flashing a Vega 56 bios will likely be
+the best choice, but it isn't as critical as for ethash mining. The
+goal is to stay at soc clk 847 MHz for Vega 56 (or Vega 64 with
+flashed 56 bios), and soc clk 960 MHz for Vega 64s. You might need to
+lock p-state levels using OverdriveNTool (Windows), mining distro
+helpers, or sysfs controls (Linux).
 
-Note 1: Vega 56 Hynix can follow the same guide below, but ended up
-slightly below 160 MH/s at 847 MHz soc/mem clk for us. You can then
-switch up to 960 MHz soc clk level, following the Vega 64 guide below
-instead. You can keep the mem clk lower than 960 MHz though, depending
-on what hashrate you'd like to target.
+Note 1: Vega 56 Hynix can follow the same guide below, but can end up
+at a slightly lower hashrate. You can then switch up to 960 MHz soc
+clk level, following the Vega 64 guide below instead. You can keep the
+mem clk lower than 960 MHz though, depending on what hashrate you'd
+like to target.
 
 Note 2: if none of the above doesn't make sense to you, the critical
 piece of information here is that RX Vegas can't use a mem clk higher
@@ -123,7 +161,7 @@ optimizing for efficiency.
  5. Lock core and mem p-states.
  6. Run the miner. Press 's' and verify that the soc clk is at 847 MHz
     (Vega 56) or 960 MHz (Vega 64).
- 7. Hopefully you'll reach around 165 MH/s and we're done.
+ 7. Hopefully you'll reach your target hashrate (120-135 MH/s) and we're done.
  8. If not, increase core clk slightly. Repeat from 6.
  9. If you crash, increase voltage.
 10. If you've run stable for a longer period, try lowering voltage.
@@ -131,38 +169,38 @@ optimizing for efficiency.
 
 RX Vega Max Performance Tuning
 ------------------------------
-This tuning targets 190-200 MH/s. Power draw will be around 200-210W
-at the wall. For Vega 64, flashing a Vega 56 bios will be the best
-choice here as well, but it isn't critical. For this tuning, we just
-go with the highest p-states.
+This tuning targets 155-160 MH/s. Power draw will be higher.  For Vega 64,
+flashing a Vega 56 bios will be the best choice here as well, but it
+isn't critical. For this tuning, we just go with the highest p-states.
 
 For Vega 56 with Samsung mem, if you have applied timings that can
-reach 53-54 MH/s, then keep them.
+reach 53-54 MH/s when mining ethash, then keep them.
 
 Note: for Vega 56 Hynix, the guide below can still be followed, but
-the target hashrate for us had to be lowered to 185 MH/s.
+the target hashrate for us had to be lowered slightly.
 
-1. Configure ethash timings.
-1. Use core p-state 7: set to 1400 MHz.
-2. Vega 56: Use mem p-state 3: set to 990 MHz if you can run ethash at 52-54 MH/s.
-   Vega 56: Use mem p-state 3: set to 950 MHz if you can run ethash at 50 MH/s.
-   Vega 64: Use mem p-state 3: set to 1107 MHz.
+1.  Configure ethash timings.
+2.  Use core p-state 7: set to 1550 MHz as a start.
+3.  Vega 56: Use mem p-state 3: set to 990 MHz if you can run ethash at 52-54 MH/s.
+    Vega 56: Use mem p-state 3: set to 950 MHz if you can run ethash at 50 MH/s.
+    Vega 64: Use mem p-state 3: set to 1107 MHz.
 
-   NOTE: if your gpu can't take the high mem clk values suggested
-            above, set it to the level you can mine ethash at.
+    NOTE: if your gpu can't take the high mem clk values suggested
+             above, set it to the level you can mine ethash at.
             
-3. Set voltage to 900mV as a start.
-3. Lock core and mem p-states.
-4. Run the miner. Check the hashrate.
-5. As long as you're underperforming the hashrate target, keep raising
-   the core clk. Under plain amdgpu-pro on linux, the scaling is
-   absurd and you might have to increase up to 1600 MHz before your
-   true effective clock is around 1400 MHz. Windows does not scale as
-   aggressively.
-6. If you crash, increase voltage.
-7. If you continue to crash even with 925mV or so, you need to give up
-   and settle for a lower hashrate target with a lowered mem clk.
-8. If you've run stable for a longer period, try lowering voltage.
+4.  Set voltage to 925mV as a start.
+5.  Lock core and mem p-states.
+6.  Run the miner. Check the hashrate.
+7.  As long as you're underperforming the hashrate target, keep raising
+    the core clk. Under plain amdgpu-pro on linux, the scaling is
+    absurd and you might have to increase up to 1650-1700 MHz before your
+    true effective clock is around 1400 MHz. Windows does not scale as
+    aggressively.
+8.  If you crash, increase voltage.
+9.  If you continue to crash even with 950mV, you might need to give up
+    and settle for a lower hashrate target with a lowered mem clk.
+10. If you've run stable for a longer period, start lowering voltage as
+    much as possible, in small steps.
 
 
 Radeon VII Tuning 
@@ -197,32 +235,32 @@ tuning.
 Note: sensor power reported, not accurate.
 
 Setup   CoreMHz SocMHz MemMHz  VDDC    Power   Peak Hashrate
-Linux*  1500    971    801     850 mV  145 W     237.5Mh/s
-Linux*  1700    971    801     925 mV  183 W     268.2Mh/s
-Windows 1500    971    801     850 mV   -       ~210.0Mh/s
+Linux*  1500    971    801     850 mV  127 W     175.5Mh/s
+Linux*  1700    971    801     935 mV  144 W     200.0Mh/s
+Windows 1500    971    801     850 mV   -        <test not performed>
 * - Linux tests performed with kernel params set as described for
-      ethash C mode.
+      ethash C-mode (or R-mode).
 
 Navi GPUs
 =========
-As stated above, Navis simply won't do that well on autolykos2 due to
+As stated above, Navis simply won't do well on autolykos2 due to
 architectural changes that don't work well with the smaller mem
-accesses. Therefore, we don't expect RDNA gpus to run this algo.
+accesses. Therefore, we don't expect RDNA gpus to run this algo. This
+guide will be updated if any serious improvements for RDNA/RDNA2 gpus
+are implemented.
 
 For tuning, you can use an existing configuration for ethash as a
 starting point, then lower the core clk about -10%. 
 
 Example tunings:
 Type    GPU CUs CoreMHz SocMHz MemMHz TEdge TMem  VDDC   Power
-5700XT  0   40  1100    1085   912    41C   70C   787 mV  84 W
+5700XT  0   40  1150    1085   912    41C   70C   737 mV  80 W
 5600XT  1   36   950    1266   910    40C   70C   800 mV  93 W
 ------------------------ GPU Status ---------------------------
-GPU 0 [41C, fan  0%]       autolykos2: 108.8Mh/s
-GPU 1 [40C, fan 49%]       autolykos2: 82.12Mh/s
+GPU 0 [41C, fan  0%]       autolykos2: 106.2Mh/s
+GPU 1 [40C, fan 49%]       autolykos2: 81.50Mh/s
 
 Type    GPU CUs CoreMHz SocMHz MemMHz TEdge TMem  VDDC   Power
 RX6800  0   60  1075    685    1049   52C   76C   787 mV 116 W (voltage not tuned) 
 ------------------------ GPU Status ---------------------------
 GPU 0 [52C, fan 28%]       autolykos2: 118.8Mh/s
-
-

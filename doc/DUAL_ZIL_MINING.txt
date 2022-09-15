@@ -27,6 +27,11 @@ optimal for most setups with the following settings:
 - Adjustment of memory allocated for the primary algo to fit the ZIL DAG.
 - Choose ethash A-mode for the ZIL mining.
 - Use the standard faster kernels for 4GB gpus since the DAG is max 1GB.
+- Can have B- or even C-mode enabled by using e.g. --eth_config=B
+  _inside_ the --zil ... --zil_end configuration. It will use 2GB or
+  4GB of additional vram depending on if B- or C-mode is used. This
+  can be combined with using any mode (including R-mode) for the
+  primary ethash mining.
 
 
 Pool Support
@@ -55,11 +60,14 @@ ZIL DAG. If you e.g. run a rig of 5700XTs running in B-mode mining ETH
 and then add ZIL, you will most probably see a reduced hashrate during
 the ETH mining and need to increase core clk.
 
-If you want to keep your current ETH tuning, the other way is to use
-the old way of running dual ZIL mining (see section below), and simply
-not cache the ZIL DAG but rebuild DAGs as you enter/exit the ZIL
-mining windows. This will steal some mining time for each ZIL window
-instead.
+However, with the new R-mode it is possible (from v0.10.3) to run dual
+eth+zil on 8GB gpus and use R-mode (or B/C-mode) for the main ethash
+mining, cache the zil dag, and run the zil mining in A- or B-mode. 
+
+If you want to keep your current ETH tuning, another way is to use the
+old way of running dual ZIL mining (see section below), and simply not
+cache the ZIL DAG but rebuild DAGs as you enter/exit the ZIL mining
+windows. This will steal some mining time for each ZIL window instead.
 
 
 Old mechanism up until v0.8.2.1
