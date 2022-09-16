@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.3
+          Team Red Miner version 0.10.3.1
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -573,8 +573,8 @@ Autolykos2 options:
       --autolykos_prebuild=N  Configures the speed for the next height pad prebuild.  A higher value means a faster prebuild
                               but with larger power fluctuations and likely a larger hashrate drop as long as the prebuild is
                               running.  Valid values are 0-9, where 0 means no prebuild at all and 9 is the fastest variant.
-                              The default value is 4.  You can choose to specify a single value for all gpus, or a
-                              comma-separated list of values per gpu.
+                              The default value is 3 or 4 depending on gpu.  You can choose to specify a single value for all
+                              gpus, or a comma-separated list of values per gpu.
       --autolykos_slowdown=N  Adds a slowdown of the pad build process.  Valid values are 0-100. The default is 0, no
                               slowdown.
       --autolykos_ignore_diff Ignores the difficulty sent by the pool and only uses the 256-bit target provided in jobs.
