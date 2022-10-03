@@ -1,4 +1,4 @@
-# teamredminer v0.10.3.1
+# teamredminer v0.10.4
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -39,6 +39,7 @@ Supported GPU algorithms and their respective dev fees:
 | Verthash                  | 2.0% |
 | Autolykos2                | 2.0% |
 | Ton                       | 1.0% |
+| Kaspa                     | 1.0% |
 | Nimiq                     | 2.5% |
 | Cryptonight R             | 2.5% |
 | Cryptonight v8 upx2       | 2.5% |
@@ -74,6 +75,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Autolykos2               |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Firopow                  |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Ton                      |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Kaspa                    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
 | Cryptonight v8 upx2      |  N   |  L   |   L     |   L  |   N   |
@@ -132,6 +134,12 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.4
+#### Changes
+- GPU:  Added KASPA single algo mining (fee 1.0%, use -a kas).
+- GPU:  Added simpler way of forcing hashrate reports for kawpow/firopow (use --prog_hash_report).
+- GPU:  Fixed missing hashrate reports in some cases for kawpow/firopow with multiple pools.
 
 ### v0.10.3.1
 #### Changes

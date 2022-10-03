@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.3.1
+          Team Red Miner version 0.10.4
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -10,6 +10,7 @@ Options:
                               autolykos2        (ergo)
                               verthash          (vtc)
                               ton               (ton)
+                              kas               (kaspa)
                               nimiq             (nimiq)
                               lyra2z      
                               phi2              (lux, argoneum)
@@ -478,6 +479,9 @@ Progpow options (kawpow, firopow):
                                1 - turn OFF progpow micro-tuning for this gpu.
                                2 - turn ON progpow micro-tuning for this gpu.
                                3 - let the miner decide if micro-tuning should be enabled (AUTO).
+      --prog_hash_report    Enables forced hashrate report (like for ethash) sent to all pools.  This is an alias for
+                               --eth_hash_report=force, which is also applicable since progpow and ethash use the same pool
+                               protocol(s).
 
 Cryptonight options:
       --rig_id              Set the rig identifier that will be sent to the pool. This is only used for
