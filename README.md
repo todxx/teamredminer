@@ -1,4 +1,4 @@
-# teamredminer v0.10.4
+# teamredminer v0.10.4.1
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -134,6 +134,11 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.4.1
+#### Changes
+- GPU:  Fixed Kaspa kernels for BC-160 (gfx1011) and Radeon VII family on older PAL drivers.
+- GPU:  Fixed rare cases of ethash false alerts of dead gpus.
 
 ### v0.10.4
 #### Changes
