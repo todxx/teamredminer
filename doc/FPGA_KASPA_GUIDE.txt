@@ -1,0 +1,131 @@
+TeamRedMiner FPGA Kaspa Guide
+=============================
+
+History:
+v1.0 2022-10-18 Initial Version.
+
+General Overview
+================
+Starting in version v0.10.5 TeamRedMiner(TRM) has support for mining Kaspa on
+currently supported FPGA platforms: C1100, U50C, FK33, TH53, TH55, E300.  The
+Kaspa algorithm is a compute heavy algorithm and does not use the HBM on these
+FPGAs.  Due to it being compute heavy it will draw large amounts of core
+(vccint) current, and miners should becareful not to exceed their card's power
+delivery and cooling capabilities.  Please read the section corresponding to
+your hardware below and be aware of the limits of your hardware before testing.
+For details on how to start the miner, set voltages and clocks, update firmware
+on C1100/U50C, etc see FPGA_GUIDE.txt.
+
+
+Mining Instructions
+===================
+Kaspa mining can be started with the 'kas' algorithm.  Example:
+
+sudo ./teamredminer -a kas -o stratum+tcp://pool.woolypooly.com:3112 -u kaspa:qq0vgkm89v3k2plkw2cv9t8wrhcqhpxeunq5ayu9mwjghdavalfggat2hu8nn -p x --fpga_clk_core=200
+
+It is strongly advised to start with a low core clock of around 200MHz and
+slowly ramp up from there to ensure you do not exceed your hardware's power
+delivery and cooling capabilities.
+
+
+Clock/Voltage Tuning
+==============
+With the release of Kaspa, we have also released a new version of the SC
+firmware for the C1100 and U50C to allow setting lower voltages on the cards.
+Users will likely want to update the TRM firmware on these cards to achieve
+optimal results.  For detailed description on how to perform tuning, see the
+ethash example in FPGA_GUIDE.txt
+
+Tuning Kaspa is much simpler than ethash since memory is not used.  The only two
+variables that play an effect are core clock and core voltage (vccint).  Miners
+will want to start with a low clock and voltage and ramp up clock as necessary
+until they see error rates increase.  At this point they should either lower the
+core clock, or increase the core voltage, until they achieve their desired
+performance and efficiency results.  For C1100, U50C, and FK33 we recommend
+running with the --debug option to get additional information about the
+regulator current outputs and to ensure they do not exceed the cards' limits.
+
+Here is a general tuning process that has worked for us:
+
+1) Start with a low core voltage of 600mV and core clock of 300MHz.
+
+2) Run cards for 5mins to ensure there are no errors and that temperatures are
+    stable.  If there are no errors, go to step 3.  Otherwise, go to step 4.
+
+3) If you are below 500MHz, increase core clock by 100MHz.  If you are at or
+    above 500MHz, increase core clock by 25MHz. Repeat step 2.
+
+4) If you are seeing errors appearing on some cards you can try to adjust
+    settings to reduce the errors by either:
+        a) reduce core clock for those FPGAs by 5MHz 
+        b) increase vccint for those FGPAs by 5mV
+    If your temperatures are exceeding your targets, reduced core clock and/or
+    voltage by 5MHz/5mV.
+
+5) Run cards for 5-10 mins and note temperatures and error rates.  If error
+    rates or temperatures exceed your targets, repeat step 4.
+
+NOTE: If you see cards crash with jtag errors, you may want to try setting 
+        --fpga_max_jtag_mhz=10 as lower voltages can cause the jtag logic to
+        not function correctly at higher jtag clock rates.
+
+
+
+Tuning Xilinx Varium C1100
+==========================
+We strongly recommend using an  aftermarket cooling setup on the C1100s before
+running Kaspa.  The original passive heatsink will not be sufficient for cooling
+the card on this algo.  The VCCINT regulators on the C1100 are rated to 180A.
+
+With good cooling, we typically see most C1100s capable of running 550-600MHz at
+600mV vccint.  Typically most cards will work at 575MHz@600mV with a few getting
+some errors and need  a little extra tuning.
+
+For more efficiency oriented setups, we find that 550Mhz@575mV is a good
+compromise where most cards are happy to run at.
+
+
+
+Tuning Xilinx U50C or ECU50
+===========================
+The frequency and voltage characteristics of this card are essentially the same
+as the C1100.  However, U50C and ECU50 users should keep a close eye on total
+board power in order to not pull excessive current over the PCIe edge connector.
+See your card's retail info for what the maximum safe power to run is for these
+boards.  The VCCINT regulators should be rated to 180A.
+
+
+Tuning SQRL Forest Kitten 33
+============================
+Unfortunately unmodified FK33s are very limited in their voltage control
+capabilities.  The original FK33s can only reduce the vccint voltage to 0.776mV.
+This coupled with their 120A rated vccint regulators, will limit the maximum
+hashrate and efficiency.  For stock FK33s, we recommend setting the lowest
+possible voltage of 0.776mV and not exceeding 475MHz for core clock, at which
+point the regulators will roughly be running at the full 120A limit.
+
+For FK33s modified to run voltages down to ~615mV, we find that you can run up
+to about 625-650MHz before exceeding the 120A, however you will likely start
+seeing errors above roughly 600MHz.
+
+
+Tuning TUL TH53/TH55
+===========================
+The TH53/TH55 should be able to supply at least 180A from the vccint regulators.
+We suggest checking with manufacturer specs to ensure current ratings.  TRM does
+not currently monitor or control voltage settings on TH53/TH55.  Users should
+use manufacturer tools to set voltages and monitor current.
+
+
+Tuning Osprey E300
+===========================
+The Osprey E300 is rather overbuilt with VCCINT regulators rated to 420A.  Users
+with E300s can safely push higher clocks and should just keep an eye on
+temperatures.  For high efficiency, we find that most E300s run well at
+575MHz@600mV. 
+
+
+
+
+
+
