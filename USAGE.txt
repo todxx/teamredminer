@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.4.1
+          Team Red Miner version 0.10.5
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -627,7 +627,7 @@ TON options:
       --wss_port=VALUE      Overrides the default local port (4444) used for the wss proxy. This can be used if your
                               system is already using port 4444 for some other tcp/ip service.
 
-TON dual mining options:
+Ethash dual mining options:
       --ton_start or --ton  Starts the TON dual mining config.  Between this and the --ton_end marker, all arguments are
                               applied to the TON mining rather than the primary algo, typically ethash.  It's expected that
                               ethash has been set up in earlier arguments.  The intention is that you can add a --ton ... --ton_end
@@ -640,6 +640,18 @@ TON dual mining options:
                               For more info, read the TON dual mining guide packaged with the TRM release.
 
       --ton_end             Marks that we're done with the TON mining config and all following arguments are for the primary
+                              algo.  This argument isn't strictly necessary, but should be included for mining distros since
+                              the user has no guarantee what arguments will be added automatically at the end of the command
+                              line by the distro.
+      --kas_start or --kas  Starts the Kaspa dual mining config.  Between this and the --kas_end marker, all arguments are
+                              applied to the Kaspa mining rather than the primary algo, typically ethash.  It's expected that
+                              ethash has been set up in earlier arguments.  The intention is that you can add a --kas ... --kas_end
+                              configuration to any working TRM configuration algo and things will work out of the box.
+
+                              The minimal working setup is to only provide a Kaspa pool.  This is an example:
+                              --kas -o stratum+tcp://pool.woolypooly.com:3112 -u <kaspa wallet>.<worker name> -p x --kas_end
+
+      --kas_end             Marks that we're done with the Kaspa mining config and all following arguments are for the primary
                               algo.  This argument isn't strictly necessary, but should be included for mining distros since
                               the user has no guarantee what arguments will be added automatically at the end of the command
                               line by the distro.
@@ -661,14 +673,14 @@ TON dual mining options:
                               and added, but as network hashrates and market prices move, new values may need to be provided. 
                               This argument provides three values, all expected to be positive numbers:
                                 X    Score for 1 MH/s of the primary algo (typically ethash). 
-                                Y    Score for 1 MH/s of the secondary algo (typically TON). 
+                                Y    Score for 1 MH/s of the secondary algo (typically TON or Kaspa). 
                                 Z    Cost per 1 W of measured power. We recommend setting this to zero for now. 
                               Example for ETH+TON: 
 
-                                Based on manual relative value: each MH/s of ETH is worth 100 MH/s of TON
+                                Based on manual relative value: each MH/s of ETH is worth 100 MH/s of TON/Kaspa
                                 --dual_tuner_weights=100:1:0
 
-                                Based on mining calculators: $0.0437 for 1 MH/s ETH, $0.0005476 for 1 MH/s TON
+                                Based on mining calculators: $0.0437 for 1 MH/s ETH, $0.0005476 for 1 MH/s TON/Kaspa
                                 --dual_tuner_weights=0.0437:0.0005476:0
 
 FPGA Options: 
@@ -683,10 +695,6 @@ FPGA Options:
                               first value in the list.  For example --fpga_clk_core=600,620 will apply 600MHz clock to 
                               FPGA 0 and 620MHz to FGPA 1.  If devices FPGA 2+ are present, they will be set to 600MHz.
       --fpga_clk_mem=LIST   Sets FPGA device memory clock frequencies.  Format is the same as --fpga_clk_core.
-      --fpga_tcore_limit=LIST Sets FPGA device core temperature soft limits.  If the FPGA core temperature exceeds the 
-                              specified value, the miner will lower the FPGA clocks to bring the core temperature under 
-                              the specified value.  Values are in Celcius with a list format similar to --fpga_clk_core.
-      --fpga_tmem_limit=LIST Sets FPGA device memory temperature soft limits.  See --fpga_tcore_limits for description.
       --fpga_vcc_int=LIST   Sets the vcc_int voltage on boards that support it.  The voltage values should be provided as a
                               comma separated list of values in milliVolts(mV), where each value applies to each board.
                               If the list is shorter than the total number of devices, the remaining devices will use the 
@@ -702,6 +710,12 @@ FPGA Options:
       --fpga_allow_unsafe=LIST Disables default safety limits for the specified FPGAs.  The devices are specified with a
                               comma separated list of DNA values, e.g. --fpga_allow_unsafe=40020000013ae32135111111
                               ***** CAUTION: Running above safety limits can result in PERMANENT DAMAGE to the device! *****
+      --fpga_tcore_limit=LIST Sets FPGA device core temperature soft limits.  If the FPGA core temperature exceeds the 
+                              specified value, the miner will lower the FPGA clocks to bring the core temperature under 
+                              the specified value.  Values are in Celcius with a list format similar to --fpga_clk_core.
+      --fpga_tmem_limit=LIST Sets FPGA device memory temperature soft limits.  See --fpga_tcore_limits for description.
+      --fpga_ivccint_limit=LIST Sets VCCINT voltage regulator current soft limits.  See --fpga_tcore_limits for description.
+      --fpga_ivccbram_limit=LIST Sets VCCBRAM voltage regulator current soft limits.  See --fpga_tcore_limits for description.
       --fpga_max_jtag_mhz=XY.Z  Sets the max allowed frequency to use for fpga jtag communication.  Default is 30.0 MHz.
 
       --fpga_eth_clk_dag=LIST Sets FPGA core clock frequencies to be used during Ethash DAG building. By default these
