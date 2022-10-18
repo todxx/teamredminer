@@ -1,4 +1,4 @@
-# teamredminer v0.10.4.1
+# teamredminer v0.10.5
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -117,9 +117,10 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 
 Supported FPGA algorithms and their respective dev fees:
 
-|      FPGA Algorithm       |  Fee |
-| ------------------------- | ---- |
-| Ethash                    | 4.0% |
+|      FPGA Algorithm       |  Fee  |
+| ------------------------- | ----- |
+| Ethash                    |  4.0% |
+| Kaspa                     | 10.0% |
 
 -----------
 
@@ -134,6 +135,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.5
+#### Changes
+- GPU:  Kaspa single algo mining rewritten for minimal latency, optimizing for the Kaspa 1 sec block time.
+- GPU:  Ethash+Kaspa dual mining now added, use --kas ... --kas_end. The setup is identical to ETH+TON. See the update DUAL_ETH_MINING.txt guide for more details.
+- FPGA: Added KASPA single algo mining.
+- FPGA: Added core clock throttling based on regulator current limits for devices that support it (C1100, U50C, FK33)
+- FPGA: Added additional --debug voltage/current measurement prints for devices that support it (C1100, U50C, FK33)
 
 ### v0.10.4.1
 #### Changes
