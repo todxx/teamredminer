@@ -1,4 +1,4 @@
-# teamredminer v0.10.5
+# teamredminer v0.10.5.1
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -135,6 +135,11 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.5.1
+#### Changes
+- GPU:  Kaspa single algo - fixed critical bug sometimes delaying shares, resulting in pool rejects.
+- GPU:  Kaspa single algo - fixed solo mining against the Kaspa stratum bridge or other setups with no extranonce sent.
 
 ### v0.10.5
 #### Changes
