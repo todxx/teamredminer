@@ -125,7 +125,25 @@ temperatures.  For high efficiency, we find that most E300s run well at
 575MHz@600mV. 
 
 
+Bittware CVP13
+===========================
+The Bittware CVP13 is a well built and well cooled card, however the VU13P part
+on the card is large and consumes large amounts of current.  Users should use
+the Bittware supplied tools to configure their CVP13's regulator voltages and
+monitor currents, as TRM does not support setting voltages or reading
+current/power values from the CVP13.  We find that CVP13s typically will run
+stabily at around 570MHz at 600mV.
 
 
+SQRL BCU1525/TUL BTU9P/Osprey ECU200
+===========================
+Thes boards are all clones of the original VCU1525 Xilinx dev board that become
+one of the first widely used FPGA mining platforms.  Owners of these boards will
+need to make sure they have a way of setting voltages to be able to run
+efficiently with TRM's Kaspa.  While these boards are very similar, they vary
+significantly in regulator efficiency as well as silicon quality of the FPGAs.
+From our early testing, we see that boards can typically run somewhere between
+550-625MHz at 650mV.  Users will want to keep an eye on total power and voltage
+regulator temperatures as TRM does not monitor or report these.
 
 
