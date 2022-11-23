@@ -1,4 +1,4 @@
-# teamredminer v0.10.5.1
+# teamredminer v0.10.6
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -114,6 +114,8 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - Xilinx/TUL/Osprey U50C/ECU50
 - TUL TH53/55
 - Osprey E300
+- Bittware CVP13
+- SQRL BCU1525/TUL BTU9P/Osprey ECU200
 
 Supported FPGA algorithms and their respective dev fees:
 
@@ -121,6 +123,12 @@ Supported FPGA algorithms and their respective dev fees:
 | ------------------------- | ----- |
 | Ethash                    |  4.0% |
 | Kaspa                     | 10.0% |
+
+FPGA device/algo compatibility table:
+|                          | C1100 | FK33 | U50C/ECU50 | TH53 | TH55 | E300 | CVP13 | BCU1525/BTU9P/ECU200 |
+| ------------------------ |:-----:|:----:|:----------:|:----:|:----:|:----:|:-----:|:--------------------:|
+| Ethash                   |   Y   |  Y   |     Y      |   Y  |  Y   |  Y   |   N   |           N          |
+| Kaspa                    |   Y   |  Y   |     Y      |   Y  |  Y   |  Y   |   Y   |           Y          |
 
 -----------
 
@@ -135,6 +143,13 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.6
+#### Changes
+- General: Added fix for Kaspa mining on MiningRigRentals.
+- FPGA: Added Kaspa support for CVP13 and VCU1525 clones (BCU, BTU, ECU)
+- FPGA: Renamed E300 to E335C in preparation for supporting additional FPGA devices on E300 boards.
+- FPGA: Fixed broken TH53 temp/voltages display.
 
 ### v0.10.5.1
 #### Changes
