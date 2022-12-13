@@ -31,7 +31,7 @@ o Thread 1 intensity X: typically a number between 1-16 for 8GB gpus and
 o Tweak setting: one of the following chars:
     o -  No tweak enabled.
     o +  First tweak option (only option for Lexa/Baffin/Polaris cards).
-    o *  Second tweak option (for Vegas, especiall with timing mods enabled).
+    o *  Second tweak option (for Vegas, especially with timing mods enabled).
     o .  I don't care, let the miner choose.
     
 o Thread 2 intensity Y: the second thread's intensity. Can be zero to disable
