@@ -15,13 +15,15 @@ officially supported on Linux, however Windows users can also mine using a Linux
 VM with USB passthru for the FPGA USB JTAG connections.
 
 In v0.9.1, additional telemetry was added as well as voltage control integrated
-into the miner for C1100 and U50C.  FK33 voltages can still only be controlled
-through the SQRL bridge.  Voltage control through TRM also requires flashing a
-custom firmware provided by TRM.  Descriptions of the flash procedure, voltage
-control arguments, and tuning examples are included below in separate sections.
-Adding voltage control is highly recommended since the stock vccint voltage is
-higher than needed and lowering vccint is an easy way to save 7-10W of power
-per card.
+into the miner for C1100 and U50C.  Voltage control through TRM also requires
+flashing a custom firmware provided by TRM.  Descriptions of the flash
+procedure, voltage control arguments, and tuning examples are included below in
+separate sections.  Adding voltage control is highly recommended since the
+stock vccint voltage is higher than needed and lowering vccint is an easy way
+to save 7-10W of power per card.
+
+In v0.10.7, additional support was added for setting voltages on TH53/55 and
+FK33 boards.
 
 Due to limited voltage regulator capacity for the HBM2 memory parts of the fpga
 on FK33 (20A) and U50C (24A), TRM limits the allowed overclocking range on both
@@ -115,16 +117,18 @@ sudo /opt/xilinx/xrt/bin/xbmgmt program -d 0000:03:00.0 --base --force
 
 Voltage Tuning
 ==============
-With a flashed custom TRM firmware, the U50C and C1100 can use the integrated
-voltage control in the miner.  FK33s still need to use the SQRL Bridge.  The
-tuning process is similar regardless of which tool sets the voltages.  That
-said, FK33s don't have much room to navigate due the limited HBM2 power rail,
-and should run at the suggested lowest possible voltages unless you have decided
-to override the safety limits and test a higher config.
+Voltage control for TH53, TH55, FK33, U50C, and C1100 is provided in TRM as of
+version v0.10.7 (U50C and C1100 will need to install custom TRM firmware).
+Other boards will need to use external tools to set voltages.  The tuning
+process is similar regardless of which tool sets the voltages.  
 
-To control voltages using TRM, you use two or three arguments. The U50C does not
-support changing the mem voltage and should only use the vccint and vccbram
-arguments. Example:
+It should be noted that FK33s don't have much room to navigate due the limited
+HBM2 power rail, and should run at the suggested lowest possible voltages
+unless you have decided to override the safety limits and test a higher config.
+
+To control voltages using TRM, you use two or three arguments. The
+U50C/TH53/TH55 do not support changing the mem voltage and should only use the
+vccint and vccbram arguments. Example:
 
 --fpga_vcc_int=x,y,z,...
 --fpga_vcc_bram=x,y,z,...
@@ -135,7 +139,7 @@ miner --help output for more details.  If you have a mixed rig with different
 types of fpgas you can skip devices with empty strings.  Assuming your order is
 one FK33, one ECU50 and one C1100, you would use e.g.:
 
---fpga_vcc_int=,750,750 --fpga_vcc_bram=,850,850 --fpga_vcc_mem=,,1200
+--fpga_vcc_int=733,750,750 --fpga_vcc_bram=822,850,850 --fpga_vcc_mem=1164,,1200
 
 Fpga devices in TRM are by default sorted in DNA order and then enumerated
 0,1,2,... The main point is to get a static device order across reboots without
@@ -322,9 +326,8 @@ the very well designed thermal solution on the board.  Once verified with TUL,
 we will raise the safety limit.)
 
 The cards generally run very well at 575 MHz core, 1125 MHz mem for 69.14 MH/s.
-While the cards are capable of adjusting vccint, TRM does not yet support
-voltage tuning for the TH53/TH55. Unfortunately controlling the vccmem voltage
-is not possible on TH53/TH55 devices, and the default vcchbm is 1.40V.
+Unfortunately controlling the vccmem voltage is not possible on TH53/TH55
+devices, and the default vcchbm is 1.40V.
 
 
 Tuning Osprey E300

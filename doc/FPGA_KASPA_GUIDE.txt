@@ -2,6 +2,7 @@ TeamRedMiner FPGA Kaspa Guide
 =============================
 
 History:
+v1.1 2022-12-23 Updated for new voltage support on TH53/55 and FK33.
 v1.0 2022-10-18 Initial Version.
 
 General Overview
@@ -98,24 +99,31 @@ boards.  The VCCINT regulators should be rated to 180A.
 Tuning SQRL Forest Kitten 33
 ============================
 Unfortunately unmodified FK33s are very limited in their voltage control
-capabilities.  The original FK33s can only reduce the vccint voltage to 0.776mV.
-This coupled with their 120A rated vccint regulators, will limit the maximum
-hashrate and efficiency.  For stock FK33s, we recommend setting the lowest
-possible voltage of 0.776mV and not exceeding 475MHz for core clock, at which
-point the regulators will roughly be running at the full 120A limit.
+capabilities.  With the new voltage control support in TRM v0.10.7, vccint
+voltage can now be dropped to to 0.733mV for unmodified cards, and down to 600mV
+for cards with the resistor modification.  See FPGA_FK33_MOD.txt for details on
+how to modify FK33s to allow lower voltage settings.  Due to the FK33's limited
+voltage range and 120A rated vccint regulators, the maximum hashrate and
+efficiency will be limited compared to other boards.  For stock FK33s, we
+recommend setting the lowest possible voltage of 0.733mV and not exceeding
+525MHz for core clock, at which point the regulators will roughly be running
+just below the full 120A limit.
 
-For FK33s modified to run voltages down to ~615mV, we find that you can run up
-to about 625-650MHz before exceeding the 120A, however you will likely start
-seeing errors above roughly 600MHz.
+For FK33s modified to run voltages down to ~600mV, we find that you can run up
+to about 700MHz before exceeding the 120A, however you will likely start
+seeing errors above roughly 625MHz.
 
 
 Tuning TUL TH53/TH55
 ===========================
 The TH53/TH55 should be able to supply at least 180A from the vccint regulators.
-We suggest checking with manufacturer specs to ensure current ratings.  TRM does
-not currently monitor or control voltage settings on TH53/TH55.  Users should
-use manufacturer tools to set voltages and monitor current.
-
+Starting in version v0.10.7 TRM can now set VCCINT and VCCBRAM voltages on TH53
+and TH55 cards, as well as read current board metrics such as regulator output
+current and temperatures (printed when using --debug).  Since both boards have
+the same power delivery and cooling design, but the TH53 has a smaller VU33P
+FPGA, the TH53 can push significantly higher clocks than the TH55 while stay
+with-in the limits of the power and cooling capabilities.  Achieving these
+higher clock rates will come at the cost of efficiency.
 
 Tuning Osprey E300
 ===========================
@@ -135,7 +143,7 @@ current/power values from the CVP13.  We find that CVP13s typically will run
 stabily at around 570MHz at 600mV.
 
 
-SQRL BCU1525/TUL BTU9P/Osprey ECU200
+SQRL BCU1525/TUL BTU9P/Osprey ECU200/VCU1525/Alveo U200
 ===========================
 Thes boards are all clones of the original VCU1525 Xilinx dev board that become
 one of the first widely used FPGA mining platforms.  Owners of these boards will

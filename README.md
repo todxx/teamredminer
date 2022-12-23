@@ -1,4 +1,4 @@
-# teamredminer v0.10.6
+# teamredminer v0.10.7
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -115,7 +115,7 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - TUL TH53/55
 - Osprey E300
 - Bittware CVP13
-- SQRL BCU1525/TUL BTU9P/Osprey ECU200
+- SQRL BCU1525/TUL BTU9P/Osprey ECU200/Aleo U200/VCU1525
 
 Supported FPGA algorithms and their respective dev fees:
 
@@ -143,6 +143,16 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.7
+#### Changes
+- GPU:  Added dual ERG+KAS mining support for all supported gpus (see DUAL_ERGO_MINING.txt).
+- GPU:  Fixed semi-broken dual zil mining for older algos (Nimiq, Argon2, x16r, and others).
+- FPGA: Added support for running higher than 700MHz on Kaspa.
+- FPGA: Added voltage control for TH53, TH55, and FK33.
+- FPGA: Added support for Kaspa on VCU1525 and Aleo U200 boards.
+- FPGA: Possible fix for crashes after network outage when mining Kaspa.
+- FPGA: Added description of FK33 voltage mod, see FPGA_FK33_MOD.txt.
 
 ### v0.10.6
 #### Changes

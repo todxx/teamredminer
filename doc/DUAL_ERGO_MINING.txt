@@ -1,0 +1,63 @@
+Team Red Miner Dual Coin ERGO Mining
+====================================
+
+2022-12-22 Initial version
+
+Overview
+--------
+To mine using autolykos2+kaspa (which is the only supported dual
+algo), take a working TRM autolykos2 command line and add a KAS
+section in the middle or at the end:
+
+--kas -o stratum+tcp://pool.woolypooly.com:3112 -u <kaspa wallet>.<worker> -p x --kas_end
+
+If you don't want to dual mine on all devices, you can add a device
+selection argument inside the --kas .. --kas_end clause. If you only
+want to dual mine on gpu 0 and gpu 3 you would use:
+
+--kas -d 0,3 -o stratum+tcp://pool.woolypooly.com:3112 -u <kaspa wallet>.<worker> -p x --kas_end
+
+The dual mining setup for autolykos2 lets the user split the capacity
+between autolykos2 and the second algo using the --dual_intensity
+argument (please see the separate section below).
+
+Power draw in dual mining will often be HIGH, especially on Vegas and
+Polaris gpus. It depends on what clocks you're coming from. Use core
+clock adjustments and the argument --dual_intensity (see --help or
+USAGE.txt) to keep power draw in check.
+
+Last, see the dual mining section in USAGE.txt or the miner's --help
+output for additional arguments.
+
+
+Dual Intensity Tuning
+---------------------
+For autolykos2 dual mining, you can balance the primary and dual algo
+using the --dual_intensity argument:
+
+- The argument range is 0.0-1.0. Zero means full autolykos2 mining, 1.0
+  means full dual algo.
+
+- If you don't specify the --dual_intensity argument, the dual
+  auto-tuner will scan the range and choose a sensible value per
+  gpu. You can observe the tuning results in the rightmost column in
+  the miner stats output.
+
+- You can enumerate values per gpu with a comma-separated list, e.g.
+  --dual_intensity=0.4,0.4,0.7,0.7
+
+- If the list is shorter than the number of gpus, the first value is
+  used for the remainder of the gpus. This implies that a single value
+  passed with --dual_intensity=0.3 will be used for all gpus.
+
+- The argument can be placed anywhere on the command line, it does not
+  need to be inside the --kas .. --kas_end range.
+
+- It is _not_ recommended to use extreme values close to zero or one,
+  for such setups it's better to simply mine a single algo instead.
+
+- Dual intensity values will typically end up in the 0.25-0.75 range.
+
+- If you want to control the dual auto-tuner behavior, TRM provides
+  the --dual_tuner_weights=X:Y:Z argument. This argument is described
+  in detail in USAGE.txt and the miner's --help output.
