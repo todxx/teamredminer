@@ -1,6 +1,7 @@
 Team Red Miner Dual Coin ERGO Mining
 ====================================
 
+2023-01-27 Updated with short note about triple mining with zil.
 2022-12-22 Initial version
 
 Overview
@@ -28,6 +29,9 @@ USAGE.txt) to keep power draw in check.
 
 Last, see the dual mining section in USAGE.txt or the miner's --help
 output for additional arguments.
+
+NOTE: to enable triple mining with ZIL, just add an appropriate --zil
+... --zil_end clause as per the instructions in DUAL_ZIL_MINING.txt.
 
 
 Dual Intensity Tuning

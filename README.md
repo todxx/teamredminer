@@ -1,4 +1,4 @@
-# teamredminer v0.10.7
+# teamredminer v0.10.8
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -143,6 +143,16 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.8
+#### Changes
+- GPU:  Kawpow on Polaris 4GB gpus extended to epoch 369 (end of April 2023).
+- GPU:  Tiny Kaspa gpu hashrate boost across all gpus (+0.1%).
+- GPU:  Added triple ERG+KAS+ZIL and ETH+KAS+ZIL mining support, add both --kas and --zil sections to enable.
+- GPU:  R-mode support in dual/triple ZIL mining. Specify --eth_config=R inside --zil ... --zil_end to enable.
+- GPU:  Fixed HiveOS ERG+KAS issues with stray hw errs reported on RDNA2 gpus.
+- GPU:  Fixed additional small issues with dual zil mining paired with older algos.
+- GPU:  Fixed hw err issues for verthash when running with R-mode kernel params.
 
 ### v0.10.7
 #### Changes

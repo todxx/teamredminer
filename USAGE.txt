@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.7
+          Team Red Miner version 0.10.8
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -53,6 +53,10 @@ Options:
       --api2_listen=IP:PORT Enables a second api port for dual mining setups.  This api endpoint will provide data for the
                               dual mining algo, just like if two separate miner instances were running in parallel.  The 
                               default setting is 127.0.0.1:4029, i.e. the port is 4029 and not 4028.  For specifying your
+                              own choice, the argument is formatted like --api_listen.  Multiple instances of this argument is
+                               now possible for separate endpoints.
+      --api3_listen=IP:PORT Enables a third api port for triple mining setups.  This api endpoint will provide data for the
+                              tertiary mining algo, typically zil. The default setting is 127.0.0.1:4030.  For specifying your
                               own choice, the argument is formatted like --api_listen.  Multiple instances of this argument is
                                now possible for separate endpoints.
 
@@ -565,6 +569,8 @@ Verthash options:
       --verthash_max_uploads=N  Some motherboards have issues with all gpus in the rig uploading the verthash table
                               at the same time.  This argument limits the number of concurrent gpus that are uploading
                               the table at the same time at startup.  Allowed values are 1-32.  The default value is 4. 
+      --verthash_verify_upload  Read back the verthash table from the gpu to verify that it has been written ok. Add this
+                              option if you have issues with stray hw errs on one or more gpus in the rig.
 
 Autolykos2 options:
       --autolykos_mem_adjust=N  Sets the amount of memory in MiB that the miner should leave unused when allocating

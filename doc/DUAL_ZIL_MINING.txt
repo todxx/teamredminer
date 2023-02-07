@@ -1,9 +1,16 @@
 Team Red Miner Dual ZIL Mining
 ==============================
-This document describes how to enable dual ZIL mining in TRM together
-with a range of other primary algos. It describes both the new
-mechanism introduced in v0.8.3 and the older variant that only can be
-used when the primary algo is ethash (including etchash).
+
+
+2023-01-27 Added short note around triple mining setups.
+2022-08-03 Updated with --zil ... --zil_end mechanism.
+2021-05-13 Initial version.
+
+
+This document describes how to enable dual or triple ZIL mining in TRM
+together with a range of other primary algos. It describes both the
+new mechanism introduced in v0.8.3 and the older variant that only can
+be used when the primary algo is ethash (including etchash).
 
 
 New mechanism from v0.8.3
@@ -33,6 +40,12 @@ optimal for most setups with the following settings:
   can be combined with using any mode (including R-mode) for the
   primary ethash mining.
 
+Dual or Triple Mining
+---------------------
+There is no difference between adding zil as a dual or triple mining
+algo. Just add the same --zil ... ---zil_end clause. It doesn't matter
+if you add it to an existing single algo or dual mining setup like
+eth+kas or erg+kas.
 
 Pool Support
 ------------

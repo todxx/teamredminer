@@ -1,6 +1,7 @@
 Team Red Miner Dual Coin ETH Mining
 ===================================
 
+2023-01-27 Updated with short note about triple mining with zil.
 2022-10-16 Updated for Kaspa dual mining.
 
 TL;DR
@@ -39,6 +40,8 @@ tuner outputs as expected hashrate. Hashrate will also vary slightly between
 Last, see the dual mining section in USAGE.txt or the miner's
 --help output for additional arguments.
 
+NOTE: to enable triple mining with ZIL, just add an appropriate --zil
+... --zil_end clause as per the instructions in DUAL_ZIL_MINING.txt.
 
 Overview
 --------

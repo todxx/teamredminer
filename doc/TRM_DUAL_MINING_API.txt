@@ -1,58 +1,60 @@
 Team Red Miner Dual Mining API Usage
 ====================================
 This document describes how to use TRM's sgminer-compatible API when
-dual mining is enabled. For resources on the sgminer api in general,
-please see e.g.
+dual (or triple) mining is enabled. For resources on the sgminer api
+in general, please see e.g.
 
 https://github.com/genesismining/sgminer-gm/blob/master/doc/API.md
 
 
 Overview
 --------
-When TRM runs two algos, two separate contexts are used
+When TRM runs more than one algo, separate contexts are used
 internally. This is applicable both for dual eth+zil mining when the
 --zil .. --zil_end arguments are used and for true dual mining like
-eth+ton.
+eth+ton or eth+kas. Then a dual mining setup like eth+kas is used
+together with --zil .. --zil_end, three contexts are available.
 
 API requests are sometimes only returning global data applicable for
 all algos, but many times a request provides data for a specific algo,
 like hashrates, pool data, and more. When algo-specific data is
 returned, data is always pulled from a single specific context. To
-pull data for both algos, you must issue multiple requests or
+pull data for all algos, you must issue multiple requests or
 subcommands. TRM provides two different approaches for doing so, both
 described below.
 
 
 Added fields
 ------------
-To know if there's dual mining ongoing or not, a field called "Algo
-Count" has been added to the CONFIG command. It will always return 1
-or 2 depending on the nr of concurrent algos being mined.
+To know if there's multi-algo mining ongoing or not, a field called
+"Algo Count" has been added to the CONFIG command. It will always
+return 1, 2, or 3 depending on the nr of concurrent algos being mined.
 
 
-Solution 1: use --api2_listen
------------------------------
-This solution acts like if two separate instances of TRM were running
-on the same machine, mining two different algos on the same set of
+Solution 1: use --api2_listen or --api3_listen
+----------------------------------------------
+This solution acts as if multiple separate instances of TRM were
+running on the same machine, mining different algos on the same set of
 gpus. The standard api is enabled by passing the --api_listen
 argument, possibly with an interface IP address and/or a port. A
-second such argument is now available, --api2_listen. This will open
-another port for a second api endpoint. The miner will only open the
-second api endpoint if dual mining is configured.
+second and third such argument is now available, --api2_listen and
+--api3_listen. This will open additional ports with api endpoints. The
+miner will only open the second and third api endpoints if dual or
+triple mining is configured.
 
 All requests to the first --api_listen endpoint will return data for
 the primary algo being mined. Requests to the second endpoint defined
-by --api2_listen will return data for the secondary algo. Both
-endpoints are full API providers and will reply to all available
-commands.
+by --api2_listen will return data for the secondary algo. The endpoing
+in --api3_listen serves the tertiary algo. All endpoints are full API
+providers and will reply to all available commands.
 
 This solution is useful when using external tools that supports the
-sgminer api (Awesome Miner is one example). You can enable both api
-endpoints, then add each rig as two separate instances.
+sgminer api (Awesome Miner is one example). You can enable multiple
+api endpoints, then add each rig as (multiple) separate instances.
 
 
-Solution 2: append 1 or 2 to command names
-------------------------------------------
+Solution 2: append 1, 2, or 3 to command names
+----------------------------------------------
 By modifying the command names available in the sgminer api
 (e.g. "config", "devs", "summary") and appending a single digit, TRM
 will return data for the algo in question. In other words, running the
@@ -65,7 +67,7 @@ especially if you run multiple sub-commands in a single request. For
 example, this JSON request would provide most of the data you might
 need in a single request:
 
-{"command":"devs+summary+pools+devs2+summary2+pools2"}
+{"command":"devs+summary+pools+devs2+summary2+pools2+devs3+summary3+pools3"}
 
-Whenever a second algo isn't available, the three latter requests will
-return "Invalid command" replies.
+Whenever a second or third algo isn't available, the latter requests
+will return "Invalid command" replies.
