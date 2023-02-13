@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.8
+          Team Red Miner version 0.10.9
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -592,6 +592,10 @@ Autolykos2 options:
       --autolykos_ignore_diff Ignores the difficulty sent by the pool and only uses the 256-bit target provided in jobs.
                               Some pools don't follow the ERGO reference miner pool implementation, in which case this
                               argument _might_ help. NOTE: this will be applied to all pools.
+      --autolykos_threads=LIST  Specifies if the gpu should use one or two threads driving execution.  Using a single thread
+                              throttles execution slightly and is default on display gpus. In all other cases the default nr
+                              threads is 2.  Allowed values are 1, 2, or empty in a comma-separated list.  If a gpu does not
+                              have a specified value, any specified value for the first gpu is used, otherwise the default.
 
 ZIL dual mining options:
       --zil_start or --zil  Starts the ZIL dual mining config.  Between this and the --zil_end marker, all arguments are
@@ -728,4 +732,9 @@ FPGA Options:
 
       --fpga_eth_clk_dag=LIST Sets FPGA core clock frequencies to be used during Ethash DAG building. By default these
                               will be set to 90% of the regular core clock. The format is the same as --fpga_clk_core.
+      --fpga_e300           Enables scanning for E300 jtag interfaces (should only be used on E300s).
+      --fpga_jc_addr=IPLIST Enables connecting to SQRL JCC2L carriers for running JCMs.  The parameter IPLIST should be
+                              a comma separated list of IP addresses of the JCC2L carriers.
+                                Examples:   --fpga_jc_addr=192.168.10.3
+                                            --fpga_jc_addr=192.168.10.13,192.168.10.57,192.168.11.243
 
