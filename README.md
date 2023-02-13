@@ -1,4 +1,4 @@
-# teamredminer v0.10.8
+# teamredminer v0.10.9
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -24,6 +24,7 @@ The miner is configured via command line only, please run with the --help option
 GPUs supported and tested:
 - Navi - RX 5700(XT)/5600(XT)/5500(XT) for supported algos in the table below.
 - Big Navi - RX 6900XT, RX 6800(XT), RX 6700(XT), RX6600XT - same support as for Navi.
+- RDNA3 - 7900XT, 7900XTX, see Navi30 in the table below for supported algos.
 - Vega - RX Vega 64/56, Vega FE, Radeon VII (Vega 2)
 - Polaris - RX 580/480/570/470/560/460/550
 - Fiji - R9 Fury/Fury X/Nano, MI8 (supported but with very limited testing).
@@ -67,39 +68,39 @@ Supported GPU algorithms and their respective dev fees:
 
 Some algorithms are not supported on some GPU architectures and/or drivers.  Below is the compatiblity table:
 
-|                          | Navi | Vega | Polaris | Fiji | Tonga |
-| ------------------------ |:----:|:----:|:-------:|:----:|:-----:|
-| Ethash                   |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Kawpow                   |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Verthash                 |  Y   |  Y   |   Y     |   Y  |   N   |
-| Autolykos2               |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Firopow                  |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Ton                      |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Kaspa                    |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Nimiq                    |  Y   |  Y   |   Y     |   Y  |   N   |
-| Cryptonight R            |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight v8 upx2      |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight v8 turtle    |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight v8 half      |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight v8 double    |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight v8 rwz       |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight v8           |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight heavy        |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight haven        |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight saber        |  N   |  L   |   L     |   L  |   N   |
-| Cryptonight conceal      |  N   |  L   |   L     |   L  |   N   |
-| Chukwa-512               |  N   |  L   |   L     |   L  |   N   |
-| Chukwa-1024              |  N   |  L   |   L     |   L  |   N   |
-| x16r                     |  N   |  Y   |   Y     |   Y  |   N   |
-| x16rv2                   |  N   |  Y   |   Y     |   Y  |   N   |
-| x16s                     |  N   |  Y   |   Y     |   Y  |   N   |
-| x16rt                    |  N   |  Y   |   Y     |   Y  |   N   |
-| MTP                      |  Y   |  Y   |   Y     |   Y  |   N   |
-| Cuckatoo31               |  N   |  Y   |   Y     |   Y  |   N   |
-| Cuckarood29              |  N   |  Y   |   Y     |   Y  |   N   |
-| Lyra2rev3                |  N   |  L   |   L     |   L  |   N   |
-| Lyra2z                   |  N   |  L   |   L     |   L  |   N   |
-| Phi2                     |  N   |  L   |   L     |   L  |   N   |
+|                          | Navi30 | Navi | Vega | Polaris | Fiji | Tonga |
+| ------------------------ |:------:|:----:|:----:|:-------:|:----:|:-----:|
+| Ethash                   |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Kawpow                   |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Verthash                 |   Y    |  Y   |  Y   |   Y     |   Y  |   N   |
+| Autolykos2               |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Firopow                  |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Ton                      |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Kaspa                    |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Nimiq                    |   N    |  Y   |  Y   |   Y     |   Y  |   N   |
+| Cryptonight R            |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 upx2      |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 turtle    |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 half      |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 double    |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8 rwz       |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight v8           |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight heavy        |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight haven        |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight saber        |   N    |  N   |  L   |   L     |   L  |   N   |
+| Cryptonight conceal      |   N    |  N   |  L   |   L     |   L  |   N   |
+| Chukwa-512               |   N    |  N   |  L   |   L     |   L  |   N   |
+| Chukwa-1024              |   N    |  N   |  L   |   L     |   L  |   N   |
+| x16r                     |   N    |  N   |  Y   |   Y     |   Y  |   N   |
+| x16rv2                   |   N    |  N   |  Y   |   Y     |   Y  |   N   |
+| x16s                     |   N    |  N   |  Y   |   Y     |   Y  |   N   |
+| x16rt                    |   N    |  N   |  Y   |   Y     |   Y  |   N   |
+| MTP                      |   N    |  Y   |  Y   |   Y     |   Y  |   N   |
+| Cuckatoo31               |   N    |  N   |  Y   |   Y     |   Y  |   N   |
+| Cuckarood29              |   N    |  N   |  Y   |   Y     |   Y  |   N   |
+| Lyra2rev3                |   N    |  N   |  L   |   L     |   L  |   N   |
+| Lyra2z                   |   N    |  N   |  L   |   L     |   L  |   N   |
+| Phi2                     |   N    |  N   |  L   |   L     |   L  |   N   |
 
 Support legend:
  - Y = Supported
@@ -113,9 +114,10 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - SQRL Forest Kitten 33 - performance limited by product design, see guide for details
 - Xilinx/TUL/Osprey U50C/ECU50
 - TUL TH53/55
-- Osprey E300
+- Osprey E300 (vu33p, vu33p_CIV, vu35p, vu35p_CIV, vu9p)
 - Bittware CVP13
 - SQRL BCU1525/TUL BTU9P/Osprey ECU200/Aleo U200/VCU1525
+- SQRL JC33 and JC35 on JCC2L carriers
 
 Supported FPGA algorithms and their respective dev fees:
 
@@ -125,10 +127,20 @@ Supported FPGA algorithms and their respective dev fees:
 | Kaspa                     | 10.0% |
 
 FPGA device/algo compatibility table:
-|                          | C1100 | FK33 | U50C/ECU50 | TH53 | TH55 | E300 | CVP13 | BCU1525/BTU9P/ECU200 |
-| ------------------------ |:-----:|:----:|:----------:|:----:|:----:|:----:|:-----:|:--------------------:|
-| Ethash                   |   Y   |  Y   |     Y      |   Y  |  Y   |  Y   |   N   |           N          |
-| Kaspa                    |   Y   |  Y   |     Y      |   Y  |  Y   |  Y   |   Y   |           Y          |
+
+|                             | Ethash | Kaspa |
+| --------------------------- |:------:|:-----:|
+| C1100                       |   Y    |   Y   |
+| FK33                        |   Y    |   Y   |
+| U50C/ECU50                  |   Y    |   Y   |
+| TH53                        |   Y    |   Y   |
+| TH55                        |   Y    |   Y   |
+| E300 (vu35p_CIV)            |   Y    |   Y   |
+| E300 (others)               |   N    |   Y   |
+| CVP13                       |   N    |   Y   |
+| BCU1525/BTU9P/ECU200/U200   |   N    |   Y   |
+| JC33/JC35 on JCC2L          |   N    |   Y   |
+
 
 -----------
 
@@ -143,6 +155,13 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+
+### v0.10.9
+#### Changes
+- GPU:  Added support for RDNA3 / 7900XT gpus (ethash, autolykos2, kaspa, verthash incl dual combos supported).
+- FPGA: Added support for JC33s and JC35s on JCC2Ls
+- FPGA: Added support for E300 with vu33p, vu33p_CIV, vu35p, and vu9p parts.
+- FPGA: Added support for Alveo U200 active cooled variant.
 
 ### v0.10.8
 #### Changes
