@@ -155,3 +155,23 @@ From our early testing, we see that boards can typically run somewhere between
 regulator temperatures as TRM does not monitor or report these.
 
 
+SQRL JC33/JC35 on JCC2L Carrier
+===========================
+The SQRL JungleCat modules (JCMs) have good power delivery and good cooling when
+run in a liquid cooled loop.  As of version v0.10.9 TRM can now run JC33 and
+JC35 modules on JCC2L carriers using the --fpga_jc_addr option to specify
+carrier IP addresses.  TRM does not currently have the ability to set voltages
+or monitor the regulators on JCMs, thus users will need other tools like the
+SQRL bridge to set voltages, and will need to run moderate clocks/voltages to
+ensure that there is plenty of margin on the regulators, unless they have an
+external method of monitoring them.  The JCMs have a design maximum current
+handle capability of 240A, though we have not verified how well they run at max
+current.  Our testing shows that JC33s can safely run up to 850MHz@~750mV,
+though this will not be practical due to the large drop in efficiency at higher
+voltages.  While we have not done thorough testing on the JC35s, we generally
+suggest users to not exceed 750MHz core clock as this should result in
+approximately 200A of VCCINT current.  In general we suggest that users should
+monitor temperatures closely, especially when testing new settings.  We suggest
+not exceeding a core temperature of 60-65C on liquid cooled modules. 
+
+
