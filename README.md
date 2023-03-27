@@ -13,7 +13,6 @@ Below is a list of mining operating systems and management software that have bu
  - [Hive OS](https://hiveos.farm/)
  - [Minerstat](https://minerstat.com/)
  - [Awesome Miner](https://www.awesomeminer.com/)
- - [PiMP OS](https://getpimp.org/)
  - [RaveOS](https://raveos.com/)
 
 This miner supports a range of algorithms.  Please see the list below for details.
