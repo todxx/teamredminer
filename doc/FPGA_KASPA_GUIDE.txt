@@ -127,10 +127,12 @@ higher clock rates will come at the cost of efficiency.
 
 Tuning Osprey E300
 ===========================
-The Osprey E300 is rather overbuilt with VCCINT regulators rated to 420A.  Users
+The Osprey E300 is rather overbuilt with VCCINT regulators rated to 420A. Users
 with E300s can safely push higher clocks and should just keep an eye on
 temperatures.  For high efficiency, we find that most E300s run well at
-575MHz@600mV. 
+575MHz@600mV.  For vu13p boards we suggest starting tuning at 500MHz@600mV, and
+moving clock up as necessary while monitoring temperatures and regulator 
+currents.
 
 
 Bittware CVP13
@@ -174,4 +176,9 @@ approximately 200A of VCCINT current.  In general we suggest that users should
 monitor temperatures closely, especially when testing new settings.  We suggest
 not exceeding a core temperature of 60-65C on liquid cooled modules. 
 
+SQRL JC13
+===========================
+We have little experience with the JC13s, so we suggest starting tuning at
+400MHz@625mV and slowly increasing clock frequency while monitoring power
+usage and temperature.
 

@@ -1,0 +1,41 @@
+Team Red Miner Event Script
+===========================
+
+2023-04-04 Initial version.
+
+Overview
+--------
+This document describes the simple event script mechanism added in TRM
+v0.10.10. It addresses certain situations when you may want to reconfigure
+your setup using external scripts at specific triggers. The current list
+of events is short as this feature was mainly added to allow external shells
+scripts to reconfigure clocks during zil switch mining. Future requests might
+lead to more events being added.
+
+Setup
+-----
+Create a shell script (Linux) or .bat file (Windows). Add an argument with
+--event_script=my_event_script.sh or --event_script=my_event_script.bat. This
+script will now be called on certain events during the miner execution.
+
+Script Execution
+----------------
+When the script executes, it is always passed an event name, and possibly an
+additional argument. The script will execute synchronously, i.e. the miner will
+not continue to execute before the event script has completed.
+
+Events
+------
+These are the current events fired whenever an event script has been configured:
+
+MINER_START         Fires during the miner startup process. Good for testing
+                    your event script. This event has no argument.
+
+PRIMARY_ALGO        Fires when the miner switches to the primary algo. The script
+                    could e.g. configure clocks suitable for the main algo being
+                    mined.
+
+SECONDARY_ALGO      Fires when the miner switches to the secondary algo (ZIL).
+                    The script could e.g. configure clocks suitable for zil/ethash
+                    mining.
+

@@ -1,11 +1,17 @@
 Team Red Miner Dual Coin ETH Mining
 ===================================
 
+2023-04-19 Updated with ironfish info.
 2023-01-27 Updated with short note about triple mining with zil.
 2022-10-16 Updated for Kaspa dual mining.
 
 TL;DR
 -----
+Supported algos are kaspa and ironfish. To mine ironfish instead of
+kaspa, replace all --kas and --kas_end with --iron and --iron_end
+below. The guide itself is not updated after the initial version
+describing ETH+KAS.
+
 To mine Ethash+Kaspa (or TON, which is a dead algo at the time of writing),
 take a working TRM ethash command line and add a KAS section in the
 middle or at the end:

@@ -1,4 +1,4 @@
-# teamredminer v0.10.9
+# teamredminer v0.10.10
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -41,6 +41,7 @@ Supported GPU algorithms and their respective dev fees:
 | Autolykos2                | 2.0% |
 | Ton                       | 1.0% |
 | Kaspa                     | 1.0% |
+| Ironfish                  | 1.0% |
 | Nimiq                     | 2.5% |
 | Cryptonight R             | 2.5% |
 | Cryptonight v8 upx2       | 2.5% |
@@ -77,6 +78,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Firopow                  |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Ton                      |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Kaspa                    |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Ironfish                 |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Nimiq                    |   N    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Cryptonight R            |   N    |  N   |  L   |   L     |   L  |   N   |
 | Cryptonight v8 upx2      |   N    |  N   |  L   |   L     |   L  |   N   |
@@ -114,10 +116,10 @@ FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - SQRL Forest Kitten 33 - performance limited by product design, see guide for details
 - Xilinx/TUL/Osprey U50C/ECU50
 - TUL TH53/55
-- Osprey E300 (vu33p, vu33p_CIV, vu35p, vu35p_CIV, vu9p)
+- Osprey E300 (vu33p, vu33p_CIV, vu35p, vu35p_CIV, vu9p, vu13p)
 - Bittware CVP13
 - SQRL BCU1525/TUL BTU9P/Osprey ECU200/Aleo U200/VCU1525
-- SQRL JC33 and JC35 on JCC2L carriers
+- SQRL JC33, JC35, JC13 on JCC2L/F carriers
 
 Supported FPGA algorithms and their respective dev fees:
 
@@ -139,7 +141,7 @@ FPGA device/algo compatibility table:
 | E300 (others)               |   N    |   Y   |
 | CVP13                       |   N    |   Y   |
 | BCU1525/BTU9P/ECU200/U200   |   N    |   Y   |
-| JC33/JC35 on JCC2L          |   N    |   Y   |
+| JC33/JC35/JC13 on JCC2L/F   |   N    |   Y   |
 
 
 -----------
@@ -155,6 +157,16 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.10
+#### Changes
+- GPU:  Added support for ironfish (-a ironfish, only the fast stratum protocol v2 supported).
+- GPU:  Dual mining support for ironfish with ERG and ethash (use --iron ... --iron_end).
+- GPU:  Addressed sluggish and lagging display with KAS solo mining (and ironfish).
+- GPU:  Added support for the ZIL ZMP protocol. Use zil:// in --zil .. --zil_end or normal pool configs.
+- GPU:  Added event script for calling external scripts on e.g. algo switching, see --event_script.
+- GPU:  Added support for switching between separate clocks/voltages on windows for zil switching.
+- FPGA: Added support for JC13s and JCC2F carriers.
+- FPGA: Added support for vu13ps on E300 boards.
 
 ### v0.10.9
 #### Changes

@@ -2,6 +2,7 @@ Team Red Miner Dual ZIL Mining
 ==============================
 
 
+2023-04-04 Added note regarding automatic clock switching on Windows.
 2023-01-27 Added short note around triple mining setups.
 2022-08-03 Updated with --zil ... --zil_end mechanism.
 2021-05-13 Initial version.
@@ -12,6 +13,13 @@ together with a range of other primary algos. It describes both the
 new mechanism introduced in v0.8.3 and the older variant that only can
 be used when the primary algo is ethash (including etchash).
 
+Clock switching
+---------------
+From v0.10.10, TRM supports switching automatically between clocks for the main
+algo and ZIL. This is only possible with the newer ZIL switching mechanism using
+--zil ... --zil_end arguments. You place one set of clk/voltage arguments for the
+primary algo outside the --zil ... ---zil_end arguments, and another set for the
+ZIL mining inside --zil ... ---zil_end.
 
 New mechanism from v0.8.3
 -------------------------
