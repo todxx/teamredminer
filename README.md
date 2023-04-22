@@ -1,4 +1,4 @@
-# teamredminer v0.10.10
+# teamredminer v0.10.11
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -157,6 +157,13 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.11
+#### Changes
+- GPU:  Small improvements for ironfish hashrate/efficiency on all gpus.
+- GPU:  Fixed low ironfish hashrate for RDNA3 / 7900XT.
+- GPU:  Automatic handling of ironfish worker name when specified as wallet.worker.
+- GPU:  User can now set their own graffiti prefix (max 20 chars) when mining ironfish (see --iron_user_graffiti) to paint the blockchain!
+
 ### v0.10.10
 #### Changes
 - GPU:  Added support for ironfish (-a ironfish, only the fast stratum protocol v2 supported).
