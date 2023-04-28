@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.11
+          Team Red Miner version 0.10.12
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -647,11 +647,6 @@ TON options:
                               system is already using port 4444 for some other tcp/ip service.
 
 Ironfish options:
-      --iron_user_graffiti=X  Specifies a user graffiti that will be used during mining.  This means that any blocks found by this
-                              rig will include this graffiti on the blockchain.  The max length is 20 bytes/characters.  This
-                              feature can be very valuable to solo miners.  By setting your own graffiti it is possible to verify
-                              if any of your submitted shares matching network difficulty made it onto the blockchain, both in
-                              solo node setups as well as in pool solo mining.
       --rig_id=X            Set the rig name that will be sent to the pool. This can also be specified using the more standard
                               wallet.worker format, and the miner will move the worker name automatically to this argument.
 

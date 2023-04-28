@@ -1,4 +1,4 @@
-# teamredminer v0.10.11
+# teamredminer v0.10.12
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -157,6 +157,12 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.12
+#### Changes
+- GPU:  Improved ironfish hashrate (+5-6% on all gpus, +10-11% for Polaris).
+- GPU:  Removed ironfish user graffiti option.
+- GPU:  Fixed broken dual zil mining for some older algos, e.g. Nimiq.
+
 ### v0.10.11
 #### Changes
 - GPU:  Small improvements for ironfish hashrate/efficiency on all gpus.
