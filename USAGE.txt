@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.12
+          Team Red Miner version 0.10.13
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -136,6 +136,8 @@ Options:
                               related to the event.  See the guide TRM_EVENT_SCRIPT.txt in the miner package for information
                               on available events.  The provided parameter should be a path to an executable script, either an
                               absolute path or relative to the miner working directory.
+      --use_distro_features  Enables any opt-in mining distro features that are detected as applicable. 
+      --no_distro_features  Disables any automatically enabled mining distro features. 
 
 Pool config options:
   -o, --url=URL             Sets the pool URL.  Currently stratum+tcp and stratum+ssl URLs are supported
@@ -718,14 +720,19 @@ Ethash dual mining options:
 FPGA Options: 
       --fpga_devices=LIST   Sets FPGA devices to use from detected list. LIST should be a comma separated list of either 
                               device indices or device DNAs as shown by --list_devices.
-                                Examples:   -d 0,1,2,4
-                                            -d 40020000013ae32135111111,40020000013ae32135222222,40020000013ae32135333333
+                                Examples:   --fpga_devices=0,1,2,4
+                                            --fpga_devices=40020000013ae32135111111,40020000013ae32135222222
                               If not specified, all available FPGA devices will be used.  
       --fpga_clk_core=LIST  Sets FPGA device core clock frequencies.  The clock frequencies should be provided as a
                               comma separated list of values in megahertz, where each value applies to each FPGA device.
                               If the list is shorter than the total number of devices, the remaining devices will use the 
                               first value in the list.  For example --fpga_clk_core=600,620 will apply 600MHz clock to 
                               FPGA 0 and 620MHz to FGPA 1.  If devices FPGA 2+ are present, they will be set to 600MHz.
+      --fpga_clk_core_init=LIST Sets the initial FPGA device core clock frequencies.  Format is the same as --fpga_clk_core.
+                              By default this value will be set to the same values as specificed in --fpga_clk_core, unless
+                              --fpga_er_auto is used in which case the default will be 50% of the --fpga_clk_core value.
+                              The miner will slowly raise the core clock frequency from the this value up to the value 
+                              specified in --fpga_clk_core unless error, temperature, or other limits are reached.
       --fpga_clk_mem=LIST   Sets FPGA device memory clock frequencies.  Format is the same as --fpga_clk_core.
       --fpga_vcc_int=LIST   Sets the vcc_int voltage on boards that support it.  The voltage values should be provided as a
                               comma separated list of values in milliVolts(mV), where each value applies to each board.
@@ -734,6 +741,22 @@ FPGA Options:
                               FPGA 0 and 800mV vcc_int to FGPA 1.  If devices FPGA 2+ are present, they will be set to 700mV.
       --fpga_vcc_bram=LIST  Sets the vcc_bram voltage on boards that support it.  The format is the same as --fpga_vcc_int.
       --fpga_vcc_mem=LIST   Sets the memory/HBM voltage on boards that support it.  The format is the same as --fpga_vcc_int.
+      --fpga_er_max=LIST    Sets the maximum allowed error rate ('er') value.  Format is the same as --fpga_clk_core.
+                              If the error rate for any device reaches this value, the device will be restarted.  Values
+                              in the list a specified as percentages, so '--fpga_er_max=6.3' will set a max error rate
+                              of 6.3 percent.
+      --fpga_er_auto=LIST   Sets a target error rate limit for the device.  The miner will automatically adjust core clock
+                              frequency to attempt to maintain the highest frequency possible without exceeding the target
+                              error rate.  This is not a hard limit and the miner may occasionally exceed it as it makes
+                              adjustments to the core clock frequency. Values are specified in percent, just like
+                              --fpga_er_max and the format of the list is the same as --fpga_clk_core.
+      --fpga_tcore_limit=LIST Sets FPGA device core temperature soft limits.  If the FPGA core temperature exceeds the 
+                              specified value, the miner will lower the FPGA clocks to bring the core temperature under 
+                              the specified value.  Values are in Celcius with a list format similar to --fpga_clk_core.
+      --fpga_tmem_limit=LIST Sets FPGA device memory temperature soft limits.  See --fpga_tcore_limits for description.
+      --fpga_ivccint_limit=LIST Sets VCCINT voltage regulator current soft limits.  See --fpga_tcore_limits for description.
+      --fpga_ivccbram_limit=LIST Sets VCCBRAM voltage regulator current soft limits.  See --fpga_tcore_limits for description.
+      --fpga_max_jtag_mhz=XY.Z  Sets the max allowed frequency to use for fpga jtag communication.  Default is 30.0 MHz.
       --fpga_update_fw      Enables updating of satellite controller firmware for C1100 boards with custom TRM firmware
                               to support features such as runtime voltage control. Only boards selected with the
                               --fpga_devices option which are not running the latest firmware version will be updated.
@@ -742,13 +765,6 @@ FPGA Options:
       --fpga_allow_unsafe=LIST Disables default safety limits for the specified FPGAs.  The devices are specified with a
                               comma separated list of DNA values, e.g. --fpga_allow_unsafe=40020000013ae32135111111
                               ***** CAUTION: Running above safety limits can result in PERMANENT DAMAGE to the device! *****
-      --fpga_tcore_limit=LIST Sets FPGA device core temperature soft limits.  If the FPGA core temperature exceeds the 
-                              specified value, the miner will lower the FPGA clocks to bring the core temperature under 
-                              the specified value.  Values are in Celcius with a list format similar to --fpga_clk_core.
-      --fpga_tmem_limit=LIST Sets FPGA device memory temperature soft limits.  See --fpga_tcore_limits for description.
-      --fpga_ivccint_limit=LIST Sets VCCINT voltage regulator current soft limits.  See --fpga_tcore_limits for description.
-      --fpga_ivccbram_limit=LIST Sets VCCBRAM voltage regulator current soft limits.  See --fpga_tcore_limits for description.
-      --fpga_max_jtag_mhz=XY.Z  Sets the max allowed frequency to use for fpga jtag communication.  Default is 30.0 MHz.
 
       --fpga_eth_clk_dag=LIST Sets FPGA core clock frequencies to be used during Ethash DAG building. By default these
                               will be set to 90% of the regular core clock. The format is the same as --fpga_clk_core.

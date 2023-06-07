@@ -1,4 +1,4 @@
-# teamredminer v0.10.12
+# teamredminer v0.10.13
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -113,9 +113,9 @@ Support legend:
 
 FPGA Devices supported and tested in Linux (Windows is not currently supported):
 - Xilinx Varium C1100
-- SQRL Forest Kitten 33 - performance limited by product design, see guide for details
+- SQRL Forest Kitten 33
 - Xilinx/TUL/Osprey U50C/ECU50
-- TUL TH53/55
+- TUL TH53/55, TH53M
 - Osprey E300 (vu33p, vu33p_CIV, vu35p, vu35p_CIV, vu9p, vu13p)
 - Bittware CVP13
 - SQRL BCU1525/TUL BTU9P/Osprey ECU200/Aleo U200/VCU1525
@@ -127,21 +127,23 @@ Supported FPGA algorithms and their respective dev fees:
 | ------------------------- | ----- |
 | Ethash                    |  4.0% |
 | Kaspa                     | 10.0% |
+| Ironfish                  | 10.0% |
 
 FPGA device/algo compatibility table:
 
-|                             | Ethash | Kaspa |
-| --------------------------- |:------:|:-----:|
-| C1100                       |   Y    |   Y   |
-| FK33                        |   Y    |   Y   |
-| U50C/ECU50                  |   Y    |   Y   |
-| TH53                        |   Y    |   Y   |
-| TH55                        |   Y    |   Y   |
-| E300 (vu35p_CIV)            |   Y    |   Y   |
-| E300 (others)               |   N    |   Y   |
-| CVP13                       |   N    |   Y   |
-| BCU1525/BTU9P/ECU200/U200   |   N    |   Y   |
-| JC33/JC35/JC13 on JCC2L/F   |   N    |   Y   |
+|                             | Ethash | Kaspa | Ironfish |
+| --------------------------- |:------:|:-----:|:--------:|
+| C1100                       |   Y    |   Y   |    Y     |
+| FK33                        |   Y    |   Y   |    Y     |
+| U50C/ECU50                  |   Y    |   Y   |    Y     |
+| TH53                        |   Y    |   Y   |    Y     |
+| TH53M                       |   N    |   Y   |    Y     |
+| TH55                        |   Y    |   Y   |    Y     |
+| E300 (vu35p_CIV)            |   Y    |   Y   |    Y     |
+| E300 (others)               |   N    |   Y   |    Y     |
+| CVP13                       |   N    |   Y   |    Y     |
+| BCU1525/BTU9P/ECU200/U200   |   N    |   Y   |    Y     |
+| JC33/JC35/JC13 on JCC2L/F   |   N    |   Y   |    Y     |
 
 
 -----------
@@ -157,6 +159,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.13
+#### Changes
+- GPU:  Added HiveOS Navi zil switch handler script for mem states, add `--use_distro_features` to enable.
+- FPGA: Added support for Ironfish algo, see FPGA_IRONFISH_GUIDE.txt
+- FPGA: Added new auto error-rate clock adjustment, see --fpga_er_auto and FPGA_IRONFISH_GUIDE.txt
+- FPGA: Added support for TUL TH53M board
+- FPGA: Fixed issue with DNAs being read from wrong SLR on vu9p/vu13p boards.
+
 ### v0.10.12
 #### Changes
 - GPU:  Improved ironfish hashrate (+5-6% on all gpus, +10-11% for Polaris).
