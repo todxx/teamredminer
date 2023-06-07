@@ -1,0 +1,112 @@
+TeamRedMiner FPGA Ironfish Guide
+=============================
+
+History:
+v1.0 2023-06-06 Initial Version.
+
+General Overview
+================
+Starting in version v0.10.13 TeamRedMiner(TRM) has support for mining Ironfish
+on all currently supported FPGA platforms.  The Ironfish algorithm is a compute
+heavy algorithm and does not use the HBM on these FPGAs.  While the algorithm is
+compute heavy, it tends to run much more efficiently than other compute heavy
+algorithms such as Kaspa.  However if voltage and clocks are pushed the
+algorithm can use large amounts of core (vccint) current, so as usual it is
+recommended that miners be careful not to exceed their card's power delivery and
+cooling capabilities.  Please read the section corresponding to your hardware
+below and be aware of the limits of your hardware before testing.  For details
+on how to start the miner, set voltages and clocks, update firmware on
+C1100/U50C, etc see FPGA_GUIDE.txt.
+
+
+Mining Instructions
+===================
+Ironfish mining can be started with the 'ironfish' algorithm.  Example:
+
+sudo ./teamredminer -a ironfish -o stratum+tcp://de.ironfish.herominers.com:1145 -u eda8dccba5acb4a93deb6939e78a8527ca4fced470e612ca6407b1b4dc635202 -p x --fpga_clk_core=200
+
+It is strongly advised to start with a low core clock of around 200MHz and
+slowly ramp up from there to ensure you do not exceed your hardware's power
+delivery and cooling capabilities.
+
+
+Clock/Voltage Tuning
+==============
+Tuning Ironfish can be a bit more complicated than tuning for Kaspa since
+Ironfish tends to yeild best results when running with some error rate.
+Typically we see the ideal running error rate to be between 1% and 2%.  However
+it can be difficult to tune devices such that they consistently stay near a
+specific error rate.  Error rates can be significantly influenced by
+temperature changes throughout the day resulting in devices not always running
+at their optimal output when using fixed voltage and clock settings.  To help
+simplify device tuning and operation in this mode of operation, we've added a
+new feature to TRM to automatically adjust core clock based on the device error
+rate.  The rest of this document will assume the use of this feature.  If you do
+not want to use this feature, then tuning will be very similar to Kaspa and
+users should reference the Kaspa guide for more info. 
+
+The new automatic error rate tuning feature in TRM is enabled with the
+--fpga_er_auto option.  This option tells TRM to try to maintain the device
+error rates below the set value.  For example if you'd like TRM to try to keep
+the error rates below 1.5%, you would use the following option:
+    --fpga_er_auto=1.5
+
+When using the auto error rate feature TRM will initially start the core clock
+at half of the specified value, and slowly increase it over time while
+monitoring device error rates. This process is slow by necessity in order to
+accurately measure the error rate and it will take between 15 and 30 minutes for
+the miner to reach a stable steady-state.
+
+When using the auto error rate feature the user will only need to specify/set
+their desired core voltage, maximum core clock, and maximum error rate.  For
+example on a C1100 a typical command line will look like:
+    sudo ./teamredminer -a ironfish -o <my_pool> -u <my_wallet> -p x --fpga_vcc_int=600 --fpga_clk_core=650 --fpga_er_auto=1
+
+This line will set voltages to 600mV, the maximum core clock to 650MHz and the
+targeted maximum error rate to 1%.  When the miner starts, it will first set the
+specified voltage then set the core clock to 325MHz (half of the max value).  It
+will then slowly increase the core clock towards 650MHz.  If the error rate goes
+above 1%, it will slowly lower the clock until the error rate drops below the 1%
+mark.  If the error rate drops significantly below the requested 1% limit, it
+will again start to increase the core clock.  Due to the probabilistic nature of
+errors, the error rates will fluctuate and result in small fluctuations in the
+running core clock.  This is normal and users can expect to see their device's
+core clocks continuously changing by 1-2MHz.
+
+**NOTE**: It is *very* important to make sure the voltage and maximum core clock
+are correctly set.  For devices where TRM is not able to set voltages, users
+must be extra careful to make sure the device votlages have been set correctly
+before starting TRM.
+
+Here is a general tuning process that has worked for us:
+
+1) Start with a low core voltage of 600mV, a maximum core clock of 600MHz, and
+    an auto error rate of 1% (this is our recommended value for Ironfish)
+
+2) Run cards for 20-30mins to allow the core clock to reach it's steady
+    state.  Monitor the card's temperature and power usage to make sure they do
+    not exceed the device's limits.
+
+3) Check if the core clock is hitting the maximum set value (i.e the device is
+    running far below the desired error rate).  If it is, increase the maximum
+    core clock by 25MHz and repeat step 2.
+
+4) At this point your card should be running stabily while staying near the
+    desired error rate.  Evaluate and note the card's hashrate, temperature, and
+    power usage to see if they are within acceptable limits.  If they are,
+    increase the core voltage by 25mV and the max core clock by 25MHz and go to
+    step 2.
+
+5) After repeating repeating steps 2-4 as necessary you can now evaluate your
+    optimal configuration for maximum profitability by taking into account your
+    electricity cost and current market conditions
+
+NOTE: If you see cards crash with jtag errors, you may want to try setting 
+        --fpga_max_jtag_mhz=5 as lower voltages can cause the jtag logic to
+        not function correctly at higher jtag clock rates.
+
+
+Unlike previous guides, we will not have individual sections for specific FPGA
+boards in this doc.  For info on specific board cooling and power capabilities
+please check the FPGA_KASPA_GUIDE.txt doc.
+
