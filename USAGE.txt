@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.13
+          Team Red Miner version 0.10.14
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -612,7 +612,7 @@ ZIL dual mining options:
                               has been set up in earlier arguments.  The intention is that you can add a --zil ... --zil_end
                               configuration to any working TRM configuration algo and things will work out of the box.
                               This argument automatically sets a range of default settings you want to use for ZIL:
-                               - Cached copy of the ZIL epoch 0 DAG.
+                               - Cached copy of the ZIL epoch DAG.
                                - Adjustment of memory allocated for the primary algo to fit the ZIL DAG.
                                - Choose ethash A-mode for the ZIL mining.
 

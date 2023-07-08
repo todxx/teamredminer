@@ -1,4 +1,4 @@
-# teamredminer v0.10.13
+# teamredminer v0.10.14
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -159,6 +159,10 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.14
+#### Changes
+- GPU:  Fixed ZIL mining on epoch 1 (instead of epoch 0).
+
 ### v0.10.13
 #### Changes
 - GPU:  Added HiveOS Navi zil switch handler script for mem states, add `--use_distro_features` to enable.
