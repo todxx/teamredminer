@@ -1,4 +1,4 @@
-# teamredminer v0.10.14
+# teamredminer v0.10.15
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -159,6 +159,10 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.15
+#### Changes
+- GPU:  Fixed kawpow bug with 0 h/s for low epochs when dual mining zil.
+
 ### v0.10.14
 #### Changes
 - GPU:  Fixed ZIL mining on epoch 1 (instead of epoch 0).

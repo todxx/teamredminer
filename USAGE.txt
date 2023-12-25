@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.14
+          Team Red Miner version 0.10.15
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
