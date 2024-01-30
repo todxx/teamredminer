@@ -1,16 +1,19 @@
-          Team Red Miner version 0.10.15
+          Team Red Miner version 0.10.16
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
                               ethash            (eth, etp, others)
                               etchash           (etc, alias for -a ethash --eth_variant_mode=etchash)
                               kawpow            (ravencoin)
+                              abel              (abel)
                               firopow           (firo)
                               mtp_firopow       (chooses firopow or mtp and shuts down miner at the fork on Oct 26 2021)
                               autolykos2        (ergo)
                               verthash          (vtc)
                               ton               (ton)
                               kas               (kaspa)
+                              karlsen           (karlsen)
+                              pyrin             (pyrin)
                               ironfish          (ironfish)
                               nimiq             (nimiq)
                               lyra2z      
@@ -716,6 +719,11 @@ Ethash dual mining options:
 
                                 Based on mining calculators: $0.0437 for 1 MH/s ETH, $0.0005476 for 1 MH/s TON/Kaspa/Ironfish
                                 --dual_tuner_weights=0.0437:0.0005476:0
+
+Abel options: 
+      --abel_api_server=X       Set the host(:port) used to submit rig and hashrate data for the abelian stratum protocol.  This
+                              is normally deduced automatically from the pool host name.  If no port is specified, 443 is
+                              assumed.
 
 FPGA Options: 
       --fpga_devices=LIST   Sets FPGA devices to use from detected list. LIST should be a comma separated list of either 

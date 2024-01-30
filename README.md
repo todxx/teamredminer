@@ -1,4 +1,4 @@
-# teamredminer v0.10.15
+# teamredminer v0.10.16
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -37,10 +37,15 @@ Supported GPU algorithms and their respective dev fees:
 | Ethash on Polaris GPUs    | 0.75%|
 | Ethash on all other GPUs  | 1.0% |
 | Kawpow                    | 2.0% |
+| Abel on Polaris, RDNA2/3  | 1.0% |
+| Abel on Vega, Navi10      | 2.0% |
+| Abel on VII, MI50/60/100s | 3.0% |
 | Verthash                  | 2.0% |
 | Autolykos2                | 2.0% |
 | Ton                       | 1.0% |
 | Kaspa                     | 1.0% |
+| Karlsen                   | 1.0% |
+| Pyrin                     | 1.0% |
 | Ironfish                  | 1.0% |
 | Nimiq                     | 2.5% |
 | Cryptonight R             | 2.5% |
@@ -73,6 +78,8 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | ------------------------ |:------:|:----:|:----:|:-------:|:----:|:-----:|
 | Ethash                   |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Kawpow                   |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Abel                     |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Kawpow                   |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Verthash                 |   Y    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Autolykos2               |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Firopow                  |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
@@ -159,6 +166,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.16
+#### Changes
+- GPU:  Added support for karlsen.
+- GPU:  Added support for pyrin.
+- GPU:  Added support for abel (R-mode supported, stats support on pools included).
+- GPU:  Added kawpow support for RDNA3 GPUs.
+- FPGA: Fixed bug with ironfish on JC13.
+
 ### v0.10.15
 #### Changes
 - GPU:  Fixed kawpow bug with 0 h/s for low epochs when dual mining zil.
