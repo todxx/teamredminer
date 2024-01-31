@@ -1,4 +1,4 @@
-# teamredminer v0.10.16
+# teamredminer v0.10.17
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -166,6 +166,14 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.17
+#### Changes
+- GPU:  Fixed pyrin invalid/dup shares on large gpus running high hashrates.
+- GPU:  Added support for dual mining abel and kaspa/ironfish/karlsen/pyrin (and triple with zil).
+- GPU:  Moved dual zil session to R-mode as the default choice when mined together with ethash or abel.
+- GPU:  Fixed some failed allocations for abel+zil.
+- GPU:  Fixed abel dag allocation in R-mode on 6GB gpus like the 5600XT. It will run for a while longer.
+
 ### v0.10.16
 #### Changes
 - GPU:  Added support for karlsen.

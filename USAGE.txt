@@ -1,4 +1,4 @@
-          Team Red Miner version 0.10.16
+          Team Red Miner version 0.10.17
 Usage: teamredminer [OPTIONS]
 Options:
   -a, --algo=ALGORITHM      Selects the mining algorithm.  Currently available:
@@ -689,6 +689,24 @@ Ethash dual mining options:
                               --iron_end configuration to any working TRM configuration algo and things will work out of the box.
 
       --iron_end            Marks that we're done with the Ironfish mining config and all following arguments are for the primary
+                              algo.  This argument isn't strictly necessary, but should be included for mining distros since
+                              the user has no guarantee what arguments will be added automatically at the end of the command
+                              line by the distro.
+      --karlsen_start or --karlsen Starts the Karlsen dual mining config.  Between this and the --karlsen_end marker, all arguments are
+                              applied to the Karlsen mining rather than the primary algo, typically ethash.  It's expected that
+                              ethash has been set up in earlier arguments.  The intention is that you can add a --karlsen ... 
+                              --karlsen_end configuration to any working TRM configuration algo and things will work out of the box.
+
+      --karlsen_end         Marks that we're done with the Karlsen mining config and all following arguments are for the primary
+                              algo.  This argument isn't strictly necessary, but should be included for mining distros since
+                              the user has no guarantee what arguments will be added automatically at the end of the command
+                              line by the distro.
+      --pyrin_start or --pyrin Starts the Pyrin dual mining config.  Between this and the --pyrin_end marker, all arguments are
+                              applied to the Pyrin mining rather than the primary algo, typically ethash.  It's expected that
+                              ethash has been set up in earlier arguments.  The intention is that you can add a --pyrin ... 
+                              --pyrin_end configuration to any working TRM configuration algo and things will work out of the box.
+
+      --pyrin_end           Marks that we're done with the Pyrin mining config and all following arguments are for the primary
                               algo.  This argument isn't strictly necessary, but should be included for mining distros since
                               the user has no guarantee what arguments will be added automatically at the end of the command
                               line by the distro.
