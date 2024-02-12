@@ -1,4 +1,4 @@
-# teamredminer v0.10.17
+# teamredminer v0.10.18
 This is an optimized miner for AMD GPUs and Xilinx FPGAs created by todxx and kerney666.
 
 **Download is available in the [github releases section](https://github.com/todxx/teamredminer/releases).**
@@ -166,6 +166,19 @@ For example command lines please see the batch/shell scripts in the miner downlo
 For command line options see the [USAGE.txt](USAGE.txt) file that comes with the miner.
 
 ## Release Notes
+### v0.10.18
+#### Changes
+- GPU:  Added TON/GRAM for RDNA3 gpus. 
+- GPU:  Fixed TON/GRAM dual mining with abel and autolykos2.
+- GPU:  Fixed broken kawpow on RDNA3 gpus.
+- GPU:  Fixed loading Radeon VII kernels in general on newer drivers.
+- GPU:  Fixed broken abel+ironfish dual mining.
+- GPU:  Fixed old bug for ironfish mining on pools like Kryptex using email as wallet/username.
+- GPU:  Fixed broken power read for some gpus on newer linux drivers.
+- GPU:  Fixed broken kawpow mining on vultaic.
+- GPU:  Patched broken job messages for new TON/GRAM pools.
+- GPU:  Added --debug logging of network traffic for out-of-band stats for ABEL pools.
+
 ### v0.10.17
 #### Changes
 - GPU:  Fixed pyrin invalid/dup shares on large gpus running high hashrates.
