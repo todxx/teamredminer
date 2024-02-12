@@ -83,7 +83,7 @@ Some algorithms are not supported on some GPU architectures and/or drivers.  Bel
 | Verthash                 |   Y    |  Y   |  Y   |   Y     |   Y  |   N   |
 | Autolykos2               |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Firopow                  |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
-| Ton                      |   N    |  Y   |  Y   |   Y     |   Y  |   Y   |
+| Ton                      |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Kaspa                    |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Ironfish                 |   Y    |  Y   |  Y   |   Y     |   Y  |   Y   |
 | Nimiq                    |   N    |  Y   |  Y   |   Y     |   Y  |   N   |
