@@ -15,6 +15,7 @@ Below is a list of mining operating systems and management software that have bu
  - [Awesome Miner](https://www.awesomeminer.com/)
  - [PiMP OS](https://getpimp.org/)
  - [RaveOS](https://raveos.com/)
+ - [BeBoMining](https://github.com/bebomining/bebomining)
 
 This miner supports a range of algorithms.  Please see the list below for details.
 The miner is configured via command line only, please run with the --help option to print a short help message for how to use the command line options.
